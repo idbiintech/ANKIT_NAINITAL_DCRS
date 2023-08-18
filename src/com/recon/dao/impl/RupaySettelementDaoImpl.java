@@ -1813,6 +1813,7 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		List<Object> data = new ArrayList<Object>();
 		try {
 			String getInterchnage = "";
+			String sandesh_sir = "";
 			List<String> Column_list = new ArrayList<String>();
 			Column_list = getPresentmentColumnList("unmatched_bkp");
 			String mdate =  generalUtil.DateFunction(filedate);
