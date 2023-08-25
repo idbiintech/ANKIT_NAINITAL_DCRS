@@ -542,6 +542,7 @@ public class GenerateUCOTTUM {
 			 * zipOut.flush(); fis.close(); } zipOut.close(); } catch(Exception fe) {
 			 * System.out.println("Exception in zipping is "+fe); }
 			 */
+			System.out.println("checking github by sandesh sir king of idbi intech ");
 		} catch (Exception e) {
 			logger.info("Exception in generateMultipleDRMTTUMFiles " + e);
 
