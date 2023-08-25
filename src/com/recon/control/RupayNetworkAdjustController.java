@@ -84,7 +84,7 @@ public String rupayAdjustmentFileUpload(@RequestParam("file") MultipartFile file
 	//1. validate whether file is already uploaded
 	
 	output = rupayAdjustntFileUpService.validateAdjustmentUpload(fileDate, cycle, network, subcate, presentmentFile);
-	
+//	output.put("result", true);
 	if(output != null && (Boolean) output.get("result"))
 	{
 		//2. upload file
@@ -125,8 +125,11 @@ public String NFSAdjTTUMValidation(String fileDate, String adjType,HttpServletRe
 	
 	String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
 	System.out.println("Created by is "+Createdby);
+	//HashMap<String, Object> output = new HashMap<String, Object>();
 	
 	HashMap<String, Object> output = rupayAdjustntFileUpService.validateAdjustmentTTUM(fileDate, adjType);
+	
+	//output.put("result", true);
 	
 	if(output != null && (Boolean) output.get("result"))
 	{
@@ -181,9 +184,11 @@ public void DownloadAdjTTUM(String fileDate, String adjType,HttpServletRequest r
 		HttpServletResponse response,HttpSession httpSession,RedirectAttributes redirectAttributes,Model model) throws Exception {
 	logger.info("***** DownloadSettlementreport.POST Start ****");
 	logger.info("DownloadAdjTTUM POST");
-	
+
+	try {
 	String passdate = genetalUtil.DateFunction(fileDate);
 
+	
 	List<Object> Excel_data = new ArrayList<Object>();
 	List<Object> TTUMData = new ArrayList<Object>();
 	String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
@@ -255,6 +260,9 @@ public void DownloadAdjTTUM(String fileDate, String adjType,HttpServletRequest r
 		OutputStream outStream = response.getOutputStream();
 		IOUtils.copy(inputstream, outStream);
 		response.flushBuffer();
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
 }	
 
 /****** RUPAY DISPUTE FILE ROLLBACK **************/

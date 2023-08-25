@@ -46,6 +46,7 @@ public class GenerateUCOTTUM {
 				sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 				stnewDate = sdf.format(date);
+				System.out.println("stnewdate"+stnewDate);
 
 			} catch (java.text.ParseException parseExep) {
 				logger.info("Exception while parsing date " + fileDate);
@@ -79,6 +80,7 @@ public class GenerateUCOTTUM {
 			return (stPath + File.separator + category + File.separator + stnewDate);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.info("Exception in checkAndMakeDirectory " + e);
 			return "Exception Occured";
 		}
@@ -100,6 +102,7 @@ public class GenerateUCOTTUM {
 				sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 				stnewDate = sdf.format(date);
+				System.out.println("stNewdate"+ stnewDate);
 
 			} catch (java.text.ParseException parseExep) {
 				logger.info("Exception while parsing date " + fileDate);
@@ -133,6 +136,7 @@ public class GenerateUCOTTUM {
 			return (stPath + File.separator + category + File.separator + stnewDate);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.info("Exception in checkAndMakeDirectory " + e);
 			return "Exception Occured";
 		}
@@ -431,7 +435,7 @@ public class GenerateUCOTTUM {
 //						lineData.append("|"+table_Data.get("TRANSACTION_AMOUNT")+"|"+table_Data.get("TRANSACTION_PARTICULAR")+"|"+table_Data.get("REMARKS"));
 
 					lineData.append(
-							" " + table_Data.get("TRANSACTION_AMOUNT") + "/" + table_Data.get("TRANSACTION_PARTICULAR")+"/"+ (table_Data.get("FILEDATE") == null ? "" : table_Data.get("FILEDATE"))+"/"
+							"       " + table_Data.get("TRANSACTION_AMOUNT") + "/" + table_Data.get("TRANSACTION_PARTICULAR")+"/"+ (table_Data.get("FILEDATE") == null ? "" : table_Data.get("FILEDATE"))+"/"
 					                                                                                                       + (table_Data.get("REMARKS") == null ? "" : table_Data.get("REMARKS")) );
 
 					/*

@@ -40,11 +40,13 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 	public HashMap<String, Object> validateAdjustmentUpload(String fileDate, String cycle, String network,
 			String subcategory, boolean presentmentFile) {
 		HashMap<String, Object> output = new HashMap<String, Object>();
+		String mdate =  genetalUtil.DateFunction(fileDate);
 		try {
 			String tableName = "";
 			if (network.equalsIgnoreCase("RUPAY")) {
 				if (subcategory.equalsIgnoreCase("DOMESTIC")) {
 					tableName = "rupay_network_adjustment";
+					//tableName = "rupay_network_adjustment_bkpbkp2222";
 				} else {
 					if (!presentmentFile)
 						tableName = "RUPAY_INTERNATIONAL_ADJUSTMENT";
@@ -56,10 +58,15 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 				tableName = "RUPAY_NCMC_NETWORK_ADJUSTMENT";
 			}
 
+			System.out.println("tablename is"+tableName);
 			String checkUpload = "select count(1) from " + tableName.toLowerCase()
 					+ " where filedate = to_date(?,'dd/mm/yyyy') and cycle = ?";
-			int uploadCount = getJdbcTemplate().queryForObject(checkUpload, new Object[] { fileDate, cycle },
+			
+			System.out.println("query is"+checkUpload);
+			int uploadCount = getJdbcTemplate().queryForObject(checkUpload, new Object[] { mdate, cycle },
 					Integer.class);
+			
+			System.out.println("checkupload is"+checkUpload );
 
 			if (uploadCount == 0) {
 				output.put("result", true);
@@ -69,6 +76,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			output.put("result", false);
 			output.put("msg", "Exception Occurred While checking");
 			System.out.println("Exception is " + e);
@@ -85,6 +93,8 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 		String res = "";
 		String row = "";
 		String line = "";
+		char quote = '"';
+		char BLANK = ' ';
 		try {
 			BufferedReader csvReader1 = new BufferedReader(new InputStreamReader(file.getInputStream()));
 			Connection con = getConnection();
@@ -92,22 +102,33 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 
 			if (network.equalsIgnoreCase("RUPAY")) {
 				if (subcategory.equalsIgnoreCase("DOMESTIC"))
-					tableName = "rupay_network_adjustment";
+					tableName = "RUPAY_NETWORK_ADJUSTMENT";
+					//tableName = "rupay_network_adjustment_bkpbkp2222";
 				else
 					tableName = "RUPAY_INTERNATIONAL_ADJUSTMENT";
 			} else {
 				tableName = "RUPAY_NCMC_NETWORK_ADJUSTMENT";
 			}
 
+//			String sql = "INSERT INTO " + tableName.toLowerCase()
+//					+ " (report_date,dispute_raise_date,dispute_raised_settl_date,case_number,function_code,function_code_description,primary_account_number,processing_code,"
+//					+ "transaction_date,transaction_amount,txn_currency_code,settlement_amount,settlement_ccy_code,txn_settlement_date,amounts_additional,control_number,dispute_originator_pid,"
+//					+ "dispute_destination_pid,acquire_ref_data,approval_code,originator_point,pos_entry_mode,pos_condition_code,acquirer_instituteid_code,acquirer_name_country,issuer_insti_id_code,"
+//					+ "issuer_name_country,card_type,card_brand,card_acceptor_terminalid,card_acceptor_name,card_accept_location_add,card_accept_country_code,card_accept_buss_code,"
+//					+ "dispute_reason_code,dispute_reason_cd_desc,dispute_amt,full_partial_indicator,dispute_member_msg_text,dispute_document_indicator,document_attached_date,mti,"
+//					+ "incentive_amount,tier_cd_nonfullfill,tier_cd_fulfill,deadline_date,days_to_act,direction_iw_ow,last_adj_stage, filedate, createdby, cycle) "
+//					+ "VALUES(?,?,?,?,?,?,?,?,"
+//					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			
 			String sql = "INSERT INTO " + tableName.toLowerCase()
-					+ " (report_date,dispute_raise_date,dispute_raised_settl_date,case_number,function_code,function_code_description,primary_account_number,processing_code,"
-					+ "transaction_date,transaction_amount,txn_currency_code,settlement_amount,settlement_ccy_code,txn_settlement_date,amounts_additional,control_number,dispute_originator_pid,"
-					+ "dispute_destination_pid,acquire_ref_data,approval_code,originator_point,pos_entry_mode,pos_condition_code,acquirer_instituteid_code,acquirer_name_country,issuer_insti_id_code,"
-					+ "issuer_name_country,card_type,card_brand,card_acceptor_terminalid,card_acceptor_name,card_accept_location_add,card_accept_country_code,card_accept_buss_code,"
-					+ "dispute_reason_code,dispute_reason_cd_desc,dispute_amt,full_partial_indicator,dispute_member_msg_text,dispute_document_indicator,document_attached_date,mti,"
-					+ "incentive_amount,tier_cd_nonfullfill,tier_cd_fulfill,deadline_date,days_to_act,direction_iw_ow, filedate, createdby, cycle) "
-					+ "VALUES(?,?,?,?,?,?,?,?,"
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, to_date(?,'dd/mm/yyyy') , ?, ?)";
+			+ " (report_date,dispute_raise_date,dispute_raised_settl_date,case_number,function_code,function_code_description,primary_account_number,processing_code,"
+			+ "transaction_date,transaction_amount,txn_currency_code,settlement_amount,settlement_ccy_code,txn_settlement_date,amounts_additional,control_number,dispute_originator_pid,"
+			+ "dispute_destination_pid,acquire_ref_data,approval_code,originator_point,pos_entry_mode,pos_condition_code,acquirer_instituteid_code,acquirer_name_country,issuer_insti_id_code,"
+			+ "issuer_name_country,card_type,card_brand,card_acceptor_terminalid,card_acceptor_name,card_accept_location_add,card_accept_country_code,card_accept_buss_code,"
+			+ "dispute_reason_code,dispute_reason_cd_desc,dispute_amt,full_partial_indicator,dispute_member_msg_text,dispute_document_indicator,document_attached_date,mti,"
+			+ "incentive_amount,tier_cd_nonfullfill,tier_cd_fulfill,deadline_date,days_to_act,direction_iw_ow,last_adj_stage,  createdby,filedate,cycle) "
+			+ "VALUES(?,?,?,?,?,?,?,?,"
+			+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ? , ?, to_date(?,'dd/mm/yy'),?)";
 
 			if (subcategory.equalsIgnoreCase("INTERNATIONAL")) {
 				sql = "INSERT INTO " + tableName
@@ -119,9 +140,126 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 						+ "DISPUTE_REASON_CODE,DISPUTE_REASON_CD_DESC,DISPUTE_AMT,FULL_PARTIAL_INDICATOR,DISPUTE_MEMBER_MSG_TEXT,DISPUTE_DOCUMENT_INDICATOR,DOCUMENT_ATTACHED_DATE,MTI,"
 						+ "INCENTIVE_AMOUNT,TIER_CD_NONFULLFILL,TIER_CD_FULFILL,DEADLINE_DATE,DAYS_TO_ACT,DIRECTION_IW_OW, FILEDATE, CREATEDBY, CYCLE) "
 						+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,"
-						+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, to_date(?,'dd/mm/yyyy') , ?, ?)";
+						+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, to_date(?,'dd/mm/yy') , ?, ?)";
 			}
 
+//			PreparedStatement ps = con.prepareStatement(sql);
+//			int count = 1;
+//			int Number = 0;
+//			con.setAutoCommit(false);
+//			while ((row = csvReader1.readLine()) != null) {
+//				int sr_no = 1;
+//				Number++;
+//				totalCount++;
+//				if (row.contains("---END OF REPORT---") || row.contains("---End of Report---")) {
+//					break;
+//				}
+//				if (count == 1) {
+//					count++;
+//					continue;
+//				}
+//
+//				if (subcategory.equalsIgnoreCase("INTERNATIONAL")) {
+//					line = row.replaceAll(",", "|");
+//				} else {
+//					line = row.replaceAll("\",\"", "|");
+//					line = line.replace("\",", "|");
+//					line = line.replace(",", "|");
+//					line = line.replace("\"", "");
+//					// System.out.println(line);
+//				}
+//				// String[] data = row.split(",");
+//
+//				String[] data = line.split("\\|");
+//
+//				for (int i = 0; i < data.length - 1; i++) {
+//					//ps.setString(sr_no, data[i]);
+//					System.out.println("" + sr_no + " , " + data[i]);
+//					sr_no++;
+//
+//				}
+//
+//				
+//				  ps.setString(sr_no++, fileDate); 
+//				  ps.setString(sr_no++, createdBy);
+//				  ps.setString(sr_no++, cycle);
+//				 
+//
+//				ps.addBatch();
+//
+//				if (Number == 1000) {
+//					System.out.print("Executed batch");
+//					ps.executeBatch();
+//				}
+//
+//			}
+//			ps.executeBatch();
+//
+//			con.commit();
+//			res = "success";
+//			csvReader1.close();
+//
+//			output.put("result", true);
+//			output.put("count", totalCount);
+			
+			// ,DISPUTE_RAISE_DATE,DISPUTE_RAISED_SETTL_DATE,CASE_NUMBER,FUNCTION_CODE,FUNCTION_CODE_DESCRIPTION,PRIMARY_ACCOUNT_NUMBER,PROCESSING_CODE
+			// ,TO_DATE(?,'DD-MMM-YYYY'),TO_DATE(?,'DD-MMM-YYYY'),?,?,?,?,?
+//			PreparedStatement ps = con.prepareStatement(sql);
+//			int count = 1;
+//			int Number = 0;
+//			con.setAutoCommit(false);
+//			while ((row = csvReader1.readLine()) != null) {
+//				int sr_no = 1;
+//				Number++;
+//				totalCount++;
+//				if (row.contains("---END OF REPORT---") || row.contains("---End of Report---")) {
+//					break;
+//				}
+//				if (count == 1) {
+//					count++;
+//					continue;
+//				}
+//
+//				if (subcategory.equalsIgnoreCase("INTERNATIONAL")) {
+//					line = row.replaceAll(",", "|");
+//				} else {
+////					line = row.replaceAll("\",\"", "|");
+////					line = line.replace("\",", "|");
+////					line = line.replace("\"", "");
+//					line = row.replaceAll(",", "|");
+//					//line = line.replace(",", "|");
+//					System.out.println("line is"+line);
+//				}
+//				// String[] data = row.split(",");
+//				String[] data = line.split("\\|");
+//
+//				for (int i = 0; i < data.length ; i++) {
+//					
+//					ps.setString(sr_no, data[i]);
+//					System.out.println("" + sr_no + " , " + data[i]);
+//					sr_no++;
+//				}
+//			ps.setString(sr_no++, fileDate);
+//				ps.setString(sr_no++, createdBy);
+//////				ps.setString(sr_no++, cycle);
+//
+//				ps.addBatch();
+//
+//				if (Number == 1000) {
+//					System.out.print("Executed batch");
+//					ps.executeBatch();
+//				}
+//
+//			}
+//			ps.executeBatch();
+//
+//			con.commit();
+//			res = "success";
+//			csvReader1.close();
+//
+//			output.put("result", true);
+//			output.put("count", totalCount);
+			
 			// ,DISPUTE_RAISE_DATE,DISPUTE_RAISED_SETTL_DATE,CASE_NUMBER,FUNCTION_CODE,FUNCTION_CODE_DESCRIPTION,PRIMARY_ACCOUNT_NUMBER,PROCESSING_CODE
 			// ,TO_DATE(?,'DD-MMM-YYYY'),TO_DATE(?,'DD-MMM-YYYY'),?,?,?,?,?
 			PreparedStatement ps = con.prepareStatement(sql);
@@ -151,12 +289,16 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 				// String[] data = row.split(",");
 				String[] data = line.split("\\|");
 
-				for (int i = 0; i < data.length - 1; i++) {
+				for (int i = 0; i < data.length ; i++) {
+//					if(data[i].equalsIgnoreCase("1")) {
+//						continue;
+//					}
 					ps.setString(sr_no, data[i].replaceAll("^\"|\"$", "").replaceAll("-", ""));
+					System.out.println("" + sr_no + " , " + data[i]);
 					sr_no++;
 				}
 				ps.setString(sr_no++, fileDate);
-				ps.setString(sr_no++, createdBy);
+//				ps.setString(sr_no++, createdBy);
 				ps.setString(sr_no++, cycle);
 
 				ps.addBatch();
@@ -176,7 +318,10 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 			output.put("result", true);
 			output.put("count", totalCount);
 
-		} catch (Exception e) {
+		} catch (Exception e) {			
+			e.printStackTrace();
+
+			
 			res = "fail";
 			output.put("result", false);
 			output.put("count", totalCount);
@@ -282,6 +427,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 	public HashMap<String, Object> validateAdjustmentTTUM(String fileDate, String adjType) {
 		HashMap<String, Object> output = new HashMap<String, Object>();
 		String fdate = genetalUtil.DateFunction(fileDate);
+		System.out.println("fdate is"+ fdate);
 		int adjTTUMCount = 0;
 		try {
 			System.out.println("inside the 1st validation");
@@ -347,17 +493,18 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 	public HashMap<String, Object> validateAdjustmentTTUMProcess(String fileDate, String adjType) {
 		HashMap<String, Object> output = new HashMap<String, Object>();
 		int adjTTUMCount = 0;
-		
+
 		String fdate = genetalUtil.DateFunction(fileDate);
-		
+
 		try {
 			// 2. Adjustment TTUM is already processed
 			if (!adjType.equalsIgnoreCase("FEE")) {
-				//String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = to_date(?,'dd/mm/yyyy') and adjtype != 'FEE'";
+				// String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where
+				// filedate = to_date(?,'dd/mm/yyyy') and adjtype != 'FEE'";
 				String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = ? and adjtype != 'FEE'";
 
 				adjTTUMCount = getJdbcTemplate().queryForObject(checKAdjTTUM, new Object[] { fdate }, Integer.class);
-				System.out.println("query of processed check is"+checKAdjTTUM);
+				System.out.println("query of processed check is" + checKAdjTTUM);
 			} else {
 				String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = to_date(?,'dd/mm/yyyy') and adjtype = ?";
 				adjTTUMCount = getJdbcTemplate().queryForObject(checKAdjTTUM, new Object[] { fdate, adjType },
@@ -386,7 +533,9 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 		Map<String, Object> inParams = new HashMap<>();
 		Map<String, Object> outParams2 = new HashMap<String, Object>();
 		String passdate = genetalUtil.DateFunction(fileDate);
-		System.out.println("date is passsing is "+fileDate);
+		System.out.println("filedate is"+ fileDate);
+		System.out.println("date is passsing is " + passdate);
+		System.out.println("data is saved");
 
 		try {
 
@@ -443,9 +592,10 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 //			e1.printStackTrace();
 //		}
 
+		System.out.println("DATE IS COMING IS"+fileDate);
 		String[] dateSplit = fileDate.split("/");
 		String MMM = "";
-		switch(dateSplit[1]) {
+		switch (dateSplit[1]) {
 		case "01":
 			MMM = "JAN";
 			break;
@@ -482,17 +632,22 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 		case "12":
 			MMM = "DEC";
 			break;
-			
+
 		}
 		String mainDate = dateSplit[0] + "-" + MMM + "-" + dateSplit[2].substring(2);
-		
 
 		System.out.println("NEW DATE WE ARE PASSING IS : " + mainDate);
+
+		String passdate = genetalUtil.DateFunction(fileDate);
+		//String ddate [] = fileDate.split("/");
+ 		String mdate = fileDate.replace("/", "-");
+ 		String ddate [] = mdate.split("-");
+		String sdate  = ddate[0] + "-" + ddate[1] + "-" + ddate[2].substring(2);
 		
-	
-					
-					
-	String passdate = genetalUtil.DateFunction(fileDate);
+		String ydate [] = passdate.split("-");
+		String zdate  = ydate[0] + "-" + ydate[1] + "-" + ydate[2].substring(2);
+
+		System.out.println("new date is"+ sdate);
 
 		List<Object> data = new ArrayList<Object>();
 		try {
@@ -553,7 +708,6 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 				 * //+ "AND (ADJTYPE) = ? " + "AND adjtype not like '%Penalty%'";
 				 */
 
-				
 				/*
 				 * getData1 =
 				 * "SELECT ACCOUNT_NUMBER AS ACCOUNT_NUMBER, ACCOUNT_REPORT_CODE , PART_TRAN_TYPE,"
@@ -562,15 +716,27 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 				 * + ",TO_DATE(FILEDATE,'DD-MM-RRRR') AS FILEDATE" +
 				 * " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + mainDate + "'";
 				 */
-				 
+
+				getData1 = "SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,TO_CHAR(LPAD(REFERENCE_AMOUNT,16,' '),'999999.99') as TRANSACTION_AMOUNT,"
+						+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , "
+						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + zdate +"' "
+						+ " order by PART_TRAN_TYPE desc ";
 				
-				getData1 = 
-						"SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,LPAD(REFERENCE_AMOUNT,16,' ') as TRANSACTION_AMOUNT,"
-					      + " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , " +
-					      "  CYCLE AS FILEDATE " +
-					      " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + mainDate + "' order by PART_TRAN_TYPE desc ";
 				
-				System.out.println("query is : "+ getData1);
+				
+//				getData1 = "SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,LPAD(REFERENCE_AMOUNT,16,' ') as TRANSACTION_AMOUNT,"
+//						+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , "
+//						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE =  to_char(to_date('" + sdate +"','dd-mm-yy'),'dd-mm-yy') "
+//						+ " order by PART_TRAN_TYPE desc ";
+				
+//				getData1 = "SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,LPAD(REFERENCE_AMOUNT,16,' ') as TRANSACTION_AMOUNT,"
+//						+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , "
+//						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = to_date('" + fileDate +"','dd-mm-yy') "
+//						+ " order by PART_TRAN_TYPE desc ";
+				
+				
+
+				System.out.println("query is : " + getData1);
 
 				// + " and SUBCATEGORY = 'DOMESTIC' "
 				// + "AND (ADJTYPE) = ? "
@@ -608,6 +774,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 			return data;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Exception in getInterchangeData " + e);
 			return null;
 
