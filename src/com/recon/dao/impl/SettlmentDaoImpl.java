@@ -3766,9 +3766,9 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 				if (tableName.contains("cbs")) {
 					if (beanObj.getCategory().equalsIgnoreCase("NFS")) {
 						if (beanObj.getStsubCategory().equalsIgnoreCase("ISSUER")) {
-							getData = "select  " + column + " as data from " + tableName
+							getData = "select distinct  " + column + " as data from " + tableName
 									+ " where filedate = to_date('" + beanObj.getDatepicker() + "','dd/mm/yyyy') and "
-									+ " (dcrs_remarks like '%MATCHED-2%' ) and amount > 0  ORDER BY SUBSTR(NARRATION,30,8) ASC , substr(narration,19,2) asc ";
+									+ " (dcrs_remarks like '%MATCHED-2%' ) and amount > 0   ";
 
 						} else {
 							getData = "select " + column + " as data from " + tableName + " where filedate = to_date('"
@@ -3797,16 +3797,16 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 						 * "','dd/mm/yyyy') and " + " dcrs_remarks like '%SUR-UNRECON-3%' ";
 						 */
 						if (beanObj.getFileName().equalsIgnoreCase("POS")) {
-							getData = "select  " + column + " as data from " + tableName
+							getData = "select distinct   " + column + " as data from " + tableName
 									+ " where filedate = to_date('" + monthdate + "','dd/mm/yyyy') and "
 									+ "dcrs_remarks like '%MATCHED-2%'  and  TXN_TYPE = 'POS'  "
-									+ "and TXN_INDCTR = 'D' ORDER BY SUBSTR(NARRATION,30,8) ASC , substr(narration,19,2) asc";
+									+ "and TXN_INDCTR = 'D' ";
 
 						} else {
-							getData = "select   " + column + " as data from " + tableName
+							getData = "select distinct   " + column + " as data from " + tableName
 									+ " where filedate = to_date('" + monthdate + "','dd/mm/yyyy') and "
 									+ "dcrs_remarks like '%MATCHED-2%'  and  TXN_TYPE = 'COM'  "
-									+ "and TXN_INDCTR = 'D' ORDER BY SUBSTR(NARRATION,30,8) ASC , substr(narration,19,2) asc";
+									+ "and TXN_INDCTR = 'D' ";
 						}
 
 						// AND E = 'C'

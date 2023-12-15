@@ -127,6 +127,7 @@ public String NFSAdjTTUMValidation(String fileDate, String adjType,HttpServletRe
 	System.out.println("Created by is "+Createdby);
 	//HashMap<String, Object> output = new HashMap<String, Object>();
 	
+	System.out.println("adj type is"+ adjType);
 	HashMap<String, Object> output = rupayAdjustntFileUpService.validateAdjustmentTTUM(fileDate, adjType);
 	
 	//output.put("result", true);
@@ -200,7 +201,7 @@ public void DownloadAdjTTUM(String fileDate, String adjType,HttpServletRequest r
 
 	//GETTING , IN DATE FIELD
 		//GET DATA FOR REPORT
-	TTUMData = rupayAdjustntFileUpService.getAdjTTUM(fileDate, adjType);
+	    TTUMData = rupayAdjustntFileUpService.getAdjTTUM(fileDate, adjType);
 		
 		String fileName = "RUPAY_DOM_ADJUSTMENT_"+adjType+"_TTUM.txt";
 		
@@ -210,7 +211,7 @@ public void DownloadAdjTTUM(String fileDate, String adjType,HttpServletRequest r
 		GenerateUCOTTUM obj = new GenerateUCOTTUM();
 		stPath = obj.checkAndMakeDirectory1(fileDate, "RUPAY");
 		
-		if(!adjType.equalsIgnoreCase("PENALTY") && !adjType.equalsIgnoreCase("FEE"))
+		if(!adjType.equalsIgnoreCase("PENALTY") ) //&& !adjType.equalsIgnoreCase("FEE")
 			obj.generateMultipleDRMTTUMFiles(stPath, fileName, 1, TTUMData,"RUPAY");  // for generating customer ttum
 		else
 		{

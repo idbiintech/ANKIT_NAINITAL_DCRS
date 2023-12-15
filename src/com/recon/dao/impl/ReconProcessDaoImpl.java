@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import org.apache.log4j.Logger;
 //import org.apache.logging.log4j.LogManager;
 //import org.apache.logging.log4j.Logger;
@@ -39,14 +38,13 @@ import com.recon.util.GeneralUtil;
 import com.recon.util.demo;
 
 @Component
-public class ReconProcessDaoImpl extends JdbcDaoSupport implements
-		IReconProcessDao {
+public class ReconProcessDaoImpl extends JdbcDaoSupport implements IReconProcessDao {
 
 	@Autowired
 	CompareService compareService;
-	
+
 	@Autowired
-	GeneralUtil generalUtil ;
+	GeneralUtil generalUtil;
 
 	@Autowired
 	CompareRupayService compareRupayService;
@@ -54,143 +52,108 @@ public class ReconProcessDaoImpl extends JdbcDaoSupport implements
 	@Autowired
 	ICompareConfigService icompareConfigService;
 
-	private static final Logger logger = Logger
-			.getLogger(ReconProcessDaoImpl.class);
+	private static final Logger logger = Logger.getLogger(ReconProcessDaoImpl.class);
 
-	/*@Override
-	public String chkFileUpload(String Category, String filedate,
-			List<CompareSetupBean> compareSetupBeans, String subCat)
-			throws Exception {
-		logger.info("***** ReconProcessDaoImpl.chkFileUpload Start ****");
-		String msg = null, flg, compareflag;
-		try {
-			for (CompareSetupBean setupBean : compareSetupBeans) {
-
-				if (!(setupBean.getStFileName().equalsIgnoreCase("REV_REPORT"))) {
-
-					String query = "SELECT UPLOAD_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = '"
-							+ filedate
-							+ "' "
-							+ " AND FileId = "
-							+ setupBean.getInFileId();
-
-					query = " SELECT CASE WHEN exists (" + query + ") then ("
-							+ query + ") else 'N' end as FLAG from dual";
-
-					logger.info("Query==" + query);
-					flg = getJdbcTemplate().queryForObject(query, String.class);
-
-					query = "";
-
-					query = "SELECT COMAPRE_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = '"
-							+ filedate
-							+ "' "
-							+ " AND FileId = "
-							+ setupBean.getInFileId();
-
-					query = " SELECT CASE WHEN exists (" + query + ") then ("
-							+ query + ") else 'N' end as FLAG from dual";
-
-					compareflag = getJdbcTemplate().queryForObject(query,
-							String.class);
-
-					if (compareflag.equalsIgnoreCase("N")) {
-						if (flg.equalsIgnoreCase("N")) {
-
-							msg = "Files are Not Uploaded.";
-							logger.info("msg==" + msg);
-							return msg;
-						} else // CHANGES MADE BY INT5779 AS ON 03 MARCH TO
-								// check whether manual file is uploaded for CBS
-								// file
-						{
-							if (setupBean.getStFileName().equalsIgnoreCase(
-									"CBS")) {
-
-								String MANUAL_FILE_CHECK = "SELECT MANUPLOAD_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate =  '"
-										+ filedate
-										+ "' "
-										+ "AND FileId = "
-										+ setupBean.getInFileId();
-
-								MANUAL_FILE_CHECK = " SELECT CASE WHEN exists ("
-										+ MANUAL_FILE_CHECK
-										+ ") then ("
-										+ MANUAL_FILE_CHECK
-										+ ") else 'N' end as FLAG from dual";
-								logger.info("MANUAL_FILE_CHECK== "
-										+ MANUAL_FILE_CHECK);
-
-								flg = getJdbcTemplate().queryForObject(
-										MANUAL_FILE_CHECK, String.class);
-								if (setupBean.getInFileId() == 39) {
-									flg = "Y";
-								}
-								if (flg.equalsIgnoreCase("N")) {
-									msg = "Manual File is not uploaded";
-									logger.info("msg==" + msg);
-									return msg;
-								}
-							}
-
-						}
-					} else {
-
-						msg = "Files are Already Processed.";
-						logger.info("msg==" + msg);
-						return msg;
-
-					}
-
-				}
-			}
-			logger.info("***** ReconProcessDaoImpl.chkFileUpload End ****");
-
-		} catch (Exception ex) {
-			logger.error(" error in ReconProcessDaoImpl.chkFileUpload",
-					new Exception("ReconProcessDaoImpl.chkFileUpload", ex));
-			throw ex;
-		}
-
-		return msg;
-
-	}*/
+	/*
+	 * @Override public String chkFileUpload(String Category, String filedate,
+	 * List<CompareSetupBean> compareSetupBeans, String subCat) throws Exception {
+	 * logger.info("***** ReconProcessDaoImpl.chkFileUpload Start ****"); String msg
+	 * = null, flg, compareflag; try { for (CompareSetupBean setupBean :
+	 * compareSetupBeans) {
+	 * 
+	 * if (!(setupBean.getStFileName().equalsIgnoreCase("REV_REPORT"))) {
+	 * 
+	 * String query =
+	 * "SELECT UPLOAD_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = '" + filedate
+	 * + "' " + " AND FileId = " + setupBean.getInFileId();
+	 * 
+	 * query = " SELECT CASE WHEN exists (" + query + ") then (" + query +
+	 * ") else 'N' end as FLAG from dual";
+	 * 
+	 * logger.info("Query==" + query); flg = getJdbcTemplate().queryForObject(query,
+	 * String.class);
+	 * 
+	 * query = "";
+	 * 
+	 * query = "SELECT COMAPRE_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = '" +
+	 * filedate + "' " + " AND FileId = " + setupBean.getInFileId();
+	 * 
+	 * query = " SELECT CASE WHEN exists (" + query + ") then (" + query +
+	 * ") else 'N' end as FLAG from dual";
+	 * 
+	 * compareflag = getJdbcTemplate().queryForObject(query, String.class);
+	 * 
+	 * if (compareflag.equalsIgnoreCase("N")) { if (flg.equalsIgnoreCase("N")) {
+	 * 
+	 * msg = "Files are Not Uploaded."; logger.info("msg==" + msg); return msg; }
+	 * else // CHANGES MADE BY INT5779 AS ON 03 MARCH TO // check whether manual
+	 * file is uploaded for CBS // file { if
+	 * (setupBean.getStFileName().equalsIgnoreCase( "CBS")) {
+	 * 
+	 * String MANUAL_FILE_CHECK =
+	 * "SELECT MANUPLOAD_FLAG FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate =  '" +
+	 * filedate + "' " + "AND FileId = " + setupBean.getInFileId();
+	 * 
+	 * MANUAL_FILE_CHECK = " SELECT CASE WHEN exists (" + MANUAL_FILE_CHECK +
+	 * ") then (" + MANUAL_FILE_CHECK + ") else 'N' end as FLAG from dual";
+	 * logger.info("MANUAL_FILE_CHECK== " + MANUAL_FILE_CHECK);
+	 * 
+	 * flg = getJdbcTemplate().queryForObject( MANUAL_FILE_CHECK, String.class); if
+	 * (setupBean.getInFileId() == 39) { flg = "Y"; } if (flg.equalsIgnoreCase("N"))
+	 * { msg = "Manual File is not uploaded"; logger.info("msg==" + msg); return
+	 * msg; } }
+	 * 
+	 * } } else {
+	 * 
+	 * msg = "Files are Already Processed."; logger.info("msg==" + msg); return msg;
+	 * 
+	 * }
+	 * 
+	 * } } logger.info("***** ReconProcessDaoImpl.chkFileUpload End ****");
+	 * 
+	 * } catch (Exception ex) {
+	 * logger.error(" error in ReconProcessDaoImpl.chkFileUpload", new
+	 * Exception("ReconProcessDaoImpl.chkFileUpload", ex)); throw ex; }
+	 * 
+	 * return msg;
+	 * 
+	 * }
+	 */
 // METHOD MODIFIED BY INT8624 for file upload proper validation	
 	@Override
-	public String chkFileUpload(String Category, String filedate,
-			List<CompareSetupBean> compareSetupBeans, String subCat)
-			throws Exception {
+	public String chkFileUpload(String Category, String filedate, List<CompareSetupBean> compareSetupBeans,
+			String subCat) throws Exception {
 		logger.info("***** ReconProcessDaoImpl.chkFileUpload Start **");
 		String msg = null;
 		try {
 			for (CompareSetupBean setupBean : compareSetupBeans) {
-				
-				String getMainFileCount = "select file_count from main_filesource where fileid = '"+setupBean.getInFileId()+"'";
-				
-				int fileCount = getJdbcTemplate().queryForObject(getMainFileCount, new Object[] {},Integer.class);
-				
-				if(!setupBean.getStFileName().equalsIgnoreCase("RUPAY"))
-				{
-					getMainFileCount = "select count(1) from main_file_upload_dtls where filedate = to_date('"+filedate+
-							"','dd/mm/yyyy') and fileid = '"+setupBean.getInFileId()+"' and file_count = '"+fileCount+"'";
 
-					logger.info("getMainFileCount "+getMainFileCount);
+				String getMainFileCount = "select file_count from main_filesource where fileid = '"
+						+ setupBean.getInFileId() + "'";
 
-					int uploadCount = getJdbcTemplate().queryForObject(getMainFileCount, new Object[] {},Integer.class);
+				int fileCount = getJdbcTemplate().queryForObject(getMainFileCount, new Object[] {}, Integer.class);
 
-					if(uploadCount == 0)
-					{
-						if(msg == null)
+				if (!setupBean.getStFileName().equalsIgnoreCase("RUPAY")) {
+					getMainFileCount = "select count(1) from main_file_upload_dtls where filedate = to_date('"
+							+ filedate + "','dd/mm/yyyy') and fileid = '" + setupBean.getInFileId()
+							+ "' and file_count = '" + fileCount + "'";
+
+					logger.info("getMainFileCount " + getMainFileCount);
+
+					int uploadCount = getJdbcTemplate().queryForObject(getMainFileCount, new Object[] {},
+							Integer.class);
+
+					if (uploadCount == 0) {
+						if (msg == null)
 							msg = setupBean.getStFileName();
 						else
-							msg = msg+","+setupBean.getStFileName();
+							msg = msg + "," + setupBean.getStFileName();
 					}
 				}
-				
+
 			}
-			if(msg != null)
-			{
-				msg = msg+" Files are not uploaded ";
+			if (msg != null) {
+				msg = msg + " Files are not uploaded ";
 			}
 			logger.info("***** ReconProcessDaoImpl.chkFileUpload End ****");
 
@@ -205,30 +168,27 @@ public class ReconProcessDaoImpl extends JdbcDaoSupport implements
 	}
 
 	/*
-	 * @Override public List<CompareSetupBean> getFileList(String category,
-	 * String filedate ,String subcat) {
+	 * @Override public List<CompareSetupBean> getFileList(String category, String
+	 * filedate ,String subcat) {
 	 * 
 	 * try { List<CompareSetupBean>compareSetupBeans = new
 	 * ArrayList<CompareSetupBean>(); String query = ""; String stSubCate = "";
 	 * if(!subcat.equals("-")) { //"'"+subcat+"'"; stSubCate = ""; query =
-	 * "SELECT distinct regexp_substr(FILE1_CATEGORY,'[^_]+',"
-	 * +(category.length()
-	 * +1)+") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?"
-	 * ;
+	 * "SELECT distinct regexp_substr(FILE1_CATEGORY,'[^_]+'," +(category.length()
+	 * +1)+") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?" ;
 	 * 
-	 * List<String> stSub_Category = getJdbcTemplate().query(query , new
-	 * Object[] {category+"_"+subcat} ,new AllSubCategories()); for(int i = 0
+	 * List<String> stSub_Category = getJdbcTemplate().query(query , new Object[]
+	 * {category+"_"+subcat} ,new AllSubCategories()); for(int i = 0
 	 * ;i<stSub_Category.size() ; i++) { if(i>0) stSubCate =
 	 * stSubCate+",'"+stSub_Category.get(i)+"'"; else stSubCate =
 	 * "'"+stSub_Category.get(i)+"'";
 	 * 
 	 * }
 	 * 
-	 * query =
-	 * "SELECT distinct regexp_substr(FILE2_CATEGORY,'[^_]+',"+(category.
+	 * query = "SELECT distinct regexp_substr(FILE2_CATEGORY,'[^_]+',"+(category.
 	 * length()
-	 * +1)+") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?"
-	 * + " AND regexp_substr(FILE2_CATEGORY,'[^_]+',6) NOT IN("+stSubCate+")";
+	 * +1)+") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?" +
+	 * " AND regexp_substr(FILE2_CATEGORY,'[^_]+',6) NOT IN("+stSubCate+")";
 	 * 
 	 * stSub_Category = getJdbcTemplate().query(query , new Object[]
 	 * {category+"_"+subcat} ,new AllSubCategories()); for(int i = 0
@@ -255,100 +215,73 @@ public class ReconProcessDaoImpl extends JdbcDaoSupport implements
 	 * ex.printStackTrace(); return null; } }
 	 */
 
-/*	@Override
-	public List<CompareSetupBean> getFileList(String category, String filedate,
-			String subcat) throws Exception {
+	/*
+	 * @Override public List<CompareSetupBean> getFileList(String category, String
+	 * filedate, String subcat) throws Exception {
+	 * 
+	 * try { logger.info("***** ReconProcessDaoImpl.getFileList Start ****");
+	 * List<CompareSetupBean> compareSetupBeans = new ArrayList<CompareSetupBean>();
+	 * String query = ""; String stSubCate = ""; if (!subcat.equals("-")) { //
+	 * "'"+subcat+"'"; stSubCate = ""; query =
+	 * "SELECT distinct regexp_substr(FILE1_CATEGORY,'[^_]+'," + (category.length()
+	 * + 1) +
+	 * ") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?";
+	 * 
+	 * List<String> stSub_Category = getJdbcTemplate().query(query, new Object[] {
+	 * category + "_" + subcat }, new AllSubCategories()); for (int i = 0; i <
+	 * stSub_Category.size(); i++) { if (i > 0) stSubCate = stSubCate + ",'" +
+	 * stSub_Category.get(i) + "'"; else stSubCate = "'" + stSub_Category.get(i) +
+	 * "'";
+	 * 
+	 * }
+	 * 
+	 * query = "SELECT distinct LTRIM(regexp_substr(FILE2_CATEGORY,'[^-]+'," +
+	 * (category.length() + 1) +
+	 * "),'_') AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?" +
+	 * " AND regexp_substr(FILE2_CATEGORY,'[^-]+',6) NOT IN(" + stSubCate + ")";
+	 * 
+	 * stSub_Category = getJdbcTemplate().query(query, new Object[] { category + "_"
+	 * + subcat }, new AllSubCategories()); for (int i = 0; i <
+	 * stSub_Category.size(); i++) { stSubCate = stSubCate + ",'" +
+	 * stSub_Category.get(i) + "'";
+	 * 
+	 * } } else { stSubCate = "'" + subcat + "'"; }
+	 * 
+	 * query =
+	 * "Select FileId as inFileId , Filename as stFileName,FILTERATION as filter_Flag,KNOCKOFF as knockoff_Flag,FILE_SUBCATEGORY AS stSubCategory "
+	 * + "FROM MAIN_FILESOURCE WHERE FILE_CATEGORY = '" + category +
+	 * "' and FILE_SUBCATEGORY in (" + stSubCate + ")" +
+	 * " order by (case  when stFileName = 'SWITCH' then 1 when stFileName ='CBS' then 2  end) ASC"
+	 * ;
+	 * 
+	 * logger.info("FILE ID== " + query);
+	 * 
+	 * 
+	 * 
+	 * compareSetupBeans = getJdbcTemplate().query(query, new
+	 * BeanPropertyRowMapper(CompareSetupBean.class));
+	 * 
+	 * return compareSetupBeans; } catch (Exception ex) { demo.logSQLException(ex,
+	 * "ReconProcessDaoImpl.getFileList");
+	 * logger.error(" error in ReconProcessDaoImpl.getFileList", new
+	 * Exception("ReconProcessDaoImpl.getFileList", ex)); // ex.printStackTrace();
+	 * return null; } }
+	 */
 
-		try {
-			logger.info("***** ReconProcessDaoImpl.getFileList Start ****");
-			List<CompareSetupBean> compareSetupBeans = new ArrayList<CompareSetupBean>();
-			String query = "";
-			String stSubCate = "";
-			if (!subcat.equals("-")) {
-				// "'"+subcat+"'";
-				stSubCate = "";
-				query = "SELECT distinct regexp_substr(FILE1_CATEGORY,'[^_]+',"
-						+ (category.length() + 1)
-						+ ") AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?";
-
-				List<String> stSub_Category = getJdbcTemplate().query(query,
-						new Object[] { category + "_" + subcat },
-						new AllSubCategories());
-				for (int i = 0; i < stSub_Category.size(); i++) {
-					if (i > 0)
-						stSubCate = stSubCate + ",'" + stSub_Category.get(i)
-								+ "'";
-					else
-						stSubCate = "'" + stSub_Category.get(i) + "'";
-
-				}
-
-				query = "SELECT distinct LTRIM(regexp_substr(FILE2_CATEGORY,'[^-]+',"
-						+ (category.length() + 1)
-						+ "),'_') AS SUBCATEGORIES FROM MAIN_RECON_SEQUENCE  WHERE RECON_CATEGORY =?"
-						+ " AND regexp_substr(FILE2_CATEGORY,'[^-]+',6) NOT IN("
-						+ stSubCate + ")";
-
-				stSub_Category = getJdbcTemplate().query(query,
-						new Object[] { category + "_" + subcat },
-						new AllSubCategories());
-				for (int i = 0; i < stSub_Category.size(); i++) {
-					stSubCate = stSubCate + ",'" + stSub_Category.get(i) + "'";
-
-				}
-			} else {
-				stSubCate = "'" + subcat + "'";
-			}
-
-			query = "Select FileId as inFileId , Filename as stFileName,FILTERATION as filter_Flag,KNOCKOFF as knockoff_Flag,FILE_SUBCATEGORY AS stSubCategory "
-					+ "FROM MAIN_FILESOURCE WHERE FILE_CATEGORY = '"
-					+ category
-					+ "' and FILE_SUBCATEGORY in ("
-					+ stSubCate
-					+ ")"
-					+ " order by (case  when stFileName = 'SWITCH' then 1 when stFileName ='CBS' then 2  end) ASC";
-
-			logger.info("FILE ID== " + query);
-
-			
-
-			compareSetupBeans = getJdbcTemplate().query(query,
-					new BeanPropertyRowMapper(CompareSetupBean.class));
-
-			return compareSetupBeans;
-		} catch (Exception ex) {
-			demo.logSQLException(ex, "ReconProcessDaoImpl.getFileList");
-			logger.error(" error in ReconProcessDaoImpl.getFileList",
-					new Exception("ReconProcessDaoImpl.getFileList", ex));
-			// ex.printStackTrace();
-			return null;
-		}
-	}*/
-	
-/**** simplified code by int8624***/
+	/**** simplified code by int8624 ***/
 	@Override
-	public List<CompareSetupBean> getFileList(String category, String filedate,
-			String subcat) throws Exception {
+	public List<CompareSetupBean> getFileList(String category, String filedate, String subcat) throws Exception {
 		List<CompareSetupBean> compareSetupBeans = new ArrayList<CompareSetupBean>();
-		try
-		{
+		try {
 			String query = "select fileid as infileid , filename as stfilename,filteration as filter_flag,knockoff as knockoff_flag,file_subcategory as stsubcategory "
-					+ "from main_filesource where file_category = '"
-					+ category
-					+ "' and file_subcategory in ('"
-					+ subcat
-					+ "')"
+					+ "from main_filesource where file_category = '" + category + "' and file_subcategory in ('"
+					+ subcat + "')"
 					+ " order by (case  when stfilename = 'SWITCH' then 1 when stfilename ='CBS' then 2  end) asc";
 
 			logger.info("FILE ID== " + query);
 
-			
-
-			compareSetupBeans = getJdbcTemplate().query(query,
-					new BeanPropertyRowMapper(CompareSetupBean.class));
-		}
-		catch(Exception ex)
-		{
+			compareSetupBeans = getJdbcTemplate().query(query, new BeanPropertyRowMapper(CompareSetupBean.class));
+		} catch (Exception ex) {
 			demo.logSQLException(ex, "ReconProcessDaoImpl.getFileList");
 			logger.error(" error in ReconProcessDaoImpl.getFileList",
 					new Exception("ReconProcessDaoImpl.getFileList", ex));
@@ -371,241 +304,181 @@ public class ReconProcessDaoImpl extends JdbcDaoSupport implements
 		}
 	}
 
-	/*@Override
-	public String validateFile(String category,
-			List<CompareSetupBean> compareSetupBeans, String filedate)
+	/*
+	 * @Override public String validateFile(String category, List<CompareSetupBean>
+	 * compareSetupBeans, String filedate) throws Exception {
+	 * logger.info("***** ReconProcessDaoImpl.validateFile Start ****"); String msg
+	 * = null; int count = 0; try {
+	 * 
+	 * 
+	 * for (CompareSetupBean setupBean : compareSetupBeans) {
+	 * 
+	 * // get FILTER, KNOCKOFF FLAGS String GET_FLAGS =
+	 * "SELECT FILTERATION FROM MAIN_FILESOURCE WHERE FILEID = ?";
+	 * 
+	 * String stFliter_Flag = getJdbcTemplate().queryForObject( GET_FLAGS, new
+	 * Object[] { setupBean.getInFileId() }, String.class);
+	 * 
+	 * GET_FLAGS = "SELECT KNOCKOFF FROM MAIN_FILESOURCE WHERE FILEID = ?";
+	 * 
+	 * String stKnockoff_Flag = getJdbcTemplate().queryForObject( GET_FLAGS, new
+	 * Object[] { setupBean.getInFileId() }, String.class);
+	 * 
+	 * String stCompare_Flag = "Y";
+	 * 
+	 * if (setupBean.getStFileName().equalsIgnoreCase("REV_REPORT")) {
+	 * 
+	 * stCompare_Flag = "N"; }
+	 * 
+	 * String tablename = getJdbcTemplate().queryForObject(
+	 * "select tablename from MAIN_FILESOURCE where FILEID = " +
+	 * setupBean.getInFileId(), String.class); String chkData = null; // Get table
+	 * name from main table if (category.equals("CARDTOCARD")) { chkData =
+	 * "select count(*) from CARD_TO_CARD_CBS_RAWDATA " +
+	 * " where TO_CHAR(to_date(CREATEDDATE,'dd/MM/YY'),'dd-MON-YY') < TO_CHAR(sysdate,'DD/MM/YYYY')"
+	 * ; } else if (category.equals("MASTERCARD")) { if
+	 * (setupBean.getStFileName().equalsIgnoreCase("CBS") ||
+	 * setupBean.getStFileName().equalsIgnoreCase( "SWITCH")) { chkData =
+	 * "select count(*) from " + tablename +
+	 * " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')"; }
+	 * else { chkData = "select count(*) from " + tablename +
+	 * " where TO_CHAR(FILEDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')"; } }
+	 * 
+	 * else if (category.equals("RUPAY")) {
+	 * 
+	 * // insertDailyRawData(filedate);
+	 * 
+	 * chkData = "select count(*) from " + tablename +
+	 * " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')"; }
+	 * 
+	 * else {
+	 * 
+	 * chkData = "select count(*) from " + tablename +
+	 * " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
+	 * 
+	 * } logger.info("chkData == " + chkData);
+	 * 
+	 * // CHECKING WHETHER ANY DATA IS PRESENT int dataCount =
+	 * getJdbcTemplate().queryForObject(chkData, Integer.class); String query = "";
+	 * if (dataCount > 0) {
+	 * 
+	 * // CHECKING RECORDS FOR PREVIOUS DAY // IF FILE IS SWITCH OR CBS THEN CHECK
+	 * MANUAL FILE FLAG TOO if (setupBean.getStFileName().equalsIgnoreCase("CBS") ||
+	 * setupBean.getStFileName().equalsIgnoreCase( "SWITCH")) { query =
+	 * "SELECT count (*) FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = (TRUNC (TO_DATE ('"
+	 * + filedate + "', 'dd/mm/yyyy') - 1) ) " + "	AND Fileid =" +
+	 * setupBean.getInFileId() + " AND category='" + category + "' " +
+	 * " AND FILTER_FLAG= ? AND KNOCKOFF_FLAG=? AND COMAPRE_FLAG='Y' " +
+	 * " AND UPLOAD_FLAG='Y' AND MANUALCOMPARE_FLAG = 'Y'  ";
+	 * 
+	 * } else { query =
+	 * "SELECT count (*) FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = (TRUNC (TO_DATE ('"
+	 * + filedate + "', 'dd/mm/yyyy') - 1) ) " + "	AND Fileid =" +
+	 * setupBean.getInFileId() + " AND category='" + category + "' " +
+	 * " AND FILTER_FLAG= ? AND KNOCKOFF_FLAG=? AND COMAPRE_FLAG='" + stCompare_Flag
+	 * + "' " + " AND UPLOAD_FLAG='Y'  ";
+	 * 
+	 * } logger.info("query==" + query); if
+	 * (!setupBean.getStFileName().equalsIgnoreCase( "REV_REPORT")) { count =
+	 * getJdbcTemplate() .queryForObject( query, new Object[] { stFliter_Flag,
+	 * stKnockoff_Flag }, Integer.class); if (count > 0) {
+	 * 
+	 * // Previous File Processed.
+	 * 
+	 * } else { msg = msg + "Previous File not Processed."; logger.info("msg==" +
+	 * msg);
+	 * 
+	 * } } }
+	 * 
+	 * } logger.info("***** ReconProcessDaoImpl.validateFile End ****"); return msg;
+	 * 
+	 * } catch (Exception ex) { demo.logSQLException(ex,
+	 * "ReconProcessDaoImpl.validateFile");
+	 * logger.error(" error in ReconProcessDaoImpl.validateFile", new
+	 * Exception("ReconProcessDaoImpl.validateFile", ex)); return msg; }
+	 * 
+	 * }
+	 */
+
+	/***** SIMPLIFIED CODING BY INT8624 *****/
+	public String validateFile(String category, List<CompareSetupBean> compareSetupBeans, String filedate)
 			throws Exception {
 		logger.info("***** ReconProcessDaoImpl.validateFile Start ****");
 		String msg = null;
-		int count = 0;
 		try {
+			// check whether recon is already processed
+			String error_msg = checkReconAlreadyProcessed(category, compareSetupBeans, filedate);
 
-			
-			for (CompareSetupBean setupBean : compareSetupBeans) {
-
-				// get FILTER, KNOCKOFF FLAGS
-				String GET_FLAGS = "SELECT FILTERATION FROM MAIN_FILESOURCE WHERE FILEID = ?";
-
-				String stFliter_Flag = getJdbcTemplate().queryForObject(
-						GET_FLAGS, new Object[] { setupBean.getInFileId() },
-						String.class);
-
-				GET_FLAGS = "SELECT KNOCKOFF FROM MAIN_FILESOURCE WHERE FILEID = ?";
-
-				String stKnockoff_Flag = getJdbcTemplate().queryForObject(
-						GET_FLAGS, new Object[] { setupBean.getInFileId() },
-						String.class);
-
-				String stCompare_Flag = "Y";
-
-				if (setupBean.getStFileName().equalsIgnoreCase("REV_REPORT")) {
-
-					stCompare_Flag = "N";
-				}
-
-				String tablename = getJdbcTemplate().queryForObject(
-						"select tablename from MAIN_FILESOURCE where FILEID = "
-								+ setupBean.getInFileId(), String.class);
-				String chkData = null;
-				// Get table name from main table
-				if (category.equals("CARDTOCARD")) {
-					chkData = "select count(*) from CARD_TO_CARD_CBS_RAWDATA "
-							+ " where TO_CHAR(to_date(CREATEDDATE,'dd/MM/YY'),'dd-MON-YY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
-				} else if (category.equals("MASTERCARD")) {
-					if (setupBean.getStFileName().equalsIgnoreCase("CBS")
-							|| setupBean.getStFileName().equalsIgnoreCase(
-									"SWITCH")) {
-						chkData = "select count(*) from "
-								+ tablename
-								+ " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
-					} else {
-						chkData = "select count(*) from "
-								+ tablename
-								+ " where TO_CHAR(FILEDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
-					}
-				}
-
-				else if (category.equals("RUPAY")) {
-
-				//	insertDailyRawData(filedate);
-
-					chkData = "select count(*) from "
-							+ tablename
-							+ " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
-				}
-
-				else {
-
-					chkData = "select count(*) from "
-							+ tablename
-							+ " where TO_CHAR(CREATEDDATE,'DD/MM/YYYY') < TO_CHAR(sysdate,'DD/MM/YYYY')";
-
-				}
-				logger.info("chkData == " + chkData);
-
-				// CHECKING WHETHER ANY DATA IS PRESENT
-				int dataCount = getJdbcTemplate().queryForObject(chkData,
+			if (error_msg == null) {
+				String checkFirstTime = "select count(*) from main_file_upload_dtls where filedate < to_date(?,'dd/mm/yyyy')";
+				int prevCount = getJdbcTemplate().queryForObject(checkFirstTime, new Object[] { filedate },
 						Integer.class);
-				String query = "";
-				if (dataCount > 0) {
 
-					// CHECKING RECORDS FOR PREVIOUS DAY
-					// IF FILE IS SWITCH OR CBS THEN CHECK MANUAL FILE FLAG TOO
-					if (setupBean.getStFileName().equalsIgnoreCase("CBS")
-							|| setupBean.getStFileName().equalsIgnoreCase(
-									"SWITCH")) {
-						query = "SELECT count (*) FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = (TRUNC (TO_DATE ('"
-								+ filedate
-								+ "', 'dd/mm/yyyy') - 1) ) "
-								+ "	AND Fileid ="
-								+ setupBean.getInFileId()
-								+ " AND category='"
-								+ category
-								+ "' "
-								+ " AND FILTER_FLAG= ? AND KNOCKOFF_FLAG=? AND COMAPRE_FLAG='Y' "
-								+ " AND UPLOAD_FLAG='Y' AND MANUALCOMPARE_FLAG = 'Y'  ";
+				if (prevCount == 0) {
+					return null;
+				} else {
+					for (CompareSetupBean setupBean : compareSetupBeans) {
 
-					} else {
-						query = "SELECT count (*) FROM MAIN_FILE_UPLOAD_DTLS WHERE filedate = (TRUNC (TO_DATE ('"
-								+ filedate
-								+ "', 'dd/mm/yyyy') - 1) ) "
-								+ "	AND Fileid ="
-								+ setupBean.getInFileId()
-								+ " AND category='"
-								+ category
-								+ "' "
-								+ " AND FILTER_FLAG= ? AND KNOCKOFF_FLAG=? AND COMAPRE_FLAG='"
-								+ stCompare_Flag
-								+ "' "
-								+ " AND UPLOAD_FLAG='Y'  ";
+						String query = "select count(*) from main_file_upload_dtls where filedate  = to_date('"
+								+ filedate + "','dd/mm/yyyy')-1" + " and fileid = '" + setupBean.getInFileId()
+								+ "' and filter_flag = (select filteration from main_filesource where fileid = '"
+								+ setupBean.getInFileId() + "')"
+								+ " and knockoff_flag = (select knockoff from main_filesource where fileid = '"
+								+ setupBean.getInFileId() + "') " + " and comapre_flag = 'Y' ";
 
-					}
-					logger.info("query==" + query);
-					if (!setupBean.getStFileName().equalsIgnoreCase(
-							"REV_REPORT")) {
-						count = getJdbcTemplate()
-								.queryForObject(
-										query,
-										new Object[] { stFliter_Flag,
-												stKnockoff_Flag },
-										Integer.class);
-						if (count > 0) {
+						logger.info("Query is " + query);
 
-							// Previous File Processed.
+						int count = getJdbcTemplate().queryForObject(query, new Object[] {}, Integer.class);
+						logger.info("Count is " + count);
 
-						} else {
-							msg = msg + "Previous File not Processed.";
-							logger.info("msg==" + msg);
+						if (count == 0) {
+							msg = "Previous File is not Processed";
+							return msg;
 
 						}
 					}
 				}
-
+			} else {
+				return error_msg;
 			}
-			logger.info("***** ReconProcessDaoImpl.validateFile End ****");
-			return msg;
-
 		} catch (Exception ex) {
 			demo.logSQLException(ex, "ReconProcessDaoImpl.validateFile");
 			logger.error(" error in ReconProcessDaoImpl.validateFile",
 					new Exception("ReconProcessDaoImpl.validateFile", ex));
-			return msg;
 		}
+		return msg;
 
-	}*/
-	
-/***** SIMPLIFIED CODING BY INT8624 *****/
-public String validateFile(String category,
-			List<CompareSetupBean> compareSetupBeans, String filedate)
-			throws Exception {
-	logger.info("***** ReconProcessDaoImpl.validateFile Start ****");
-	String msg = null;
-	try
-	{
-		//check whether recon is already processed
-		String error_msg = checkReconAlreadyProcessed(category, compareSetupBeans, filedate);
-		
-		if(error_msg == null)
-		{
-			String checkFirstTime = "select count(*) from main_file_upload_dtls where filedate < to_date(?,'dd/mm/yyyy')";
-			int prevCount = getJdbcTemplate().queryForObject(checkFirstTime, new Object[] {filedate}, Integer.class);
+	}
 
-			if(prevCount == 0)
-			{
-				return null;
-			}
-			else
-			{
-				for (CompareSetupBean setupBean : compareSetupBeans) {
+	public String checkReconAlreadyProcessed(String category, List<CompareSetupBean> compareSetupBeans,
+			String filedate) {
+		String msg = null;
+		try {
+			for (CompareSetupBean setupBean : compareSetupBeans) {
+				String getcompareFlag = "select comapre_flag from main_file_upload_dtls where filedate = to_date('"
+						+ filedate + "','dd/mm/yyyy') and fileid = '" + setupBean.getInFileId() + "'";
 
-					String query = "select count(*) from main_file_upload_dtls where filedate  = to_date('"+filedate+"','dd/mm/yyyy')-1"
-							+" and fileid = '"+setupBean.getInFileId()+"' and filter_flag = (select filteration from main_filesource where fileid = '"+setupBean.getInFileId()+"')"
-							+" and knockoff_flag = (select knockoff from main_filesource where fileid = '"+setupBean.getInFileId()+"') "
-							+" and comapre_flag = 'Y' ";
+				System.out.println("here the checking query is"+getcompareFlag);
+				String compareFlag = getJdbcTemplate().queryForObject(getcompareFlag, new Object[] {}, String.class);
 
-					logger.info("Query is "+query);
-
-					int count = getJdbcTemplate().queryForObject(query, new Object[] {},Integer.class);
-					logger.info("Count is "+count);
-
-					if(count == 0)
-					{
-						msg = "Previous File is not Processed";
-						return msg;
-
-					}
+				if (compareFlag.equals("Y")) {
+					msg = "Recon is already processed";
+					return msg;
 				}
 			}
+		} catch (Exception e) {
+			logger.info("Exception while checking recon process " + e);
+			msg = "Exception while checcking recon processed or not ";
 		}
-		else
-		{
-			return error_msg;
-		}
+		return msg;
 	}
-	catch(Exception ex)
-	{
-		demo.logSQLException(ex, "ReconProcessDaoImpl.validateFile");
-		logger.error(" error in ReconProcessDaoImpl.validateFile",
-				new Exception("ReconProcessDaoImpl.validateFile", ex));
-	}
-	return msg;
-		
-	}
-
-public String checkReconAlreadyProcessed(String category,
-		List<CompareSetupBean> compareSetupBeans, String filedate)
-{
-	String msg = null;
-	try
-	{
-		for(CompareSetupBean setupBean : compareSetupBeans)
-		{
-			String getcompareFlag = "select comapre_flag from main_file_upload_dtls where filedate = to_date('"+filedate+"','dd/mm/yyyy') and fileid = '"+setupBean.getInFileId()+"'";
-			
-			String compareFlag = getJdbcTemplate().queryForObject(getcompareFlag, new Object[] {},String.class);
-			
-			if(compareFlag.equals("Y"))
-			{
-				msg = "Recon is already processed";
-				return msg;
-			}
-		}
-	}
-	catch(Exception e)
-	{
-		logger.info("Exception while checking recon process "+e);
-		msg = "Exception while checcking recon processed or not ";
-	}
-	return msg;
-}
 
 	@Override
-	public boolean processFile(String category,
-			List<CompareSetupBean> compareSetupBeans, String filedate,
+	public boolean processFile(String category, List<CompareSetupBean> compareSetupBeans, String filedate,
 			String Createdby, String subcat) throws Exception {
 
 		String monthdate = generalUtil.DateFunction(filedate);
-		
+
 		boolean result = false;
 		String StMerger_Category = "";
 		String stCategory = category;
@@ -613,61 +486,54 @@ public String checkReconAlreadyProcessed(String category,
 		logger.info("***** ReconProcessDaoImpl.processFile Start ****");
 
 		try {
-			if(category.equalsIgnoreCase("RUPAY"))
-			{
-				if(subcat.equalsIgnoreCase("DOMESTIC"))
-				{
+			if (category.equalsIgnoreCase("RUPAY")) {
+				if (subcat.equalsIgnoreCase("DOMESTIC")) {
 					logger.info("Inside rupay Domestic classification");
-					String getCount = "select count(1) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category = 'RUPAY' and file_subcategory = 'DOMESTIC') "+        
-							" AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
-					
+					String getCount = "select count(1) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category = 'RUPAY' and file_subcategory = 'DOMESTIC') "
+							+ " AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
+
 //					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] {filedate},Integer.class);
-					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] {monthdate},Integer.class);
-					
-					if(pendingClass > 0)
+					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] { monthdate },
+							Integer.class);
+
+					if (pendingClass > 0)
 						DomesticClassifydata(category, subcat, filedate, Createdby);
-				}
-				else if(subcat.equalsIgnoreCase("INTERNATIONAL"))
-				{
+				} else if (subcat.equalsIgnoreCase("INTERNATIONAL")) {
 					logger.info("Inside rupay International classification");
-					String getCount = "select count(*) from main_file_upload_dtls a where fileid in ( SELECT FILEID FROM MAIN_FILESOURCE WHERE FILE_CATEGORY = 'RUPAY' AND FILE_SUBCATEGORY = 'INTERNATIONAL') "+        
-							" AND FILEDATE = ? and FILTER_FLAG != (select FILTERATION FROM main_filesource b where a.fileid = b.fileid)";
-					
-					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] {filedate},Integer.class);
-					
-					if(pendingClass > 0)
+					String getCount = "select count(*) from main_file_upload_dtls a where fileid in ( SELECT FILEID FROM MAIN_FILESOURCE WHERE FILE_CATEGORY = 'RUPAY' AND FILE_SUBCATEGORY = 'INTERNATIONAL') "
+							+ " AND FILEDATE = ? and FILTER_FLAG != (select FILTERATION FROM main_filesource b where a.fileid = b.fileid)";
+
+					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] { filedate },
+							Integer.class);
+
+					if (pendingClass > 0)
 						InternationalClassifydata(category, subcat, filedate, Createdby);
 				}
-			}
-			else if (category.equalsIgnoreCase("VISA"))
-			{
+			} else if (category.equalsIgnoreCase("VISA")) {
 
-				if(subcat.equalsIgnoreCase("ISSUER"))
-				{
+				if (subcat.equalsIgnoreCase("ISSUER")) {
 					logger.info("Inside VISA ISSUER classification");
-					String getCount = "select count(1) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category = 'VISA' and file_subcategory = 'ISSUER') "+        
-							" AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
-					
-					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] {filedate},Integer.class);
-					
-					if(pendingClass > 0)
+					String getCount = "select count(1) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category = 'VISA' and file_subcategory = 'ISSUER') "
+							+ " AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
+
+					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] { filedate },
+							Integer.class);
+
+					if (pendingClass > 0)
 						VisaIssClassifydata(category, subcat, filedate, Createdby);
-				}
-				else if(subcat.equalsIgnoreCase("ACQUIRER"))
-				{
+				} else if (subcat.equalsIgnoreCase("ACQUIRER")) {
 					logger.info("Inside VISA ACQUIRER classification");
-					String getCount = "select count(*) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category  = 'VISA' AND FILE_SUBCATEGORY = 'ACQUIRER') "+        
-							" AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
-					
-					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] {filedate},Integer.class);
-					
-					if(pendingClass > 0)
+					String getCount = "select count(*) from main_file_upload_dtls a where fileid in ( select fileid from main_filesource where file_category  = 'VISA' AND FILE_SUBCATEGORY = 'ACQUIRER') "
+							+ " AND filedate = to_date(?,'dd/mm/yyyy') and filter_flag != (select filteration FROM main_filesource b where a.fileid = b.fileid)";
+
+					int pendingClass = getJdbcTemplate().queryForObject(getCount, new Object[] { filedate },
+							Integer.class);
+
+					if (pendingClass > 0)
 						VisaAcqClassifydata(category, subcat, filedate, Createdby);
 				}
-			
-				
-			}
-			else {
+
+			} else {
 
 				if (category.equals("NFS")) {
 					logger.info("******** In NFS ***********");
@@ -684,13 +550,11 @@ public String checkReconAlreadyProcessed(String category,
 					logger.info("******** In CASHNET ***********");
 					if (subcat.equals("ISSUER")) {
 						logger.info("******** In CASHNET - ISSUER ***********");
-						cashnetISSClassifydata(category, subcat, filedate,
-								Createdby);
+						cashnetISSClassifydata(category, subcat, filedate, Createdby);
 
 					} else if (subcat.equals("ACQUIRER")) {
 						logger.info("******** In CASHNET - ACQUIRER ***********");
-						cashnetAcqClassifydata(category, subcat, filedate,
-								Createdby);
+						cashnetAcqClassifydata(category, subcat, filedate, Createdby);
 
 					}
 
@@ -698,14 +562,11 @@ public String checkReconAlreadyProcessed(String category,
 
 			}
 
-			CompareSetupBean setupBean = chkStatus(compareSetupBeans, category,
-					filedate);
+			CompareSetupBean setupBean = chkStatus(compareSetupBeans, category, filedate);
 
-			logger.info("knockoff" + setupBean.getKnockoff_Flag() + "filter"
-					+ setupBean.getFilter_Flag());
+			logger.info("knockoff" + setupBean.getKnockoff_Flag() + "filter" + setupBean.getFilter_Flag());
 
-			if (setupBean.getKnockoff_Flag().equals("Completed")
-					&& setupBean.getFilter_Flag().equals("Completed")) {
+			if (setupBean.getKnockoff_Flag().equals("Completed") && setupBean.getFilter_Flag().equals("Completed")) {
 
 				result = true;
 
@@ -738,9 +599,8 @@ public String checkReconAlreadyProcessed(String category,
 	}
 
 	@Override
-	public boolean compareFiles(String category, String filedate,
-			CompareBean compareBean, String subcat, String dollar_val)
-			throws Exception {
+	public boolean compareFiles(String category, String filedate, CompareBean compareBean, String subcat,
+			String dollar_val) throws Exception {
 
 		boolean result = false;
 		try {
@@ -752,72 +612,55 @@ public String checkReconAlreadyProcessed(String category,
 
 			if (category.contains("ONUS")) {
 				logger.info("********* In ONUS ******");
-				result = OnusComparedata(category, subcat, filedate,
-						compareBean.getStEntryBy());
-			} 
-			else if (category.equals("NFS")) {
+				result = OnusComparedata(category, subcat, filedate, compareBean.getStEntryBy());
+			} else if (category.equals("NFS")) {
 
 				logger.info("********* In NFS ******");
 				if (subcat.equals("ISSUER")) {
 					logger.info("********* In ISSUER ******");
-					result = ISSComparedata(category, subcat, filedate,
-							compareBean.getStEntryBy());
+					result = ISSComparedata(category, subcat, filedate, compareBean.getStEntryBy());
 
 				} else if (subcat.equals("ACQUIRER")) {
 					logger.info("********* In ACQUIRER ******");
-					result = AcqComparedata(category, subcat, filedate,
-							compareBean.getStEntryBy());
+					result = AcqComparedata(category, subcat, filedate, compareBean.getStEntryBy());
 
 				}
 
-			} 
-			else if (category.equals("RUPAY")) {
-				
+			} else if (category.equals("RUPAY")) {
+
 				logger.info("*********** In Rupay ******************");
-				if(subcat.equals("DOMESTIC"))
-				{
+				if (subcat.equals("DOMESTIC")) {
 					logger.info("******** In Domestic ***********");
 					result = DomesticComparedata(category, subcat, filedate, compareBean.getStEntryBy());
-				}
-				else if(subcat.equals("INTERNATIONAL"))
-				{
+				} else if (subcat.equals("INTERNATIONAL")) {
 					logger.info("******** In International ***********");
 					result = InternationalComparedata(category, subcat, filedate, compareBean.getStEntryBy());
 				}
-			}
-			else if (category.equals("VISA")) {
-				
+			} else if (category.equals("VISA")) {
+
 				logger.info("*********** In Visa ******************");
-				if(subcat.equals("ISSUER"))
-				{
+				if (subcat.equals("ISSUER")) {
 					logger.info("******** In ISSUER ***********");
 					result = VisaCompareData(category, subcat, filedate, compareBean.getStEntryBy());
-				}
-				else
-				{
+				} else {
 					logger.info("******** In ACQUIRER ***********");
 					result = VisaAcqCompareData(category, subcat, filedate, compareBean.getStEntryBy());
 				}
-			}
-			else if (category.equals("CARDTOCARD")) {
-				
+			} else if (category.equals("CARDTOCARD")) {
+
 				logger.info("*********** In CARDTOCARD ******************");
-				//if(subcat.equals("ISSUER"))
+				// if(subcat.equals("ISSUER"))
 				{
 					logger.info("******** In ISSUER ***********");
 					result = CardtoCardCompareData(category, filedate, compareBean.getStEntryBy());
 				}
-			}
-			else if (category.equals("CASHNET")) {
-				
+			} else if (category.equals("CASHNET")) {
+
 				logger.info("*********** In CASHNET ******************");
-				if(subcat.equals("ISSUER"))
-				{
+				if (subcat.equals("ISSUER")) {
 					logger.info("******** In ISSUER ***********");
 					result = CashnetIssCompareData(category, filedate, compareBean.getStEntryBy());
-				}
-				else  if(subcat.equals("ACQUIRER"))
-				{
+				} else if (subcat.equals("ACQUIRER")) {
 					logger.info("******** In ACQUIRER ***********");
 					result = CashnetAcqCompareData(category, filedate, compareBean.getStEntryBy());
 				}
@@ -829,7 +672,7 @@ public String checkReconAlreadyProcessed(String category,
 		} catch (Exception e) {
 			// redirectAttributes.addFlashAttribute(ERROR_MSG,
 			// "Configuration already Exists.");
-			System.out.println("Exception in reconprocessdaoImpl "+e);
+			System.out.println("Exception in reconprocessdaoImpl " + e);
 			demo.logSQLException(e, "ReconProcessDaoImpl.compareFiles");
 			logger.error(" error in  ReconProcessDaoImpl.compareFiles",
 					new Exception(" ReconProcessDaoImpl.compareFiles", e));
@@ -838,8 +681,8 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean VisaIssDLeg(String category, String subCat, String filedate,
-			int rec_set_id) throws ParseException, Exception {
+	public boolean VisaIssDLeg(String category, String subCat, String filedate, int rec_set_id)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** VISA ISSUER D LEG COMPARE ****");
 			String response = null;
@@ -883,20 +726,16 @@ public String checkReconAlreadyProcessed(String category,
 			setFunction(false);
 
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean KnockoffTTUMdata(String category, String subCat,
-			String filedate, int rec_set_id) throws ParseException, Exception {
+	public boolean KnockoffTTUMdata(String category, String subCat, String filedate, int rec_set_id)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.KnockoffTTUMdata Start ****");
 			String response = null;
@@ -938,23 +777,17 @@ public String checkReconAlreadyProcessed(String category,
 			setFunction(false);
 
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_REC_SET_ID",
-					Types.INTEGER));
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_REC_SET_ID", Types.INTEGER));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean KnockoffVISATTUMdata(String category, String subCat,
-			String filedate, String entry_by, int rec_set_id)
-			throws ParseException, Exception {
+	public boolean KnockoffVISATTUMdata(String category, String subCat, String filedate, String entry_by,
+			int rec_set_id) throws ParseException, Exception {
 		try {
 			logger.info("***** FilterationDaoImpl.KnockoffVISATTUMdata Start ****");
 			String response = null;
@@ -965,8 +798,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_SUBCATEGORY", subCat.substring(0, 3));
 			inParams.put("I_REC_SET_ID", rec_set_id);
 
-			KnockoffvisaTTUM knockoffTTUM = new KnockoffvisaTTUM(
-					getJdbcTemplate());
+			KnockoffvisaTTUM knockoffTTUM = new KnockoffvisaTTUM(getJdbcTemplate());
 			Map<String, Object> outParams = knockoffTTUM.execute(inParams);
 
 			// logger.info("outParams msg1"+outParams.get("msg1"));
@@ -998,24 +830,19 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_REC_SET_ID",
-					Types.INTEGER));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_REC_SET_ID", Types.INTEGER));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
 	@Override
-	public CompareSetupBean chkStatus(List<CompareSetupBean> compareSetupBeans,
-			String category, String filedate) throws Exception {
+	public CompareSetupBean chkStatus(List<CompareSetupBean> compareSetupBeans, String category, String filedate)
+			throws Exception {
 
 		logger.info("***** ReconProcessDaoImpl.chkStatus Start ****");
 		boolean upload_flag = false, Filter_flag = false, knockoff_flag = false, COMAPRE_FLAG = false;
@@ -1031,22 +858,19 @@ public String checkReconAlreadyProcessed(String category,
 
 				logger.info("filter" + setupBean.getFilter_Flag());
 
-				if (getStatus("UPLOAD_FLAG", filedate, category,
-						setupBean.getInFileId()) > 0) {
+				if (getStatus("UPLOAD_FLAG", filedate, category, setupBean.getInFileId()) > 0) {
 
 					upload++;
 
 				}
-				if (getStatus("COMAPRE_FLAG", filedate, category,
-						setupBean.getInFileId()) > 0) {
+				if (getStatus("COMAPRE_FLAG", filedate, category, setupBean.getInFileId()) > 0) {
 
 					compare++;
 
 				}
 				if (setupBean.getKnockoff_Flag().equalsIgnoreCase("Y")) {
 
-					if (getStatus("FILTER_FLAG", filedate, category,
-							setupBean.getInFileId()) > 0) {
+					if (getStatus("FILTER_FLAG", filedate, category, setupBean.getInFileId()) > 0) {
 
 						filter++;
 
@@ -1062,8 +886,7 @@ public String checkReconAlreadyProcessed(String category,
 				}
 				if (setupBean.getKnockoff_Flag().equalsIgnoreCase("Y")) {
 
-					if (getStatus("KNOCKOFF_FLAG", filedate, category,
-							setupBean.getInFileId()) > 0) {
+					if (getStatus("KNOCKOFF_FLAG", filedate, category, setupBean.getInFileId()) > 0) {
 
 						knockoff++;
 
@@ -1127,19 +950,12 @@ public String checkReconAlreadyProcessed(String category,
 		return bean;
 	}
 
-	public int getStatus(String Flag, String filedate, String category,
-			int fileid) throws Exception {
+	public int getStatus(String Flag, String filedate, String category, int fileid) throws Exception {
 		logger.info("***** ReconProcessDaoImpl.getStatus Start ****");
 		try {
-			String query = "Select count(*)  FROM main_file_upload_dtls  where category='"
-					+ category
-					+ "'"
-					+ " and filedate = to_date('"
-					+ filedate
-					+ "','dd/mm/yyyy') and "
-					+ " fileid="
-					+ fileid
-					+ " and " + Flag + " = 'Y'";
+			String query = "Select count(*)  FROM main_file_upload_dtls  where category='" + category + "'"
+					+ " and filedate = to_date('" + filedate + "','dd/mm/yyyy') and " + " fileid=" + fileid + " and "
+					+ Flag + " = 'Y'";
 
 			logger.info(query);
 
@@ -1158,97 +974,75 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean chkStatus(CompareSetupBean setupBean, List<String> tables)
-			throws Exception {
+	public boolean chkStatus(CompareSetupBean setupBean, List<String> tables) throws Exception {
 		logger.info("***** ReconProcessDaoImpl.chkStatus Start ****");
 		try {
-			String query = "select FILEID from main_filesource where upper(filename) = '"
-					+ tables.get(0)
-					+ "' and FILE_CATEGORY='"
-					+ setupBean.getCategory()
-					+ "' and FILE_SUBCATEGORY='"
+			String query = "select FILEID from main_filesource where upper(filename) = '" + tables.get(0)
+					+ "' and FILE_CATEGORY='" + setupBean.getCategory() + "' and FILE_SUBCATEGORY='"
 					+ setupBean.getStSubCategory() + "'";
 
 			logger.info("query==" + query);
 
-			int fileid1 = getJdbcTemplate()
-					.queryForObject(query, Integer.class);
+			int fileid1 = getJdbcTemplate().queryForObject(query, Integer.class);
 			logger.info("fileid1==" + fileid1);
 
-			query = "select FILEID from main_filesource where upper(filename) = '"
-					+ tables.get(1)
-					+ "' and FILE_CATEGORY='"
-					+ setupBean.getCategory()
-					+ "' and FILE_SUBCATEGORY='"
+			query = "select FILEID from main_filesource where upper(filename) = '" + tables.get(1)
+					+ "' and FILE_CATEGORY='" + setupBean.getCategory() + "' and FILE_SUBCATEGORY='"
 					+ setupBean.getStSubCategory() + "'";
 			logger.info("query==" + query);
 
-			int fileid2 = getJdbcTemplate()
-					.queryForObject(query, Integer.class);
+			int fileid2 = getJdbcTemplate().queryForObject(query, Integer.class);
 			logger.info("fileid2==" + fileid2);
 
 			String knockoffFlag1, FilterFlag1, KnockoffFlag2, filterflag2;
 
 			FilterFlag1 = getJdbcTemplate().queryForObject(
-					"select FILTERATION from main_filesource where FILEID ="
-							+ fileid1 + "  ", String.class);
+					"select FILTERATION from main_filesource where FILEID =" + fileid1 + "  ", String.class);
 			logger.info("FilterFlag1==" + FilterFlag1);
 
 			knockoffFlag1 = getJdbcTemplate().queryForObject(
-					"select KNOCKOFF from main_filesource where FILEID ="
-							+ fileid1 + "  ", String.class);
+					"select KNOCKOFF from main_filesource where FILEID =" + fileid1 + "  ", String.class);
 			logger.info("knockoffFlag1==" + knockoffFlag1);
 
 			filterflag2 = getJdbcTemplate().queryForObject(
-					"select FILTERATION from main_filesource where FILEID ="
-							+ fileid2 + "  ", String.class);
+					"select FILTERATION from main_filesource where FILEID =" + fileid2 + "  ", String.class);
 			logger.info("filterflag2==" + filterflag2);
 
 			KnockoffFlag2 = getJdbcTemplate().queryForObject(
-					"select KNOCKOFF from main_filesource where FILEID ="
-							+ fileid2 + " ", String.class);
+					"select KNOCKOFF from main_filesource where FILEID =" + fileid2 + " ", String.class);
 			logger.info("KnockoffFlag2==" + KnockoffFlag2);
 
 			String sql = "";
 			int result1 = 0, result2 = 0;
-			if (FilterFlag1.equalsIgnoreCase("Y")
-					&& knockoffFlag1.equalsIgnoreCase("Y")) {
+			if (FilterFlag1.equalsIgnoreCase("Y") && knockoffFlag1.equalsIgnoreCase("Y")) {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = "
-						+ fileid1
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = " + fileid1
 						+ " and Knockoff_FLAG='Y' AND Upload_FLAG = 'Y' and FILTER_FLAG = 'Y' and COMAPRE_FLAG='N' and  filedate =  to_date('"
-						+ setupBean.getFileDate()
-						+ "','dd/mm/yyyy')  ";
+						+ setupBean.getFileDate() + "','dd/mm/yyyy')  ";
 				result1 = getJdbcTemplate().queryForObject(sql, Integer.class);
 
 			} else {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = "
-						+ fileid1
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = " + fileid1
 						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' and filedate =  to_date('"
-						+ setupBean.getFileDate()+"','dd/mm/yyyy') ";
+						+ setupBean.getFileDate() + "','dd/mm/yyyy') ";
 				result1 = getJdbcTemplate().queryForObject(sql, Integer.class);
 			}
 			logger.info("sql==" + sql);
 			logger.info("result1==" + result1);
 
-			if (filterflag2.equalsIgnoreCase("Y")
-					&& KnockoffFlag2.equalsIgnoreCase("Y")) {
+			if (filterflag2.equalsIgnoreCase("Y") && KnockoffFlag2.equalsIgnoreCase("Y")) {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = "
-						+ fileid2
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = " + fileid2
 						+ " and Knockoff_FLAG='Y' AND Upload_FLAG = 'Y' and FILTER_FLAG = 'Y' and COMAPRE_FLAG='N' "
-						+ "and filedate =  to_date('"
-						+ setupBean.getFileDate()+"','dd/mm/yyyy') ";
+						+ "and filedate =  to_date('" + setupBean.getFileDate() + "','dd/mm/yyyy') ";
 				result2 = getJdbcTemplate().queryForObject(sql, Integer.class);
 
 			} else {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = "
-						+ fileid2
-						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' "
-						+ "and filedate = to_date('"
-						+ setupBean.getFileDate()+"','dd/mm/yyyy') ";
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = " + fileid2
+						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' " + "and filedate = to_date('"
+						+ setupBean.getFileDate() + "','dd/mm/yyyy') ";
 				result2 = getJdbcTemplate().queryForObject(sql, Integer.class);
 
 			}
@@ -1274,58 +1068,43 @@ public String checkReconAlreadyProcessed(String category,
 		}
 	}
 
-	public boolean checkCompareStatus(String stFileDate, String stCategory,
-			String stTable1_Subcat, String stTable2_cat, List<String> tables)
-			throws Exception {
+	public boolean checkCompareStatus(String stFileDate, String stCategory, String stTable1_Subcat, String stTable2_cat,
+			List<String> tables) throws Exception {
 
 		logger.info("***** ReconProcessDaoImpl.checkCompareStatus Start ****");
 
 		try {
-			String query = "select FILEID from main_filesource where upper(filename) = '"
-					+ tables.get(0)
-					+ "' and FILE_CATEGORY='"
-					+ stCategory
-					+ "' and FILE_SUBCATEGORY='" + stTable1_Subcat + "'";
+			String query = "select FILEID from main_filesource where upper(filename) = '" + tables.get(0)
+					+ "' and FILE_CATEGORY='" + stCategory + "' and FILE_SUBCATEGORY='" + stTable1_Subcat + "'";
 			logger.info("query==" + query);
-			int fileid1 = getJdbcTemplate()
-					.queryForObject(query, Integer.class);
+			int fileid1 = getJdbcTemplate().queryForObject(query, Integer.class);
 			logger.info("fileid1==" + fileid1);
-			query = "select FILEID from main_filesource where upper(filename) = '"
-					+ tables.get(1)
-					+ "' and FILE_CATEGORY='"
-					+ stCategory
-					+ "' and FILE_SUBCATEGORY='" + stTable2_cat + "'";
+			query = "select FILEID from main_filesource where upper(filename) = '" + tables.get(1)
+					+ "' and FILE_CATEGORY='" + stCategory + "' and FILE_SUBCATEGORY='" + stTable2_cat + "'";
 			logger.info("query==" + query);
-			int fileid2 = getJdbcTemplate()
-					.queryForObject(query, Integer.class);
+			int fileid2 = getJdbcTemplate().queryForObject(query, Integer.class);
 			logger.info("fileid2==" + fileid2);
 			String knockoffFlag1, FilterFlag1, KnockoffFlag2, filterflag2;
 
 			FilterFlag1 = getJdbcTemplate().queryForObject(
-					"select FILTERATION from main_filesource where FILEID ="
-							+ fileid1 + "  ", String.class);
+					"select FILTERATION from main_filesource where FILEID =" + fileid1 + "  ", String.class);
 			logger.info("FilterFlag1==" + FilterFlag1);
 			knockoffFlag1 = getJdbcTemplate().queryForObject(
-					"select KNOCKOFF from main_filesource where FILEID ="
-							+ fileid1 + "  ", String.class);
+					"select KNOCKOFF from main_filesource where FILEID =" + fileid1 + "  ", String.class);
 			logger.info("knockoffFlag1==" + knockoffFlag1);
 
 			filterflag2 = getJdbcTemplate().queryForObject(
-					"select FILTERATION from main_filesource where FILEID ="
-							+ fileid2 + "  ", String.class);
+					"select FILTERATION from main_filesource where FILEID =" + fileid2 + "  ", String.class);
 			logger.info("filterflag2==" + filterflag2);
 			KnockoffFlag2 = getJdbcTemplate().queryForObject(
-					"select KNOCKOFF from main_filesource where FILEID ="
-							+ fileid2 + " ", String.class);
+					"select KNOCKOFF from main_filesource where FILEID =" + fileid2 + " ", String.class);
 			logger.info("KnockoffFlag2==" + KnockoffFlag2);
 
 			String sql = "";
 			int result1 = 0, result2 = 0;
-			if (FilterFlag1.equalsIgnoreCase("Y")
-					&& knockoffFlag1.equalsIgnoreCase("Y")) {
+			if (FilterFlag1.equalsIgnoreCase("Y") && knockoffFlag1.equalsIgnoreCase("Y")) {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = "
-						+ fileid1
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = " + fileid1
 						+ " and Knockoff_FLAG='Y' AND Upload_FLAG = 'Y' and FILTER_FLAG = 'Y' and COMAPRE_FLAG='N' "
 						+ "and  filedate =  '" + stFileDate + "'  ";
 
@@ -1333,30 +1112,24 @@ public String checkReconAlreadyProcessed(String category,
 
 			} else {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = "
-						+ fileid1
-						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' and filedate =  '"
-						+ stFileDate + "'  ";
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = " + fileid1
+						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' and filedate =  '" + stFileDate + "'  ";
 				result1 = getJdbcTemplate().queryForObject(sql, Integer.class);
 			}
 			logger.info("sql==" + sql);
 			logger.info("result1==" + result1);
 
-			if (filterflag2.equalsIgnoreCase("Y")
-					&& KnockoffFlag2.equalsIgnoreCase("Y")) {
+			if (filterflag2.equalsIgnoreCase("Y") && KnockoffFlag2.equalsIgnoreCase("Y")) {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = "
-						+ fileid2
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where  FILEID = " + fileid2
 						+ " and Knockoff_FLAG='Y' AND Upload_FLAG = 'Y' and FILTER_FLAG = 'Y' and COMAPRE_FLAG='N'"
 						+ " and filedate =  '" + stFileDate + "'  ";
 				result2 = getJdbcTemplate().queryForObject(sql, Integer.class);
 
 			} else {
 
-				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = "
-						+ fileid2
-						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' and filedate = '"
-						+ stFileDate + "'  ";
+				sql = "Select count(*) from MAIN_FILE_UPLOAD_DTLS where FILEID = " + fileid2
+						+ " and  Upload_FLAG = 'Y' and  COMAPRE_FLAG='N' and filedate = '" + stFileDate + "'  ";
 				result2 = getJdbcTemplate().queryForObject(sql, Integer.class);
 
 			}
@@ -1382,23 +1155,19 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean updatereconstatus(CompareSetupBean setupBean,
-			List<String> tables, List<String> categories) throws Exception {
+	public boolean updatereconstatus(CompareSetupBean setupBean, List<String> tables, List<String> categories)
+			throws Exception {
 		logger.info("***** ReconProcessDaoImpl.updatereconstatus Start ****");
 		try {
 
 			for (int i = 0; i < tables.size(); i++) {
 
-				String query = "select FILEID from main_filesource where upper(filename) = '"
-						+ tables.get(i)
-						+ "' and FILE_CATEGORY='"
-						+ setupBean.getCategory()
-						+ "' and FILE_SUBCATEGORY='"
+				String query = "select FILEID from main_filesource where upper(filename) = '" + tables.get(i)
+						+ "' and FILE_CATEGORY='" + setupBean.getCategory() + "' and FILE_SUBCATEGORY='"
 						+ categories.get(i) + "'";
 				logger.info("query==" + query);
 
-				int fileid1 = getJdbcTemplate().queryForObject(query,
-						Integer.class);
+				int fileid1 = getJdbcTemplate().queryForObject(query, Integer.class);
 				logger.info("fileid1==" + fileid1);
 
 				setupBean.setInFileId(fileid1);
@@ -1406,12 +1175,10 @@ public String checkReconAlreadyProcessed(String category,
 				 * if(setupBean.getCategory().equals("ONUS") ||
 				 * setupBean.getCategory().equals("AMEX")) {
 				 */
-				icompareConfigService.updateFlag("MANUALCOMPARE_FLAG",
-						setupBean);
+				icompareConfigService.updateFlag("MANUALCOMPARE_FLAG", setupBean);
 				icompareConfigService.updateFlag("COMAPRE_FLAG", setupBean);
 				/*
-				 * } else icompareConfigService.updateFlag("COMAPRE_FLAG",
-				 * setupBean);
+				 * } else icompareConfigService.updateFlag("COMAPRE_FLAG", setupBean);
 				 */
 
 			}
@@ -1429,62 +1196,47 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean updateRupayreconstatus(CompareSetupBean setupBean,
-			Set<String> tables, Set<String> subCategory) throws Exception {
+	public boolean updateRupayreconstatus(CompareSetupBean setupBean, Set<String> tables, Set<String> subCategory)
+			throws Exception {
 		logger.info("***** ReconProcessDaoImpl.updateRupayreconstatus Start ****");
 		try {
 
 			for (String fileName : tables) {
 				for (String stSubCat : subCategory) {
 					try {
-						if (fileName.equals("RUPAY")
-								&& stSubCat.equals("SURCHARGE")
+						if (fileName.equals("RUPAY") && stSubCat.equals("SURCHARGE")
 								&& setupBean.getCategory().equals("RUPAY")) {
 
 							logger.info("IN RUPAY-SURCHARGE");
-						} else if (fileName.equals("SWITCH")
-								&& stSubCat.equals("SURCHARGE")
+						} else if (fileName.equals("SWITCH") && stSubCat.equals("SURCHARGE")
 								&& setupBean.getCategory().equals("RUPAY")) {
 
 							logger.info("IN RUPAY-SURCHARGE");
-						} else if (fileName.equals("VISA")
-								&& stSubCat.equals("SURCHARGE")
+						} else if (fileName.equals("VISA") && stSubCat.equals("SURCHARGE")
 								&& setupBean.getCategory().equals("VISA")) {
 
 							logger.info("IN RUPAY-SURCHARGE");
-						} else if (fileName.equals("SWITCH")
-								&& stSubCat.equals("SURCHARGE")
+						} else if (fileName.equals("SWITCH") && stSubCat.equals("SURCHARGE")
 								&& setupBean.getCategory().equals("VISA")) {
 
 							logger.info("IN RUPAY-SURCHARGE");
 						} else {
-							String query = "select FILEID from main_filesource where upper(filename) = '"
-									+ fileName
-									+ "' and FILE_CATEGORY='"
-									+ setupBean.getCategory()
-									+ "' and FILE_SUBCATEGORY='"
-									+ stSubCat
-									+ "'";
+							String query = "select FILEID from main_filesource where upper(filename) = '" + fileName
+									+ "' and FILE_CATEGORY='" + setupBean.getCategory() + "' and FILE_SUBCATEGORY='"
+									+ stSubCat + "'";
 							logger.info("query==" + query);
-							int fileid1 = getJdbcTemplate().queryForObject(
-									query, Integer.class);
+							int fileid1 = getJdbcTemplate().queryForObject(query, Integer.class);
 							logger.info("fileid1==" + fileid1);
 							setupBean.setInFileId(fileid1);
-							icompareConfigService.updateFlag("COMAPRE_FLAG",
-									setupBean);
+							icompareConfigService.updateFlag("COMAPRE_FLAG", setupBean);
 							// ADDED BY INT5779 AS ON 12TH MARCH FOR MERGING MAN
 							// FILE CODE
-							icompareConfigService.updateFlag(
-									"MANUALCOMPARE_FLAG", setupBean);
+							icompareConfigService.updateFlag("MANUALCOMPARE_FLAG", setupBean);
 						}
 					} catch (Exception e) {
-						demo.logSQLException(e,
-								"ReconProcessDaoImpl.updateRupayreconstatus");
-						logger.error(
-								" error in ReconProcessDaoImpl.updateRupayreconstatus",
-								new Exception(
-										"ReconProcessDaoImpl.updateRupayreconstatus",
-										e));
+						demo.logSQLException(e, "ReconProcessDaoImpl.updateRupayreconstatus");
+						logger.error(" error in ReconProcessDaoImpl.updateRupayreconstatus",
+								new Exception("ReconProcessDaoImpl.updateRupayreconstatus", e));
 						throw e;
 					}
 				}
@@ -1495,8 +1247,7 @@ public String checkReconAlreadyProcessed(String category,
 			 * for (int i = 0; i < tables.size(); i++) {
 			 * 
 			 * 
-			 * String query
-			 * ="select FILEID from main_filesource where upper(filename) = '"
+			 * String query ="select FILEID from main_filesource where upper(filename) = '"
 			 * +tables.get(i)+"' and FILE_CATEGORY='"+setupBean.getCategory()+
 			 * "' and FILE_SUBCATEGORY='" +categories.get(i)+"'"; int
 			 * fileid1=getJdbcTemplate().queryForObject(query, Integer.class);
@@ -1515,12 +1266,9 @@ public String checkReconAlreadyProcessed(String category,
 			return true;
 
 		} catch (Exception ex) {
-			demo.logSQLException(ex,
-					"ReconProcessDaoImpl.updateRupayreconstatus");
-			logger.error(
-					" error in ReconProcessDaoImpl.updateRupayreconstatus",
-					new Exception("ReconProcessDaoImpl.updateRupayreconstatus",
-							ex));
+			demo.logSQLException(ex, "ReconProcessDaoImpl.updateRupayreconstatus");
+			logger.error(" error in ReconProcessDaoImpl.updateRupayreconstatus",
+					new Exception("ReconProcessDaoImpl.updateRupayreconstatus", ex));
 
 			return false;
 		}
@@ -1529,8 +1277,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// added for mastercard and cardtpcard on 16_03_2018
 
-	public boolean Mastercard_Iss1(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Mastercard_Iss1(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Iss1 Start ****");
 			// boolean resp=false;
@@ -1540,8 +1287,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			inParams.put("rec_set_id", value);
 
-			MasterCard_proc1 cbrmatching = new MasterCard_proc1(
-					getJdbcTemplate());
+			MasterCard_proc1 cbrmatching = new MasterCard_proc1(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams Msg==" + outParams.get("msg1"));
@@ -1567,8 +1313,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// CARDTOCARD
 
-	public boolean CardtoCard(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean CardtoCard(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.CardtoCard Start ****");
 			// boolean resp=false;
@@ -1578,8 +1323,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			inParams.put("rec_set_id", value);
 
-			CardtoCard_proc1 cbrmatching = new CardtoCard_proc1(
-					getJdbcTemplate());
+			CardtoCard_proc1 cbrmatching = new CardtoCard_proc1(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams Msg==" + outParams.get("msg1"));
@@ -1603,8 +1347,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// Onus_Pos
 
-	public boolean Onus_Pos_Cycle1(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Onus_Pos_Cycle1(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Onus_Pos_Cycle1 Start ****");
 			// boolean resp=false;
@@ -1621,10 +1364,10 @@ public String checkReconAlreadyProcessed(String category,
 			logger.info("***** ReconProcessDaoImpl.Onus_Pos_Cycle1 End ****");
 
 			if (outParams.get("msg1") != null) {
-				logger.info("outParams "+outParams.get("msg1"));
+				logger.info("outParams " + outParams.get("msg1"));
 				return true;
 			} else {
-				
+
 				return false;
 			}
 
@@ -1637,8 +1380,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Onus_Pos_Cycle2(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Onus_Pos_Cycle2(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Onus_Pos_Cycle2 Start ****");
 			// boolean resp=false;
@@ -1669,8 +1411,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Onus_Pos_Cycle3(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Onus_Pos_Cycle3(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Onus_Pos_Cycle3 Start ****");
 			// boolean resp=false;
@@ -1701,8 +1442,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Onus_Pos_Settlment(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Onus_Pos_Settlment(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Onus_Pos_Settlment Start ****");
 			// boolean resp=false;
@@ -1712,8 +1452,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			// inParams.put("rec_set_id", value);
 
-			onus_pos_settlmnt cbrmatching = new onus_pos_settlmnt(
-					getJdbcTemplate());
+			onus_pos_settlmnt cbrmatching = new onus_pos_settlmnt(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams Msg==" + outParams.get("msg1"));
@@ -1734,8 +1473,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Mastercard_Iss_CD(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Mastercard_Iss_CD(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Iss_CD Start ****");
 			// boolean resp=false;
@@ -1744,8 +1482,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("category_name", categ);
 			inParams.put("date_val", filedate);
 
-			MasterCard_proc_CD cbrmatching = new MasterCard_proc_CD(
-					getJdbcTemplate());
+			MasterCard_proc_CD cbrmatching = new MasterCard_proc_CD(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams Msg==" + outParams.get("msg1"));
@@ -1767,8 +1504,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean CardtoCard_settle(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean CardtoCard_settle(String categ, String filedate) throws ParseException, Exception {
 		try {
 
 			logger.info("***** ReconProcessDaoImpl.CardtoCard_settle Start ****");
@@ -1798,8 +1534,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Mastercard_Acq1(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Mastercard_Acq1(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Acq1 Start ****");
 			// boolean resp=false;
@@ -1809,8 +1544,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			inParams.put("rec_set_id", value);
 
-			MasterCard_proc_Acq cbrmatching = new MasterCard_proc_Acq(
-					getJdbcTemplate());
+			MasterCard_proc_Acq cbrmatching = new MasterCard_proc_Acq(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -1832,8 +1566,8 @@ public String checkReconAlreadyProcessed(String category,
 
 	}
 
-	public boolean Mastercard_Acq2(String categ, String filedate, String value,
-			String dollar_val) throws ParseException, Exception {
+	public boolean Mastercard_Acq2(String categ, String filedate, String value, String dollar_val)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Acq2 Start ****");
 			// boolean resp=false;
@@ -1844,8 +1578,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("rec_set_id", value);
 			inParams.put("dollar_val", dollar_val);
 
-			MasterCard_proc_Acq2 cbrmatching = new MasterCard_proc_Acq2(
-					getJdbcTemplate());
+			MasterCard_proc_Acq2 cbrmatching = new MasterCard_proc_Acq2(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -1869,8 +1602,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// For recon Settlement
 
-	public boolean Mastercard_Recon_Settlement_iss(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_Recon_Settlement_iss(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss Start ****");
 			// boolean resp=false;
@@ -1879,8 +1611,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("category_name", categ);
 			inParams.put("date_val", filedate);
 
-			MasterCard_recon_sett_pro cbrmatching = new MasterCard_recon_sett_pro(
-					getJdbcTemplate());
+			MasterCard_recon_sett_pro cbrmatching = new MasterCard_recon_sett_pro(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -1894,20 +1625,15 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss",
-							e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss",
+					new Exception(" ReconProcessDaoImpl.Mastercard_Recon_Settlement_iss", e));
 			return false;
 		}
 
 	}
 
-	public boolean Mastercard_Recon_Settlement_acq(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_Recon_Settlement_acq(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq Start ****");
 			// boolean resp=false;
@@ -1916,8 +1642,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("category_name", categ);
 			inParams.put("date_val", filedate);
 
-			MasterCard_recon_sett_pro1 cbrmatching = new MasterCard_recon_sett_pro1(
-					getJdbcTemplate());
+			MasterCard_recon_sett_pro1 cbrmatching = new MasterCard_recon_sett_pro1(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -1931,18 +1656,14 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq",
-							e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq",
+					new Exception(" ReconProcessDaoImpl.Mastercard_Recon_Settlement_acq", e));
 			return false;
 		}
 	}
 
-	public boolean Mastercard_Iss2(String categ, String filedate, String value,String dollar_val)
+	public boolean Mastercard_Iss2(String categ, String filedate, String value, String dollar_val)
 			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Iss2 Start ****");
@@ -1953,8 +1674,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			inParams.put("rec_set_id", value);
 			inParams.put("dollar_val", dollar_val);
-			MasterCard_proc2 cbrmatching = new MasterCard_proc2(
-					getJdbcTemplate());
+			MasterCard_proc2 cbrmatching = new MasterCard_proc2(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -1979,8 +1699,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// call auto-reversal
 
-	public boolean Mastercard_Acq_auto_rev(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_Acq_auto_rev(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Acq_auto_rev Start ****");
 			// boolean resp=false;
@@ -1990,8 +1709,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			// inParams.put("rec_set_id", value);
 
-			MasterCard_proc_Acq_auto_rev cbrmatching = new MasterCard_proc_Acq_auto_rev(
-					getJdbcTemplate());
+			MasterCard_proc_Acq_auto_rev cbrmatching = new MasterCard_proc_Acq_auto_rev(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -2005,12 +1723,9 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_Acq_auto_rev");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_Acq_auto_rev",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_Acq_auto_rev", e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_Acq_auto_rev");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_Acq_auto_rev",
+					new Exception(" ReconProcessDaoImpl.Mastercard_Acq_auto_rev", e));
 			return false;
 		}
 
@@ -2018,8 +1733,7 @@ public String checkReconAlreadyProcessed(String category,
 
 	// man_file_process
 
-	public boolean Mastercard_man_file_process(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_man_file_process(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_man_file_process Start ****");
 			// boolean resp=false;
@@ -2029,8 +1743,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			// inParams.put("rec_set_id", value);
 
-			MasterCard_proc_man_file cbrmatching = new MasterCard_proc_man_file(
-					getJdbcTemplate());
+			MasterCard_proc_man_file cbrmatching = new MasterCard_proc_man_file(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -2044,20 +1757,15 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_man_file_process");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_man_file_process",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_man_file_process",
-							e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_man_file_process");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_man_file_process",
+					new Exception(" ReconProcessDaoImpl.Mastercard_man_file_process", e));
 			return false;
 		}
 
 	}
 
-	public boolean Mastercard_man_file_process1(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_man_file_process1(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_man_file_process1 Start ****");
 			// boolean resp=false;
@@ -2067,8 +1775,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			// inParams.put("rec_set_id", value);
 
-			MasterCard_proc_man_file1 cbrmatching = new MasterCard_proc_man_file1(
-					getJdbcTemplate());
+			MasterCard_proc_man_file1 cbrmatching = new MasterCard_proc_man_file1(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -2082,20 +1789,15 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_man_file_process1");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_man_file_process1",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_man_file_process1",
-							e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_man_file_process1");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_man_file_process1",
+					new Exception(" ReconProcessDaoImpl.Mastercard_man_file_process1", e));
 			return false;
 		}
 
 	}
 
-	public boolean Mastercard_Iss_auto_rev(String categ, String filedate)
-			throws ParseException, Exception {
+	public boolean Mastercard_Iss_auto_rev(String categ, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Iss_auto_rev Start ****");
 			// boolean resp=false;
@@ -2105,8 +1807,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			// inParams.put("rec_set_id", value);
 
-			MasterCard_proc_Iss_auto_rev cbrmatching = new MasterCard_proc_Iss_auto_rev(
-					getJdbcTemplate());
+			MasterCard_proc_Iss_auto_rev cbrmatching = new MasterCard_proc_Iss_auto_rev(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -2120,12 +1821,9 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.Mastercard_Iss_auto_rev");
-			logger.error(
-					" error in  ReconProcessDaoImpl.Mastercard_Iss_auto_rev",
-					new Exception(
-							" ReconProcessDaoImpl.Mastercard_Iss_auto_rev", e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.Mastercard_Iss_auto_rev");
+			logger.error(" error in  ReconProcessDaoImpl.Mastercard_Iss_auto_rev",
+					new Exception(" ReconProcessDaoImpl.Mastercard_Iss_auto_rev", e));
 			return false;
 		}
 
@@ -2138,8 +1836,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlParameter("dollar_val", Types.VARCHAR));
@@ -2149,8 +1846,7 @@ public String checkReconAlreadyProcessed(String category,
 		}
 	}
 
-	public boolean Mastercard_Iss3(String categ, String filedate, String value)
-			throws ParseException, Exception {
+	public boolean Mastercard_Iss3(String categ, String filedate, String value) throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.Mastercard_Iss3 Start ****");
 			// boolean resp=false;
@@ -2160,8 +1856,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("date_val", filedate);
 			inParams.put("rec_set_id", value);
 
-			MasterCard_proc3 cbrmatching = new MasterCard_proc3(
-					getJdbcTemplate());
+			MasterCard_proc3 cbrmatching = new MasterCard_proc3(getJdbcTemplate());
 			Map<String, Object> outParams = cbrmatching.execute(inParams);
 
 			logger.info("outParams msg1" + outParams.get("msg1"));
@@ -2190,8 +1885,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2207,8 +1901,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2224,8 +1917,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2241,8 +1933,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2258,8 +1949,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2275,8 +1965,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2292,8 +1981,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			// declareParameter(new
 			// SqlParameter("rec_set_id",Types.VARCHAR));
@@ -2310,8 +1998,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2326,8 +2013,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2342,8 +2028,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
@@ -2359,8 +2044,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlParameter("rec_set_id", Types.VARCHAR));
 			declareParameter(new SqlParameter("dollar_val", Types.VARCHAR));
@@ -2377,8 +2061,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2393,8 +2076,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2411,8 +2093,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2427,8 +2108,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2445,8 +2125,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2461,8 +2140,7 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("category_name",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("category_name", Types.VARCHAR));
 			declareParameter(new SqlParameter("date_val", Types.VARCHAR));
 			declareParameter(new SqlOutParameter("msg1", Types.VARCHAR));
 
@@ -2471,34 +2149,25 @@ public String checkReconAlreadyProcessed(String category,
 	}
 
 	// END
-	public void clearTables(List<String> tables, CompareBean compareBeanObj)
-			throws Exception {
+	public void clearTables(List<String> tables, CompareBean compareBeanObj) throws Exception {
 		logger.info("***** ReconProcessDaoImpl.clearTables Start ****");
 		try {
 			for (int i = 0; i < tables.size(); i++) {
-				String TRUNCATE_QUERY = "TRUNCATE TABLE "
-						+ compareBeanObj.getStMergeCategory() + "_"
-						+ tables.get(i);
+				String TRUNCATE_QUERY = "TRUNCATE TABLE " + compareBeanObj.getStMergeCategory() + "_" + tables.get(i);
 				logger.info("TRUNCATE QUERY IS " + TRUNCATE_QUERY);
 				getJdbcTemplate().execute(TRUNCATE_QUERY);
-				TRUNCATE_QUERY = "TRUNCATE TABLE "
-						+ compareBeanObj.getStMergeCategory() + "_"
-						+ tables.get(i) + "_KNOCKOFF";
+				TRUNCATE_QUERY = "TRUNCATE TABLE " + compareBeanObj.getStMergeCategory() + "_" + tables.get(i)
+						+ "_KNOCKOFF";
 				logger.info("TRUNCATE QUERY IS " + TRUNCATE_QUERY);
 				getJdbcTemplate().execute(TRUNCATE_QUERY);
-				TRUNCATE_QUERY = "TRUNCATE TABLE "
-						+ compareBeanObj.getStMergeCategory() + "_"
-						+ tables.get(i) + "_MATCHED";
+				TRUNCATE_QUERY = "TRUNCATE TABLE " + compareBeanObj.getStMergeCategory() + "_" + tables.get(i)
+						+ "_MATCHED";
 				logger.info("TRUNCATE QUERY IS " + TRUNCATE_QUERY);
 				getJdbcTemplate().execute(TRUNCATE_QUERY);
-				TRUNCATE_QUERY = "TRUNCATE TABLE TEMP_"
-						+ compareBeanObj.getStMergeCategory() + "_"
-						+ tables.get(i);
+				TRUNCATE_QUERY = "TRUNCATE TABLE TEMP_" + compareBeanObj.getStMergeCategory() + "_" + tables.get(i);
 				logger.info("TRUNCATE QUERY IS " + TRUNCATE_QUERY);
 				getJdbcTemplate().execute(TRUNCATE_QUERY);
-				TRUNCATE_QUERY = "TRUNCATE TABLE RECON_"
-						+ compareBeanObj.getStMergeCategory() + "_"
-						+ tables.get(i);
+				TRUNCATE_QUERY = "TRUNCATE TABLE RECON_" + compareBeanObj.getStMergeCategory() + "_" + tables.get(i);
 				logger.info("TRUNCATE QUERY IS " + TRUNCATE_QUERY);
 				getJdbcTemplate().execute(TRUNCATE_QUERY);
 
@@ -2513,8 +2182,8 @@ public String checkReconAlreadyProcessed(String category,
 	}
 
 	// Nfs Issuer Process
-	public boolean ISSClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean ISSClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.ISSClassifydata Start ****");
 
@@ -2526,8 +2195,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			IssClassificaton acqclassificaton = new IssClassificaton(
-					getJdbcTemplate());
+			IssClassificaton acqclassificaton = new IssClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 
 			// logger.info("outParams msg1"+outParams.get("msg1"));
@@ -2551,29 +2219,25 @@ public String checkReconAlreadyProcessed(String category,
 	}
 
 	class IssClassificaton extends StoredProcedure {
-		//private static final String procName = "TEMP_NFS_ISS_CLASSIFY";
+		// private static final String procName = "TEMP_NFS_ISS_CLASSIFY";
 		private static final String procName = "NFS_ISS_CLASSIFY_NAINITAL";
 
 		IssClassificaton(JdbcTemplate JdbcTemplate) {
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean ISSComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean ISSComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.ISSComparedata Start ****");
 			String response = null;
@@ -2617,24 +2281,20 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
 	// Nfs Acquirer Process
 
-	public boolean AcqClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean AcqClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.AcqClassifydata Start ****");
 			String response = null;
@@ -2645,8 +2305,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			AcqClassificaton acqclassificaton = new AcqClassificaton(
-					getJdbcTemplate());
+			AcqClassificaton acqclassificaton = new AcqClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 
 			logger.info("***** ReconProcessDaoImpl.AcqClassifydata End ****");
@@ -2675,25 +2334,20 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean AcqComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean AcqComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
-			logger.info("***** ReconProcessDaoImpl.AcqComparedata Start ****"
-					+ "");
+			logger.info("***** ReconProcessDaoImpl.AcqComparedata Start ****" + "");
 			String response = null;
 			Map<String, Object> inParams = new HashMap<String, Object>();
 
@@ -2704,14 +2358,14 @@ public String checkReconAlreadyProcessed(String category,
 
 			AcqCompare acqComparedata = new AcqCompare(getJdbcTemplate());
 			Map<String, Object> outParams = acqComparedata.execute(inParams);
-			
-			logger.info("Outparam is "+outParams);
+
+			logger.info("Outparam is " + outParams);
 
 			logger.info("***** ReconProcessDaoImpl.AcqComparedata End ****");
 
-			if (outParams.get("ERROR_MESSAGE") != null){
-				
-				System.out.println(outParams.get("ERROR_MESSAGE") );
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				System.out.println(outParams.get("ERROR_MESSAGE"));
 
 				return false;
 			} else {
@@ -2735,24 +2389,20 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
 	// CASHNET Issuer Process
 
-	public boolean cashnetISSClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean cashnetISSClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.cashnetISSClassifydata Start ****");
 			String response = null;
@@ -2763,25 +2413,21 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			cashnetIssClassificaton acqclassificaton = new cashnetIssClassificaton(
-					getJdbcTemplate());
+			cashnetIssClassificaton acqclassificaton = new cashnetIssClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 			logger.info("***** ReconProcessDaoImpl.cashnetISSClassifydata End ****");
 			if (outParams.get("ERROR_MESSAGE") != null) {
-				logger.info("Error is "+outParams.get("ERROR_MESSAGE") );
+				logger.info("Error is " + outParams.get("ERROR_MESSAGE"));
 				return false;
 			} else {
-				logger.info("Procedure executed successfully" );
+				logger.info("Procedure executed successfully");
 				return true;
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.cashnetISSClassifydata");
-			logger.error(
-					" error in  ReconProcessDaoImpl.cashnetISSClassifydata",
-					new Exception(
-							" ReconProcessDaoImpl.cashnetISSClassifydata", e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.cashnetISSClassifydata");
+			logger.error(" error in  ReconProcessDaoImpl.cashnetISSClassifydata",
+					new Exception(" ReconProcessDaoImpl.cashnetISSClassifydata", e));
 			return false;
 		}
 
@@ -2794,80 +2440,61 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-/*	public boolean cashnetISSComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
-		try {
-			logger.info("***** ReconProcessDaoImpl.cashnetISSComparedata Start ****");
-			String response = null;
-			Map<String, Object> inParams = new HashMap<String, Object>();
-
-			inParams.put("I_CATEGORY", category);
-			inParams.put("I_SUBCATEGORY", subCat);
-			inParams.put("I_FILE_DATE", filedate);
-			inParams.put("I_ENTRY_BY", entry_by);
-
-			cashnetIssCompare issCompare = new cashnetIssCompare(
-					getJdbcTemplate());
-			Map<String, Object> outParams = issCompare.execute(inParams);
-			logger.info("***** ReconProcessDaoImpl.cashnetISSComparedata End ****");
-			if (outParams.get("ERROR_MESSAGE") != null) {
-
-				return false;
-			} else {
-
-				return true;
-			}
-
-		} catch (Exception e) {
-			demo.logSQLException(e, "ReconProcessDaoImpl.cashnetISSComparedata");
-			logger.error(
-					" error in  ReconProcessDaoImpl.cashnetISSComparedata",
-					new Exception(" ReconProcessDaoImpl.cashnetISSComparedata",
-							e));
-			return false;
-		}
-
-	}
-
-	class cashnetIssCompare extends StoredProcedure {
-		private static final String procName = "CASHNET_ISS_COMPARE_PROC";
-
-		cashnetIssCompare(JdbcTemplate JdbcTemplate) {
-			super(JdbcTemplate, procName);
-			setFunction(false);
-
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
-			compile();
-		}
-	}*/
+	/*
+	 * public boolean cashnetISSComparedata(String category, String subCat, String
+	 * filedate, String entry_by) throws ParseException, Exception { try {
+	 * logger.info("***** ReconProcessDaoImpl.cashnetISSComparedata Start ****");
+	 * String response = null; Map<String, Object> inParams = new HashMap<String,
+	 * Object>();
+	 * 
+	 * inParams.put("I_CATEGORY", category); inParams.put("I_SUBCATEGORY", subCat);
+	 * inParams.put("I_FILE_DATE", filedate); inParams.put("I_ENTRY_BY", entry_by);
+	 * 
+	 * cashnetIssCompare issCompare = new cashnetIssCompare( getJdbcTemplate());
+	 * Map<String, Object> outParams = issCompare.execute(inParams);
+	 * logger.info("***** ReconProcessDaoImpl.cashnetISSComparedata End ****"); if
+	 * (outParams.get("ERROR_MESSAGE") != null) {
+	 * 
+	 * return false; } else {
+	 * 
+	 * return true; }
+	 * 
+	 * } catch (Exception e) { demo.logSQLException(e,
+	 * "ReconProcessDaoImpl.cashnetISSComparedata"); logger.error(
+	 * " error in  ReconProcessDaoImpl.cashnetISSComparedata", new
+	 * Exception(" ReconProcessDaoImpl.cashnetISSComparedata", e)); return false; }
+	 * 
+	 * }
+	 * 
+	 * class cashnetIssCompare extends StoredProcedure { private static final String
+	 * procName = "CASHNET_ISS_COMPARE_PROC";
+	 * 
+	 * cashnetIssCompare(JdbcTemplate JdbcTemplate) { super(JdbcTemplate, procName);
+	 * setFunction(false);
+	 * 
+	 * declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+	 * declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+	 * declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+	 * compile(); } }
+	 */
 
 	// cashnet Acquirer Process
 
-	public boolean cashnetAcqClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean cashnetAcqClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.cashnetAcqClassifydata Start ****");
 			String response = null;
@@ -2878,8 +2505,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			cashnetAcqClassificaton acqclassificaton = new cashnetAcqClassificaton(
-					getJdbcTemplate());
+			cashnetAcqClassificaton acqclassificaton = new cashnetAcqClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 			logger.info("***** ReconProcessDaoImpl.cashnetAcqClassifydata End ****");
 			if (outParams.get("ERROR_MESSAGE") != null) {
@@ -2891,12 +2517,9 @@ public String checkReconAlreadyProcessed(String category,
 			}
 
 		} catch (Exception e) {
-			demo.logSQLException(e,
-					"ReconProcessDaoImpl.cashnetAcqClassifydata");
-			logger.error(
-					" error in  ReconProcessDaoImpl.cashnetAcqClassifydata",
-					new Exception(
-							" ReconProcessDaoImpl.cashnetAcqClassifydata", e));
+			demo.logSQLException(e, "ReconProcessDaoImpl.cashnetAcqClassifydata");
+			logger.error(" error in  ReconProcessDaoImpl.cashnetAcqClassifydata",
+					new Exception(" ReconProcessDaoImpl.cashnetAcqClassifydata", e));
 			return false;
 		}
 
@@ -2909,78 +2532,61 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	/*public boolean cashnetAcqComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
-		try {
-			logger.info("***** ReconProcessDaoImpl.cashnetAcqComparedata Start ****");
-			String response = null;
-			Map<String, Object> inParams = new HashMap<String, Object>();
+	/*
+	 * public boolean cashnetAcqComparedata(String category, String subCat, String
+	 * filedate, String entry_by) throws ParseException, Exception { try {
+	 * logger.info("***** ReconProcessDaoImpl.cashnetAcqComparedata Start ****");
+	 * String response = null; Map<String, Object> inParams = new HashMap<String,
+	 * Object>();
+	 * 
+	 * inParams.put("I_CATEGORY", category); inParams.put("I_SUBCATEGORY", subCat);
+	 * inParams.put("I_FILE_DATE", filedate); inParams.put("I_ENTRY_BY", entry_by);
+	 * 
+	 * cashnetAcqCompare acqComparedata = new cashnetAcqCompare( getJdbcTemplate());
+	 * Map<String, Object> outParams = acqComparedata.execute(inParams);
+	 * logger.info("***** ReconProcessDaoImpl.cashnetAcqComparedata End ****"); if
+	 * (outParams.get("ERROR_MESSAGE") != null) {
+	 * 
+	 * return false; } else {
+	 * 
+	 * return true; }
+	 * 
+	 * } catch (Exception e) { demo.logSQLException(e,
+	 * "ReconProcessDaoImpl.cashnetAcqComparedata"); logger.error(
+	 * " error in  ReconProcessDaoImpl.cashnetAcqComparedata", new
+	 * Exception(" ReconProcessDaoImpl.cashnetAcqComparedata", e)); return false; }
+	 * 
+	 * }
+	 */
 
-			inParams.put("I_CATEGORY", category);
-			inParams.put("I_SUBCATEGORY", subCat);
-			inParams.put("I_FILE_DATE", filedate);
-			inParams.put("I_ENTRY_BY", entry_by);
+	/*
+	 * class cashnetAcqCompare extends StoredProcedure { private static final String
+	 * procName = "CASHNET_ACQ_COMPARE_PROC";
+	 * 
+	 * cashnetAcqCompare(JdbcTemplate JdbcTemplate) { super(JdbcTemplate, procName);
+	 * setFunction(false);
+	 * 
+	 * declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+	 * declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+	 * declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+	 * declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+	 * compile(); } }
+	 */
 
-			cashnetAcqCompare acqComparedata = new cashnetAcqCompare(
-					getJdbcTemplate());
-			Map<String, Object> outParams = acqComparedata.execute(inParams);
-			logger.info("***** ReconProcessDaoImpl.cashnetAcqComparedata End ****");
-			if (outParams.get("ERROR_MESSAGE") != null) {
-
-				return false;
-			} else {
-
-				return true;
-			}
-
-		} catch (Exception e) {
-			demo.logSQLException(e, "ReconProcessDaoImpl.cashnetAcqComparedata");
-			logger.error(
-					" error in  ReconProcessDaoImpl.cashnetAcqComparedata",
-					new Exception(" ReconProcessDaoImpl.cashnetAcqComparedata",
-							e));
-			return false;
-		}
-
-	}*/
-
-	/*class cashnetAcqCompare extends StoredProcedure {
-		private static final String procName = "CASHNET_ACQ_COMPARE_PROC";
-
-		cashnetAcqCompare(JdbcTemplate JdbcTemplate) {
-			super(JdbcTemplate, procName);
-			setFunction(false);
-
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
-			compile();
-		}
-	}*/
-
-	public boolean WCCComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean WCCComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.WCCComparedata Start ****");
 			String response = null;
@@ -3018,16 +2624,12 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
@@ -3050,8 +2652,8 @@ public String checkReconAlreadyProcessed(String category,
 
 		/*
 		 * String updattab = "update MAIN_FILESOURCE set 'CBS_RUPAY_RAWDATA' " +
-		 * " where TABLENAME ='CBS_RUPAY_RAWDATA_COPY' "+
-		 * " and FILE_CATEGORY= 'RUPAY' " ; logger.info(updattab);
+		 * " where TABLENAME ='CBS_RUPAY_RAWDATA_COPY' "+ " and FILE_CATEGORY= 'RUPAY' "
+		 * ; logger.info(updattab);
 		 * 
 		 * getJdbcTemplate().execute(updattab);
 		 */
@@ -3067,16 +2669,15 @@ public String checkReconAlreadyProcessed(String category,
 
 		/*
 		 * String updattab = "update MAIN_FILESOURCE set 'CBS_RUPAY_RAWDATA' " +
-		 * " where TABLENAME ='CBS_RUPAY_RAWDATA_COPY' "+
-		 * " and FILE_CATEGORY= 'RUPAY' " ; logger.info(updattab);
-		 * getJdbcTemplate().execute(updattab);
+		 * " where TABLENAME ='CBS_RUPAY_RAWDATA_COPY' "+ " and FILE_CATEGORY= 'RUPAY' "
+		 * ; logger.info(updattab); getJdbcTemplate().execute(updattab);
 		 */
 
 		return true;
 	}
 
-	public boolean OnusCardLessCompare(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	public boolean OnusCardLessCompare(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.cardless Start ****");
 			String response = null;
@@ -3099,10 +2700,8 @@ public String checkReconAlreadyProcessed(String category,
 
 		} catch (Exception e) {
 			demo.logSQLException(e, "ReconProcessDaoImpl.cashnetISSComparedata");
-			logger.error(
-					" error in  ReconProcessDaoImpl.cashnetISSComparedata",
-					new Exception(" ReconProcessDaoImpl.cashnetISSComparedata",
-							e));
+			logger.error(" error in  ReconProcessDaoImpl.cashnetISSComparedata",
+					new Exception(" ReconProcessDaoImpl.cashnetISSComparedata", e));
 			return false;
 		}
 
@@ -3115,14 +2714,11 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
@@ -3137,20 +2733,15 @@ public String checkReconAlreadyProcessed(String category,
 			setFunction(false);
 
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean VisaIssDCBS(String category, String subCat, String filedate)
-			throws ParseException, Exception {
+	public boolean VisaIssDCBS(String category, String subCat, String filedate) throws ParseException, Exception {
 		try {
 			logger.info("***** VISA ISSUER D LEG COMPARE ****");
 			String response = null;
@@ -3182,58 +2773,57 @@ public String checkReconAlreadyProcessed(String category,
 		}
 
 	}
-	
+
 //ADDED BY INT8624 FOR UPDATING RESPONSECODE IN ONUS_POS 
-	public void getResponseCodeForOnusPos(String fileDate)throws ParseException, Exception
-	{
-		try
-		{
+	public void getResponseCodeForOnusPos(String fileDate) throws ParseException, Exception {
+		try {
 			String tableName = "RESPONSECODE_ONUS_POS_DATA";
-			//first dropping the table if exists
-			if(getJdbcTemplate().queryForObject("SELECT count (*) FROM tab WHERE tname  = '"+tableName+"'", new Object[] {},Integer.class) > 0)
-			{
-				getJdbcTemplate().execute("DROP TABLE "+tableName);
+			// first dropping the table if exists
+			if (getJdbcTemplate().queryForObject("SELECT count (*) FROM tab WHERE tname  = '" + tableName + "'",
+					new Object[] {}, Integer.class) > 0) {
+				getJdbcTemplate().execute("DROP TABLE " + tableName);
 				logger.info("table dropped");
 			}
-			
+
 			logger.info("Now Creating table");
-			String createTemp = "CREATE TABLE "+tableName+" AS ( SELECT DISTINCT (T1.DCRS_REMARKS || ' ('||T2.RESPCODE||')') AS DCRS_REMARKS,t1.SEG_TRAN_ID,t1.CREATEDBY,t1.CREATEDDATE,t1.FILEDATE,t1.FORACID,t1.TRAN_DATE,t1.E,t1.AMOUNT,t1.BALANCE,t1.TRAN_ID,t1.VALUE_DATE,t1.REMARKS,t1.REF_NO," + 
-					"t1.PARTICULARALS,t1.CONTRA_ACCOUNT,t1.PSTD_USER_ID,t1.ENTRY_DATE,t1.VFD_DATE,t1.PARTICULARALS2,t1.ORG_ACCT,t1.SYS_REF,t1.MAN_CONTRA_ACCOUNT " + 
-					"FROM SETTLEMENT_pos_CBS t1 INNER JOIN SETTLEMENT_pos_SWITCH t2 ON(  ( t1.REMARKS =  t2.PAN) AND  (SUBSTR( t1.REF_NO,2,6) =  SUBSTR( t2.TRACE,2,6)) " + 
-					"AND  TO_NUMBER( REPLACE(t1.AMOUNT,',','')) =  TO_NUMBER( REPLACE(t2.AMOUNT,',','')) ) where t1.DCRS_REMARKS = 'POS_ONU_CBS_UNMATCHED' AND t2.DCRS_REMARKS = 'POS_ONU' " + 
-					"and T1.FILEDATE = '"+fileDate+"')";
-			logger.info("create table query is "+createTemp);
-			
+			String createTemp = "CREATE TABLE " + tableName
+					+ " AS ( SELECT DISTINCT (T1.DCRS_REMARKS || ' ('||T2.RESPCODE||')') AS DCRS_REMARKS,t1.SEG_TRAN_ID,t1.CREATEDBY,t1.CREATEDDATE,t1.FILEDATE,t1.FORACID,t1.TRAN_DATE,t1.E,t1.AMOUNT,t1.BALANCE,t1.TRAN_ID,t1.VALUE_DATE,t1.REMARKS,t1.REF_NO,"
+					+ "t1.PARTICULARALS,t1.CONTRA_ACCOUNT,t1.PSTD_USER_ID,t1.ENTRY_DATE,t1.VFD_DATE,t1.PARTICULARALS2,t1.ORG_ACCT,t1.SYS_REF,t1.MAN_CONTRA_ACCOUNT "
+					+ "FROM SETTLEMENT_pos_CBS t1 INNER JOIN SETTLEMENT_pos_SWITCH t2 ON(  ( t1.REMARKS =  t2.PAN) AND  (SUBSTR( t1.REF_NO,2,6) =  SUBSTR( t2.TRACE,2,6)) "
+					+ "AND  TO_NUMBER( REPLACE(t1.AMOUNT,',','')) =  TO_NUMBER( REPLACE(t2.AMOUNT,',','')) ) where t1.DCRS_REMARKS = 'POS_ONU_CBS_UNMATCHED' AND t2.DCRS_REMARKS = 'POS_ONU' "
+					+ "and T1.FILEDATE = '" + fileDate + "')";
+			logger.info("create table query is " + createTemp);
+
 			getJdbcTemplate().execute(createTemp);
-			
-			String deleteFromSettlement = "DELETE from SETTLEMENT_POS_CBS OS1 WHERE FILEDATE = '"+fileDate+"' AND OS1.DCRS_REMARKS= 'POS_ONU_CBS_UNMATCHED' AND EXISTS " + 
-					"(SELECT 1 FROM "+tableName+" OS2 WHERE OS1.REMARKS = OS2.REMARKS AND SUBSTR( OS1.REF_NO,2,6) = SUBSTR( OS2.REF_NO,2,6) " + 
-					"AND TO_NUMBER( REPLACE(OS1.AMOUNT,',','')) = TO_NUMBER( REPLACE(OS2.AMOUNT,',','')))";
-			logger.info("DELETE QUERY IS "+deleteFromSettlement);
+
+			String deleteFromSettlement = "DELETE from SETTLEMENT_POS_CBS OS1 WHERE FILEDATE = '" + fileDate
+					+ "' AND OS1.DCRS_REMARKS= 'POS_ONU_CBS_UNMATCHED' AND EXISTS " + "(SELECT 1 FROM " + tableName
+					+ " OS2 WHERE OS1.REMARKS = OS2.REMARKS AND SUBSTR( OS1.REF_NO,2,6) = SUBSTR( OS2.REF_NO,2,6) "
+					+ "AND TO_NUMBER( REPLACE(OS1.AMOUNT,',','')) = TO_NUMBER( REPLACE(OS2.AMOUNT,',','')))";
+			logger.info("DELETE QUERY IS " + deleteFromSettlement);
 			getJdbcTemplate().execute(deleteFromSettlement);
 
-			String InsertQuery = "INSERT INTO SETTLEMENT_POS_CBS (DCRS_REMARKS,SEG_TRAN_ID,CREATEDBY,CREATEDDATE,FILEDATE,FORACID,TRAN_DATE,E,AMOUNT,BALANCE,TRAN_ID,VALUE_DATE,REMARKS,REF_NO," + 
-					"PARTICULARALS,CONTRA_ACCOUNT,PSTD_USER_ID,ENTRY_DATE,VFD_DATE,PARTICULARALS2,ORG_ACCT,SYS_REF,MAN_CONTRA_ACCOUNT) ( SELECT * FROM "+tableName+" )";
-			logger.info("Insert query is "+InsertQuery);
+			String InsertQuery = "INSERT INTO SETTLEMENT_POS_CBS (DCRS_REMARKS,SEG_TRAN_ID,CREATEDBY,CREATEDDATE,FILEDATE,FORACID,TRAN_DATE,E,AMOUNT,BALANCE,TRAN_ID,VALUE_DATE,REMARKS,REF_NO,"
+					+ "PARTICULARALS,CONTRA_ACCOUNT,PSTD_USER_ID,ENTRY_DATE,VFD_DATE,PARTICULARALS2,ORG_ACCT,SYS_REF,MAN_CONTRA_ACCOUNT) ( SELECT * FROM "
+					+ tableName + " )";
+			logger.info("Insert query is " + InsertQuery);
 			getJdbcTemplate().execute(InsertQuery);
-			
+
 			logger.info("Completed inserting in settlement table");
-			
-			//DROPPING TEMP TABLE
-			getJdbcTemplate().execute("DROP TABLE "+tableName);
+
+			// DROPPING TEMP TABLE
+			getJdbcTemplate().execute("DROP TABLE " + tableName);
 			logger.info("Table dropped");
-			
-		}
-		catch(Exception e)
-		{
-			logger.info("Exception in getResponseCodeForOnusPos "+e);
+
+		} catch (Exception e) {
+			logger.info("Exception in getResponseCodeForOnusPos " + e);
 			demo.logSQLException(e, "ReconProcessDaoImpl.getResponseCodeForOnusPos");
 		}
 	}
 
-	//RUPAY DOM CLASSIFICATION
-	public boolean DomesticClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+	// RUPAY DOM CLASSIFICATION
+	public boolean DomesticClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			String passdate = generalUtil.DateFunction(filedate);
 			logger.info("***** ReconProcessDaoImpl.DomesticClassifydata Start ****");
@@ -3243,12 +2833,11 @@ public String checkReconAlreadyProcessed(String category,
 
 			inParams.put("I_CATEGORY", category);
 			inParams.put("I_SUBCATEGORY", subCat);
-			//inParams.put("I_FILE_DATE", filedate);
+			// inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_FILE_DATE", passdate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			DomesticClassificaton acqclassificaton = new DomesticClassificaton(
-					getJdbcTemplate());
+			DomesticClassificaton acqclassificaton = new DomesticClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 
 			// logger.info("outParams msg1"+outParams.get("msg1"));
@@ -3270,7 +2859,7 @@ public String checkReconAlreadyProcessed(String category,
 		}
 
 	}
-	
+
 	class DomesticClassificaton extends StoredProcedure {
 		private static final String procName = "RUPAY_DOM_CLASSIFY";
 
@@ -3278,22 +2867,18 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
-	
-	public boolean InternationalClassifydata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+
+	public boolean InternationalClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.DomesticClassifydata Start ****");
 
@@ -3303,8 +2888,7 @@ public String checkReconAlreadyProcessed(String category,
 			inParams.put("I_FILEDATE", filedate);
 			inParams.put("I_ENTRY_BY", entry_by);
 
-			InternationalClassificaton acqclassificaton = new InternationalClassificaton(
-					getJdbcTemplate());
+			InternationalClassificaton acqclassificaton = new InternationalClassificaton(getJdbcTemplate());
 			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 
 			// logger.info("outParams msg1"+outParams.get("msg1"));
@@ -3326,7 +2910,7 @@ public String checkReconAlreadyProcessed(String category,
 		}
 
 	}
-	
+
 	class InternationalClassificaton extends StoredProcedure {
 		private static final String procName = "RUPAY_INT_CLASSIFY";
 
@@ -3334,29 +2918,25 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILEDATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILEDATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
 
-	public boolean DomesticComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
-		
+	public boolean DomesticComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+
 		String monthdate = generalUtil.DateFunction(filedate);
-		
-		
+
 		try {
 			logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
 			String response = null;
 			Map<String, Object> inParams = new HashMap<String, Object>();
-			
-			//inParams.put("I_FILE_DATE", filedate);
+
+			// inParams.put("I_FILE_DATE", filedate);
 			inParams.put("I_FILE_DATE", monthdate);
 			inParams.put("I_CATEGORY", category);
 			inParams.put("I_SUBCATEGORY", subCat);
@@ -3391,27 +2971,23 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("I_FILE_DATE",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-			declareParameter(new SqlParameter("I_SUBCATEGORY",
-					Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
 			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
-	
-	public boolean InternationalComparedata(String category, String subCat,
-			String filedate, String entry_by) throws ParseException, Exception {
+
+	public boolean InternationalComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
 		try {
 			logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
 			String response = null;
 			Map<String, Object> inParams = new HashMap<String, Object>();
-			
+
 			inParams.put("FILEDT", filedate);
 			inParams.put("USER_ID", entry_by);
 
@@ -3444,647 +3020,577 @@ public String checkReconAlreadyProcessed(String category,
 			super(JdbcTemplate, procName);
 			setFunction(false);
 
-			declareParameter(new SqlParameter("FILEDT",Types.VARCHAR));
+			declareParameter(new SqlParameter("FILEDT", Types.VARCHAR));
 			declareParameter(new SqlParameter("USER_ID", Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_CODE",
-					Types.VARCHAR));
-			declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-					Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
 			compile();
 		}
 	}
-	
+
 	// VISA ISSUER CLASSIFICATION
-		public boolean VisaIssClassifydata(String category, String subCat,
-				String filedate, String entry_by) throws ParseException, Exception {
-			try {
-				logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata Start ****");
+	public boolean VisaIssClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata Start ****");
 
-				String response = null;
-				Map<String, Object> inParams = new HashMap<String, Object>();
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
 
-				inParams.put("I_CATEGORY", category);
-				inParams.put("I_SUBCATEGORY", subCat);
-				inParams.put("I_FILE_DATE", filedate);
-				inParams.put("I_ENTRY_BY", entry_by);
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", subCat);
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_ENTRY_BY", entry_by);
 
-				VisaIssClassificaton acqclassificaton = new VisaIssClassificaton(
-						getJdbcTemplate());
-				Map<String, Object> outParams = acqclassificaton.execute(inParams);
+			VisaIssClassificaton acqclassificaton = new VisaIssClassificaton(getJdbcTemplate());
+			Map<String, Object> outParams = acqclassificaton.execute(inParams);
 
-				// logger.info("outParams msg1"+outParams.get("msg1"));
-				logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata End ****");
+			// logger.info("outParams msg1"+outParams.get("msg1"));
+			logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata End ****");
 
-				if (outParams.get("ERROR_MESSAGE") != null) {
+			if (outParams.get("ERROR_MESSAGE") != null) {
 
-					return false;
-				} else {
-
-					return true;
-				}
-
-			} catch (Exception e) {
-				demo.logSQLException(e, "ReconProcessDaoImpl.VisaIssClassifydata");
-				logger.error(" error in  ReconProcessDaoImpl.VisaIssClassifydata",
-						new Exception(" ReconProcessDaoImpl.VisaIssClassifydata", e));
 				return false;
+			} else {
+
+				return true;
 			}
 
-		}
-		
-		class VisaIssClassificaton extends StoredProcedure {
-			private static final String procName = "VISA_ISS_CLASSIFY";
-
-			VisaIssClassificaton(JdbcTemplate JdbcTemplate) {
-				super(JdbcTemplate, procName);
-				setFunction(false);
-
-				declareParameter(new SqlParameter("I_FILE_DATE",
-						Types.VARCHAR));
-				declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-				declareParameter(new SqlParameter("I_SUBCATEGORY",
-						Types.VARCHAR));
-				declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-				declareParameter(new SqlOutParameter("ERROR_CODE",
-						Types.VARCHAR));
-				declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-						Types.VARCHAR));
-				compile();
-			}
-		}
-		
-		// VISA ISSUER COMPARE
-		public boolean VisaCompareData(String category, String subCat,
-				String filedate, String entry_by) throws ParseException, Exception {
-			try {
-				logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
-				String response = null;
-				Map<String, Object> inParams = new HashMap<String, Object>();
-				
-				inParams.put("I_FILE_DATE", filedate);
-				inParams.put("I_CATEGORY", category);
-				inParams.put("I_SUBCATEGORY", subCat);
-				inParams.put("I_ENTRY_BY", entry_by);
-
-				VisaIssCompare issCompare = new VisaIssCompare(getJdbcTemplate());
-				Map<String, Object> outParams = issCompare.execute(inParams);
-
-				logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
-
-				if (outParams.get("ERROR_MESSAGE") != null) {
-
-					return false;
-				} else {
-
-					return true;
-				}
-
-			} catch (Exception e) {
-				demo.logSQLException(e, "ReconProcessDaoImpl.DomesticComparedata");
-				logger.error(" error in  ReconProcessDaoImpl.DomesticComparedata",
-						new Exception(" ReconProcessDaoImpl.DomesticComparedata", e));
-				return false;
-			}
-
-		}
-
-		class VisaIssCompare extends StoredProcedure {
-			private static final String procName = "RECON_VISA_ISS_PROC";
-
-			VisaIssCompare(JdbcTemplate JdbcTemplate) {
-				super(JdbcTemplate, procName);
-				setFunction(false);
-
-				declareParameter(new SqlParameter("I_FILE_DATE",
-						Types.VARCHAR));
-				declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-				declareParameter(new SqlParameter("I_SUBCATEGORY",
-						Types.VARCHAR));
-				declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-				declareParameter(new SqlOutParameter("ERROR_CODE",
-						Types.VARCHAR));
-				declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-						Types.VARCHAR));
-				compile();
-			}
-		}
-		// VISA ISSUER COMPARE
-				public boolean VisaAcqCompareData(String category, String subCat,
-						String filedate, String entry_by) throws ParseException, Exception {
-					try {
-						logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
-						String response = null;
-						Map<String, Object> inParams = new HashMap<String, Object>();
-						
-						inParams.put("I_FILE_DATE", filedate);
-						inParams.put("I_CATEGORY", category);
-						inParams.put("I_SUBCATEGORY", subCat);
-						inParams.put("I_ENTRY_BY", entry_by);
-
-						VisaAcqCompare issCompare = new VisaAcqCompare(getJdbcTemplate());
-						Map<String, Object> outParams = issCompare.execute(inParams);
-
-						logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
-
-						if (outParams.get("ERROR_MESSAGE") != null) {
-
-							return false;
-						} else {
-
-							return true;
-						}
-
-					} catch (Exception e) {
-						demo.logSQLException(e, "ReconProcessDaoImpl.DomesticComparedata");
-						logger.error(" error in  ReconProcessDaoImpl.DomesticComparedata",
-								new Exception(" ReconProcessDaoImpl.DomesticComparedata", e));
-						return false;
-					}
-
-				}
-
-				class VisaAcqCompare extends StoredProcedure {
-					private static final String procName = "RECON_VISA_ACQ_PROC";
-
-					VisaAcqCompare(JdbcTemplate JdbcTemplate) {
-						super(JdbcTemplate, procName);
-						setFunction(false);
-
-						declareParameter(new SqlParameter("I_FILE_DATE",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-						declareParameter(new SqlParameter("I_SUBCATEGORY",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_CODE",
-								Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-								Types.VARCHAR));
-						compile();
-					}
-				}
-		
-		// VISA ISSUER CLASSIFICATION
-				public boolean VisaAcqClassifydata(String category, String subCat,
-						String filedate, String entry_by) throws ParseException, Exception {
-					try {
-						logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata Start ****");
-
-						String response = null;
-						Map<String, Object> inParams = new HashMap<String, Object>();
-
-						inParams.put("I_CATEGORY", category);
-						inParams.put("I_SUBCATEGORY", subCat);
-						inParams.put("I_FILE_DATE", filedate);
-						inParams.put("I_ENTRY_BY", entry_by);
-
-						VisaAcqClassificaton acqclassificaton = new VisaAcqClassificaton(
-								getJdbcTemplate());
-						Map<String, Object> outParams = acqclassificaton.execute(inParams);
-
-						// logger.info("outParams msg1"+outParams.get("msg1"));
-						logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata End ****");
-
-						if (outParams.get("ERROR_MESSAGE") != null) {
-
-							return false;
-						} else {
-
-							return true;
-						}
-
-					} catch (Exception e) {
-						demo.logSQLException(e, "ReconProcessDaoImpl.VisaIssClassifydata");
-						logger.error(" error in  ReconProcessDaoImpl.VisaIssClassifydata",
-								new Exception(" ReconProcessDaoImpl.VisaIssClassifydata", e));
-						return false;
-					}
-
-				}
-				
-				class VisaAcqClassificaton extends StoredProcedure {
-					private static final String procName = "VISA_ACQ_CLASSIFY";
-
-					VisaAcqClassificaton(JdbcTemplate JdbcTemplate) {
-						super(JdbcTemplate, procName);
-						setFunction(false);
-
-						declareParameter(new SqlParameter("I_FILE_DATE",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-						declareParameter(new SqlParameter("I_SUBCATEGORY",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_CODE",
-								Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-								Types.VARCHAR));
-						compile();
-					}
-				}
-				
-		
-public boolean CardtoCardCompareData(String category,
-String filedate, String entry_by) throws ParseException, Exception {
-					try {
-						logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData Start ****");
-						String response = null;
-						Map<String, Object> inParams = new HashMap<String, Object>();
-						
-						inParams.put("I_FILE_DATE", filedate);
-						inParams.put("I_ENTRY_BY", entry_by);
-
-						CardtoCardIssCompare issCompare = new CardtoCardIssCompare(getJdbcTemplate());
-						Map<String, Object> outParams = issCompare.execute(inParams);
-
-						logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
-
-						if (outParams.get("ERROR_MESSAGE") != null) {
-
-							return false;
-						} else {
-
-							return true;
-						}
-
-					} catch (Exception e) {
-						demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
-						logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
-								new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
-						return false;
-					}
-
-				}
-
-				class CardtoCardIssCompare extends StoredProcedure {
-					private static final String procName = "RECON_CARDTOCARD_PROC";
-
-					CardtoCardIssCompare(JdbcTemplate JdbcTemplate) {
-						super(JdbcTemplate, procName);
-						setFunction(false);
-
-						declareParameter(new SqlParameter("I_FILE_DATE",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_CODE",
-								Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-								Types.VARCHAR));
-						compile();
-					}
-				}
-				
-				
-				public boolean CashnetIssCompareData(String category,
-						String filedate, String entry_by) throws ParseException, Exception {
-					try {
-						logger.info("***** ReconProcessDaoImpl.CashnetCompareData Issuer Start ****");
-						String response = null;
-						Map<String, Object> inParams = new HashMap<String, Object>();
-
-						inParams.put("I_FILE_DATE", filedate);
-						inParams.put("I_CATEGORY", category);
-						inParams.put("I_SUBCATEGORY", "");
-						inParams.put("I_ENTRY_BY", entry_by);
-
-						CashnetIssCompare issCompare = new CashnetIssCompare(getJdbcTemplate());
-						Map<String, Object> outParams = issCompare.execute(inParams);
-
-						logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
-
-						if (outParams.get("ERROR_MESSAGE") != null) {
-
-							return false;
-						} else {
-
-							return true;
-						}
-
-					} catch (Exception e) {
-						demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
-						logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
-								new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
-						return false;
-					}
-
-				}
-
-
-				class CashnetIssCompare extends StoredProcedure {
-					private static final String procName = "RECON_CASHNET_ISS_PROC";
-
-					CashnetIssCompare(JdbcTemplate JdbcTemplate) {
-						super(JdbcTemplate, procName);
-						setFunction(false);
-
-						declareParameter(new SqlParameter("I_FILE_DATE",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-						declareParameter(new SqlParameter("I_SUBCATEGORY",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_CODE",
-								Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-								Types.VARCHAR));
-						compile();
-					}
-				}
-
-				public boolean CashnetAcqCompareData(String category,
-						String filedate, String entry_by) throws ParseException, Exception {
-					try {
-						logger.info("***** ReconProcessDaoImpl.CashnetCompareData Acquirer Start ****");
-						String response = null;
-						Map<String, Object> inParams = new HashMap<String, Object>();
-
-						inParams.put("I_FILE_DATE", filedate);
-						inParams.put("I_CATEGORY", category);
-						inParams.put("I_SUBCATEGORY", "");
-						inParams.put("I_ENTRY_BY", entry_by);
-
-						CashnetAcqCompare issCompare = new CashnetAcqCompare(getJdbcTemplate());
-						Map<String, Object> outParams = issCompare.execute(inParams);
-
-						logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
-
-						if (outParams.get("ERROR_MESSAGE") != null) {
-
-							return false;
-						} else {
-
-							return true;
-						}
-
-					} catch (Exception e) {
-						demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
-						logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
-								new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
-						return false;
-					}
-
-				}
-
-
-				class CashnetAcqCompare extends StoredProcedure {
-					private static final String procName = "RECON_CASHNET_ACQ_PROC";
-
-					CashnetAcqCompare(JdbcTemplate JdbcTemplate) {
-						super(JdbcTemplate, procName);
-						setFunction(false);
-
-						declareParameter(new SqlParameter("I_FILE_DATE",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
-						declareParameter(new SqlParameter("I_SUBCATEGORY",
-								Types.VARCHAR));
-						declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_CODE",
-								Types.VARCHAR));
-						declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-								Types.VARCHAR));
-						compile();
-					}
-				}		
-		
-
-@Override
-public HashMap<String, Object> checkRupayIntRecon(String fileDate)
-{
-	HashMap<String, Object> output = new HashMap<String, Object>();
-	
-	try
-	{
-		String checkReconProcess = "select COUNT(*) from main_file_upload_dtls T1 where filedate = ? AND FILE_SUBCATEGORY = 'INTERNATIONAL' "+
-				"AND CATEGORY = 'RUPAY' AND T1.COMAPRE_FLAG = 'Y' "+
-				"and filter_flag = (SELECT FILTERATION FROM MAIN_FILESOURCE T2 WHERE T1.FILEID = T2.FILEID AND T1.CATEGORY = T2.FILE_CATEGORY "+
-				"AND T1.FILE_SUBCATEGORY = T2.FILE_SUBCATEGORY AND T1.FILTER_FLAG = T2.FILTERATION AND T1.KNOCKOFF_FLAG = T2.KNOCKOFF) ";
-		
-		int checkReconCount = getJdbcTemplate().queryForObject(checkReconProcess, new Object[] {fileDate}, Integer.class);
-		
-		if(checkReconCount > 0)
-		{
-			output.put("result", true);
-		}
-		else
-		{
-			output.put("result", false);
-			output.put("msg", "Recon is not processed");
-		}
-		
-	}
-	catch(Exception e)
-	{
-		logger.info("Exception in checkRupayIntRecon "+e);
-		output.put("result", false);
-		output.put("msg", "Exception in checkRupayIntRecon");
-	}
-	return output;
-}
-
-@Override
-public HashMap<String, Object> processRupayIntRecon(String fileDate, String entryBy)
-{
-	HashMap<String, Object> output = new HashMap<String, Object>();
-	
-	try
-	{
-		logger.info("***** ReconProcessDaoImpl.processRupayIntRecon Start ****");
-		String response = null;
-		Map<String, Object> inParams = new HashMap<String, Object>();
-		
-		inParams.put("FILEDT", fileDate);
-		inParams.put("USER_ID", entryBy);
-		
-
-		RupayIntProcess issCompare = new RupayIntProcess(getJdbcTemplate());
-		Map<String, Object> outParams = issCompare.execute(inParams);
-
-		logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
-
-		if (outParams.get("ERROR_MESSAGE") != null) {
-
-			output.put("result", false);
-			output.put("msg", "Recon not processed");
-		} else {
-			output.put("result", true);
-		}
-	
-	}
-	catch(Exception e)
-	{
-		output.put("result", false);
-		output.put("msg", "Exception is "+e);
-	}
-	return output;
-}
-
-class RupayIntProcess extends StoredProcedure {
-	private static final String procName = "RECON_RUPAY_INT";
-
-	RupayIntProcess(JdbcTemplate JdbcTemplate) {
-		super(JdbcTemplate, procName);
-		setFunction(false);
-
-		declareParameter(new SqlParameter("FILEDT",Types.VARCHAR));
-		declareParameter(new SqlParameter("USER_ID", Types.VARCHAR));
-		declareParameter(new SqlOutParameter("ERROR_MESSAGE",Types.VARCHAR));
-		compile();
-	}
-}
-
-
-@Override
-public HashMap<String, Object> checkCardtoCardRecon(String fileDate)
-{
-	HashMap<String, Object> output = new HashMap<String, Object>();
-	
-	try
-	{
-		String checkReconProcess = "select COUNT(*) from main_file_upload_dtls T1 where filedate = ? "+
-				"AND CATEGORY = 'CARDTOCARD' AND T1.COMAPRE_FLAG = 'Y' "+
-				"and filter_flag = (SELECT FILTERATION FROM MAIN_FILESOURCE T2 WHERE T1.FILEID = T2.FILEID AND T1.CATEGORY = T2.FILE_CATEGORY "+
-				"AND T1.FILE_SUBCATEGORY = T2.FILE_SUBCATEGORY AND T1.FILTER_FLAG = T2.FILTERATION AND T1.KNOCKOFF_FLAG = T2.KNOCKOFF) ";
-		
-		int checkReconCount = getJdbcTemplate().queryForObject(checkReconProcess, new Object[] {fileDate}, Integer.class);
-		
-		if(checkReconCount > 0)
-		{
-			output.put("result", true);
-			output.put("msg", "Recon is already Processed");
-		}
-		else
-		{
-			output.put("result", false);
-			output.put("msg", "Recon is not processed");
-		}
-		
-	}
-	catch(Exception e)
-	{
-		logger.info("Exception in checkRupayIntRecon "+e);
-		output.put("result", false);
-		output.put("msg", "Exception in checkRupayIntRecon");
-	}
-	return output;
-}
-
-public HashMap<String, Object> checkCardtoCardRawFiles(String filedate)
-{
-	HashMap<String, Object> output = new HashMap<String, Object>();
-	
-	try
-	{
-		String checkHostFileUpload = "SELECT COUNT(*) FROM MAIN_FILE_UPLOAD_DTLS WHERE FILEDATE = ? AND CATEGORY = 'CARDTOCARD'";
-		String checkNFSFileUpload = "SELECT COUNT(*) FROM MAIN_FILE_UPLOAD_DTLS WHERE FILEDATE = ? AND CATEGORY = 'NFS' AND FILE_SUBCATEGORY = 'ISSUER'"
-				+" AND FILEID = (SELECT FILEID FROM MAIN_FILESOURCE WHERE FILENAME = 'NFS' AND FILE_CATEGORY = 'CARDTOCARD' AND FILE_SUBCATEGORY = 'ISSUER')";
-		
-		int hostFileCount = getJdbcTemplate().queryForObject(checkHostFileUpload, new Object[] {filedate}, Integer.class);
-		int NFSFileCount = getJdbcTemplate().queryForObject(checkNFSFileUpload, new Object[] {filedate}, Integer.class);
-		
-		if(hostFileCount == 0)
-		{
-			output.put("result", false);
-			output.put("msg", "Host File is not uploaded");
-		}
-		else if(NFSFileCount == 0)
-		{
-			output.put("result", false);
-			output.put("msg", "NFS File is not uploaded");
-		}
-		else
-		{
-			output.put("result", true);
-		}
-		
-	}
-	catch(Exception e)
-	{
-		logger.info("Exception in checkCardtoCardRawFiles "+e);
-		output.put("result", false);
-		output.put("msg", "Exception while checking file upload");
-	}
-	return output;
-}
-
-public HashMap<String, Object> checkCardtoCardPrevRecon(String filedate)
-{
-	HashMap<String, Object> output = new HashMap<String, Object>();
-	try
-	{
-		String checkPrevRecon = "SELECT COUNT(*) FROM main_file_upload_dtls where filedate = to_date('"+
-					filedate+"','dd/mm/yyyy')-1 and category = 'CARDTOCARD'";
-		
-		int prevCount = getJdbcTemplate().queryForObject(checkPrevRecon, new Object[] {}, Integer.class);
-		
-		if(prevCount == 0)
-		{
-			output.put("result", false);
-			output.put("msg", "Previous day recon is not processed!");
-		}
-		else
-		{
-			output.put("result", true);			
-		}
-		
-	}
-	catch(Exception e)
-	{
-		logger.info("Exception in checkCardtoCardPrevRecon "+e);
-		output.put("result", false);
-		output.put("msg", "Exception while checking previous date recon!");
-	}
-	return output;
-}
-
-public boolean OnusComparedata(String category, String subCat,
-		String filedate, String entry_by) throws ParseException, Exception {
-	try {
-		logger.info("***** ReconProcessDaoImpl.OnusComparedata Start ****");
-		String response = null;
-		Map<String, Object> inParams = new HashMap<String, Object>();
-
-		inParams.put("i_filedate", filedate);
-		inParams.put("i_entry_by", entry_by);
-
-		OnusCompare issCompare = new OnusCompare(getJdbcTemplate());
-		Map<String, Object> outParams = issCompare.execute(inParams);
-
-		logger.info("***** ReconProcessDaoImpl.OnusComparedata End ****");
-
-		if (outParams.get("ERROR_MESSAGE") != null) {
-
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.VisaIssClassifydata");
+			logger.error(" error in  ReconProcessDaoImpl.VisaIssClassifydata",
+					new Exception(" ReconProcessDaoImpl.VisaIssClassifydata", e));
 			return false;
-		} else {
-
-			return true;
 		}
 
-	} catch (Exception e) {
-		demo.logSQLException(e, "ReconProcessDaoImpl.OnusComparedata");
-		logger.error(" error in  ReconProcessDaoImpl.OnusComparedata",
-				new Exception(" ReconProcessDaoImpl.OnusComparedata", e));
-		return false;
 	}
 
-}
+	class VisaIssClassificaton extends StoredProcedure {
+		private static final String procName = "VISA_ISS_CLASSIFY";
 
-class OnusCompare extends StoredProcedure {
-	private static final String procName = "recon_onus_proc";
+		VisaIssClassificaton(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
 
-	OnusCompare(JdbcTemplate JdbcTemplate) {
-		super(JdbcTemplate, procName);
-		setFunction(false);
-
-		declareParameter(new SqlParameter("i_filedate",
-				Types.VARCHAR));		
-		declareParameter(new SqlParameter("i_entry_by",
-						Types.VARCHAR));		
-				
-		declareParameter(new SqlOutParameter("ERROR_MESSAGE",
-				Types.VARCHAR));
-		compile();
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
 	}
-}
+
+	// VISA ISSUER COMPARE
+	public boolean VisaCompareData(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", subCat);
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			VisaIssCompare issCompare = new VisaIssCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.DomesticComparedata");
+			logger.error(" error in  ReconProcessDaoImpl.DomesticComparedata",
+					new Exception(" ReconProcessDaoImpl.DomesticComparedata", e));
+			return false;
+		}
+
+	}
+
+	class VisaIssCompare extends StoredProcedure {
+		private static final String procName = "RECON_VISA_ISS_PROC";
+
+		VisaIssCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	// VISA ISSUER COMPARE
+	public boolean VisaAcqCompareData(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.DomesticComparedata Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", subCat);
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			VisaAcqCompare issCompare = new VisaAcqCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.DomesticComparedata");
+			logger.error(" error in  ReconProcessDaoImpl.DomesticComparedata",
+					new Exception(" ReconProcessDaoImpl.DomesticComparedata", e));
+			return false;
+		}
+
+	}
+
+	class VisaAcqCompare extends StoredProcedure {
+		private static final String procName = "RECON_VISA_ACQ_PROC";
+
+		VisaAcqCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	// VISA ISSUER CLASSIFICATION
+	public boolean VisaAcqClassifydata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata Start ****");
+
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", subCat);
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			VisaAcqClassificaton acqclassificaton = new VisaAcqClassificaton(getJdbcTemplate());
+			Map<String, Object> outParams = acqclassificaton.execute(inParams);
+
+			// logger.info("outParams msg1"+outParams.get("msg1"));
+			logger.info("***** ReconProcessDaoImpl.VisaIssClassifydata End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.VisaIssClassifydata");
+			logger.error(" error in  ReconProcessDaoImpl.VisaIssClassifydata",
+					new Exception(" ReconProcessDaoImpl.VisaIssClassifydata", e));
+			return false;
+		}
+
+	}
+
+	class VisaAcqClassificaton extends StoredProcedure {
+		private static final String procName = "VISA_ACQ_CLASSIFY";
+
+		VisaAcqClassificaton(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	public boolean CardtoCardCompareData(String category, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			CardtoCardIssCompare issCompare = new CardtoCardIssCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
+			logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
+					new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
+			return false;
+		}
+
+	}
+
+	class CardtoCardIssCompare extends StoredProcedure {
+		private static final String procName = "RECON_CARDTOCARD_PROC";
+
+		CardtoCardIssCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	public boolean CashnetIssCompareData(String category, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.CashnetCompareData Issuer Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", "");
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			CashnetIssCompare issCompare = new CashnetIssCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
+			logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
+					new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
+			return false;
+		}
+
+	}
+
+	class CashnetIssCompare extends StoredProcedure {
+		private static final String procName = "RECON_CASHNET_ISS_PROC";
+
+		CashnetIssCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	public boolean CashnetAcqCompareData(String category, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.CashnetCompareData Acquirer Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("I_FILE_DATE", filedate);
+			inParams.put("I_CATEGORY", category);
+			inParams.put("I_SUBCATEGORY", "");
+			inParams.put("I_ENTRY_BY", entry_by);
+
+			CashnetAcqCompare issCompare = new CashnetAcqCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.CardtoCardCompareData End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.CardtoCardCompareData");
+			logger.error(" error in  ReconProcessDaoImpl.CardtoCardCompareData",
+					new Exception(" ReconProcessDaoImpl.CardtoCardCompareData", e));
+			return false;
+		}
+
+	}
+
+	class CashnetAcqCompare extends StoredProcedure {
+		private static final String procName = "RECON_CASHNET_ACQ_PROC";
+
+		CashnetAcqCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("I_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_CATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_SUBCATEGORY", Types.VARCHAR));
+			declareParameter(new SqlParameter("I_ENTRY_BY", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_CODE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	@Override
+	public HashMap<String, Object> checkRupayIntRecon(String fileDate) {
+		HashMap<String, Object> output = new HashMap<String, Object>();
+
+		try {
+			String checkReconProcess = "select COUNT(*) from main_file_upload_dtls T1 where filedate = ? AND FILE_SUBCATEGORY = 'INTERNATIONAL' "
+					+ "AND CATEGORY = 'RUPAY' AND T1.COMAPRE_FLAG = 'Y' "
+					+ "and filter_flag = (SELECT FILTERATION FROM MAIN_FILESOURCE T2 WHERE T1.FILEID = T2.FILEID AND T1.CATEGORY = T2.FILE_CATEGORY "
+					+ "AND T1.FILE_SUBCATEGORY = T2.FILE_SUBCATEGORY AND T1.FILTER_FLAG = T2.FILTERATION AND T1.KNOCKOFF_FLAG = T2.KNOCKOFF) ";
+
+			int checkReconCount = getJdbcTemplate().queryForObject(checkReconProcess, new Object[] { fileDate },
+					Integer.class);
+
+			if (checkReconCount > 0) {
+				output.put("result", true);
+			} else {
+				output.put("result", false);
+				output.put("msg", "Recon is not processed");
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception in checkRupayIntRecon " + e);
+			output.put("result", false);
+			output.put("msg", "Exception in checkRupayIntRecon");
+		}
+		return output;
+	}
+
+	@Override
+	public HashMap<String, Object> processRupayIntRecon(String fileDate, String entryBy) {
+		HashMap<String, Object> output = new HashMap<String, Object>();
+
+		try {
+			logger.info("***** ReconProcessDaoImpl.processRupayIntRecon Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("FILEDT", fileDate);
+			inParams.put("USER_ID", entryBy);
+
+			RupayIntProcess issCompare = new RupayIntProcess(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.DomesticComparedata End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				output.put("result", false);
+				output.put("msg", "Recon not processed");
+			} else {
+				output.put("result", true);
+			}
+
+		} catch (Exception e) {
+			output.put("result", false);
+			output.put("msg", "Exception is " + e);
+		}
+		return output;
+	}
+
+	class RupayIntProcess extends StoredProcedure {
+		private static final String procName = "RECON_RUPAY_INT";
+
+		RupayIntProcess(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("FILEDT", Types.VARCHAR));
+			declareParameter(new SqlParameter("USER_ID", Types.VARCHAR));
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	@Override
+	public HashMap<String, Object> checkCardtoCardRecon(String fileDate) {
+		HashMap<String, Object> output = new HashMap<String, Object>();
+
+		try {
+			String checkReconProcess = "select COUNT(*) from main_file_upload_dtls T1 where filedate = ? "
+					+ "AND CATEGORY = 'CARDTOCARD' AND T1.COMAPRE_FLAG = 'Y' "
+					+ "and filter_flag = (SELECT FILTERATION FROM MAIN_FILESOURCE T2 WHERE T1.FILEID = T2.FILEID AND T1.CATEGORY = T2.FILE_CATEGORY "
+					+ "AND T1.FILE_SUBCATEGORY = T2.FILE_SUBCATEGORY AND T1.FILTER_FLAG = T2.FILTERATION AND T1.KNOCKOFF_FLAG = T2.KNOCKOFF) ";
+
+			int checkReconCount = getJdbcTemplate().queryForObject(checkReconProcess, new Object[] { fileDate },
+					Integer.class);
+
+			if (checkReconCount > 0) {
+				output.put("result", true);
+				output.put("msg", "Recon is already Processed");
+			} else {
+				output.put("result", false);
+				output.put("msg", "Recon is not processed");
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception in checkRupayIntRecon " + e);
+			output.put("result", false);
+			output.put("msg", "Exception in checkRupayIntRecon");
+		}
+		return output;
+	}
+
+	public HashMap<String, Object> checkCardtoCardRawFiles(String filedate) {
+		HashMap<String, Object> output = new HashMap<String, Object>();
+
+		try {
+			String checkHostFileUpload = "SELECT COUNT(*) FROM MAIN_FILE_UPLOAD_DTLS WHERE FILEDATE = ? AND CATEGORY = 'CARDTOCARD'";
+			String checkNFSFileUpload = "SELECT COUNT(*) FROM MAIN_FILE_UPLOAD_DTLS WHERE FILEDATE = ? AND CATEGORY = 'NFS' AND FILE_SUBCATEGORY = 'ISSUER'"
+					+ " AND FILEID = (SELECT FILEID FROM MAIN_FILESOURCE WHERE FILENAME = 'NFS' AND FILE_CATEGORY = 'CARDTOCARD' AND FILE_SUBCATEGORY = 'ISSUER')";
+
+			int hostFileCount = getJdbcTemplate().queryForObject(checkHostFileUpload, new Object[] { filedate },
+					Integer.class);
+			int NFSFileCount = getJdbcTemplate().queryForObject(checkNFSFileUpload, new Object[] { filedate },
+					Integer.class);
+
+			if (hostFileCount == 0) {
+				output.put("result", false);
+				output.put("msg", "Host File is not uploaded");
+			} else if (NFSFileCount == 0) {
+				output.put("result", false);
+				output.put("msg", "NFS File is not uploaded");
+			} else {
+				output.put("result", true);
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception in checkCardtoCardRawFiles " + e);
+			output.put("result", false);
+			output.put("msg", "Exception while checking file upload");
+		}
+		return output;
+	}
+
+	public HashMap<String, Object> checkCardtoCardPrevRecon(String filedate) {
+		HashMap<String, Object> output = new HashMap<String, Object>();
+		try {
+			String checkPrevRecon = "SELECT COUNT(*) FROM main_file_upload_dtls where filedate = to_date('" + filedate
+					+ "','dd/mm/yyyy')-1 and category = 'CARDTOCARD'";
+
+			int prevCount = getJdbcTemplate().queryForObject(checkPrevRecon, new Object[] {}, Integer.class);
+
+			if (prevCount == 0) {
+				output.put("result", false);
+				output.put("msg", "Previous day recon is not processed!");
+			} else {
+				output.put("result", true);
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception in checkCardtoCardPrevRecon " + e);
+			output.put("result", false);
+			output.put("msg", "Exception while checking previous date recon!");
+		}
+		return output;
+	}
+
+	public boolean OnusComparedata(String category, String subCat, String filedate, String entry_by)
+			throws ParseException, Exception {
+		try {
+			logger.info("***** ReconProcessDaoImpl.OnusComparedata Start ****");
+			String response = null;
+			Map<String, Object> inParams = new HashMap<String, Object>();
+
+			inParams.put("i_filedate", filedate);
+			inParams.put("i_entry_by", entry_by);
+
+			OnusCompare issCompare = new OnusCompare(getJdbcTemplate());
+			Map<String, Object> outParams = issCompare.execute(inParams);
+
+			logger.info("***** ReconProcessDaoImpl.OnusComparedata End ****");
+
+			if (outParams.get("ERROR_MESSAGE") != null) {
+
+				return false;
+			} else {
+
+				return true;
+			}
+
+		} catch (Exception e) {
+			demo.logSQLException(e, "ReconProcessDaoImpl.OnusComparedata");
+			logger.error(" error in  ReconProcessDaoImpl.OnusComparedata",
+					new Exception(" ReconProcessDaoImpl.OnusComparedata", e));
+			return false;
+		}
+
+	}
+
+	class OnusCompare extends StoredProcedure {
+		private static final String procName = "recon_onus_proc";
+
+		OnusCompare(JdbcTemplate JdbcTemplate) {
+			super(JdbcTemplate, procName);
+			setFunction(false);
+
+			declareParameter(new SqlParameter("i_filedate", Types.VARCHAR));
+			declareParameter(new SqlParameter("i_entry_by", Types.VARCHAR));
+
+			declareParameter(new SqlOutParameter("ERROR_MESSAGE", Types.VARCHAR));
+			compile();
+		}
+	}
 
 }

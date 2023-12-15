@@ -33,9 +33,9 @@ public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	LoginDao loginDao;
-	
-	Logger logger =Logger.getLogger(LoginServiceImpl.class);
-	
+
+	Logger logger = Logger.getLogger(LoginServiceImpl.class);
+
 	@SuppressWarnings({ "unused", "rawtypes" })
 	@Override
 	public void validateUser(LoginBean loginBean) throws Exception {
@@ -101,70 +101,68 @@ public class LoginServiceImpl implements LoginService {
 			}
 
 			logger.info("***** LoginServiceImpl.validateUser End ****");
-		}catch(AuthenticationException e){
+		} catch (AuthenticationException e) {
 			demo.logSQLException(e, "LoginServiceImpl.validateUser");
-			logger.error(" error in LoginServiceImpl.validateUser", new Exception("LoginServiceImpl.validateUser",e));
+			logger.error(" error in LoginServiceImpl.validateUser", new Exception("LoginServiceImpl.validateUser", e));
 			throw new AuthenticationException("Invalid Username and/or Password.");
-		}catch (Exception e) {
+		} catch (Exception e) {
 			demo.logSQLException(e, "LoginController.validateUser");
-			logger.error(" error in LoginServiceImpl.validateUser", new Exception("LoginServiceImpl.validateUser",e));
+			logger.error(" error in LoginServiceImpl.validateUser", new Exception("LoginServiceImpl.validateUser", e));
 			throw e;
 		}
 	}
 
 	@Override
 	public LoginBean getUserDetail(LoginBean loginBean) throws Exception {
-		try{
+		try {
 			return loginDao.getUserDetail(loginBean);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw e;
 		}
 	}
 
 	@Override
 	public void invalidateUser(LoginBean loginBean) throws Exception {
-		try{
+		try {
 			loginDao.invalidateUser(loginBean);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw e;
 		}
-		
-	}
-	
-	@Override
-	public void closeSession(LoginBean loginBean) throws Exception {
-		try{
-			loginDao.closeSession(loginBean);
-		}catch(Exception e){
-			throw e;
-		}
-		
+
 	}
 
-	
 	@Override
-	public boolean checkIp(LoginBean loginBean) throws Exception{
+	public void closeSession(LoginBean loginBean) throws Exception {
+		try {
+			loginDao.closeSession(loginBean);
+		} catch (Exception e) {
+			throw e;
+		}
+
+	}
+
+	@Override
+	public boolean checkIp(LoginBean loginBean) throws Exception {
 		return loginDao.checkIp(loginBean);
 	}
-	
+
 	@Override
-	public Map<String, Object> getAllSession(LoginBean loginBean) throws Exception{
-			return loginDao.getAllSession(loginBean);
+	public Map<String, Object> getAllSession(LoginBean loginBean) throws Exception {
+		return loginDao.getAllSession(loginBean);
 	}
 
 	@Override
 	public List<ProcessDtlBean> getProcessdtls(String Flag) {
-		
+
 		return loginDao.getProcessdtls(Flag);
 	}
-	
-	@Override
-	public List<ProcessDtlBean> getDetails() {
-		
-		
-		
-		return loginDao.getDetails();
-	}
 
+
+
+	@Override
+	public List<ProcessDtlBean> getDetails(ProcessDtlBean processDtlBean) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

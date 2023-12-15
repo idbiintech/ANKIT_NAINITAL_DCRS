@@ -28,9 +28,9 @@ import com.recon.service.NFSSettlementTTUMService;
 import com.recon.util.GeneralUtil;
 
 public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSSettlementTTUMService {
-	
+
 	@Autowired
-	GeneralUtil generalUtil ;
+	GeneralUtil generalUtil;
 
 	private static final Logger logger = Logger.getLogger(NFSSettlementTTUMServiceImpl.class);
 	private static final String O_ERROR_MESSAGE = "o_error_message";
@@ -458,7 +458,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 		Map<String, Object> inParams = new HashMap<>();
 		Map<String, Object> outParams = new HashMap<String, Object>();
 		String monthdate = generalUtil.DateFunction(beanObj.getDatepicker());
-		
+
 		String query = null;
 		try {
 
@@ -497,18 +497,17 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 //
 //				}
 
-				// 3. execute settlement ttum procedure
-				NFSSettVoucherProc rollBackexe = new NFSSettVoucherProc(getJdbcTemplate());
-				inParams.put("FILEDT", monthdate);
-				inParams.put("USER_ID", beanObj.getCreatedBy());
-				outParams = rollBackexe.execute(inParams);
-				
+			// 3. execute settlement ttum procedure
+			NFSSettVoucherProc rollBackexe = new NFSSettVoucherProc(getJdbcTemplate());
+			inParams.put("FILEDT", monthdate);
+			inParams.put("USER_ID", beanObj.getCreatedBy());
+			outParams = rollBackexe.execute(inParams);
 
-				if (outParams.get("msg") != null) {
-					logger.info("OUT PARAM IS " + outParams.get("msg"));
-					return false;
-				}
-			
+			if (outParams.get("msg") != null) {
+				logger.info("OUT PARAM IS " + outParams.get("msg"));
+				return false;
+			}
+
 		} catch (Exception e) {
 			logger.info("Exception is " + e);
 			return false;
@@ -520,10 +519,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 	class NFSSettVoucherProc extends StoredProcedure {
 		private static final String insert_proc = "nfs_settlement_ttum_process_new";
 //		private static final String insert_proc = "nfs_settlement_ttum_process";
-		//String monthdate = generalUtil.DateFunction(filedate);
-		
-		
-
+		// String monthdate = generalUtil.DateFunction(filedate);
 
 		public NFSSettVoucherProc(JdbcTemplate jdbcTemplate) {
 			super(jdbcTemplate, insert_proc);
@@ -628,32 +624,31 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 //			data.add(DailyData);
 //
 //			return data;
-			
-		String	getData = "select (' '||ACCOUNT_NO ||SUBSTR(account_no ,0,3)||'     '||TXN_IND||LPAD(TRIM(AMOUNT),17,0)||' '||TRIM(ttum_naration))"
-				             +" from NFS_SETTLEMENT_DATA_TTUM where filedate = to_date(?,'dd/mm/yyyy') order by txn_ind desc";
-			//getData = "select * from  "+ ttum_tableName ;
-		List<String> Data = new ArrayList<String>();
-			logger.info("getData  TEXT QUERY is "+getData); 	
-			
 
-			Data= getJdbcTemplate().query(getData, new Object[] {beanObj.getDatepicker()}, new ResultSetExtractor<List<String>>(){
-				public List<String> extractData(ResultSet rs)throws SQLException {
-					List<String> beanList = new ArrayList<String>();
-					
-					while (rs.next()) {
-						
-						beanList.add(rs.getString(1));
+			String getData = "select (' '||ACCOUNT_NO ||SUBSTR(account_no ,0,3)||'     '||TXN_IND||LPAD(TRIM(AMOUNT),17,0)||' '||TRIM(ttum_naration))"
+					+ " from NFS_SETTLEMENT_DATA_TTUM where filedate = to_date(?,'dd/mm/yyyy') order by txn_ind desc";
+			// getData = "select * from "+ ttum_tableName ;
+			List<String> Data = new ArrayList<String>();
+			logger.info("getData  TEXT QUERY is " + getData);
+
+			Data = getJdbcTemplate().query(getData, new Object[] { beanObj.getDatepicker() },
+					new ResultSetExtractor<List<String>>() {
+						public List<String> extractData(ResultSet rs) throws SQLException {
+							List<String> beanList = new ArrayList<String>();
+
+							while (rs.next()) {
+
+								beanList.add(rs.getString(1));
 //						beanList.add(rs.getString(2));
 //						beanList.add(rs.getString(3));
 //						beanList.add(rs.getString(4));
 //						beanList.add(rs.getString(5));
 
-						 
-					}
-					return beanList;
-				}
-			});
-			
+							}
+							return beanList;
+						}
+					});
+
 			return Data;
 
 		} catch (Exception e) {
@@ -663,33 +658,66 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 		}
 
 	}
-	
-	
-	
+
 	@Override
 	public List<String> getCashAtPos(String filedate) {
 		List<Object> data = new ArrayList<Object>();
 		String mdate = generalUtil.DateFunction(filedate);
 		try {
-			System.out.println("date mdate is"+ mdate);
-		String	getData = "select (LPAD(ACCOUNTID,'16',' ')||'INR'||SUBSTR(ACCOUNTID ,0,3)||'     '||TXN_INDCTR||RPAD(LPAD(TRIM(AMOUNT),17,' '),17,' ')||' '||TRIM(NARRATION) || RRN ||'/'|| DDATE) "
-				 			             +" from cash_at_pos_data where filedate = ? order by TXN_INDCTR asc";
-		List<String> Data = new ArrayList<String>();
-			logger.info("getData  TEXT QUERY is "+getData); 	
-			
+			System.out.println("date mdate is" + mdate);
+			String getData = "select (LPAD(ACCOUNTID,'16',' ')||'INR'||SUBSTR(ACCOUNTID ,0,3)||'     '||TXN_INDCTR||RPAD(LPAD(TRIM(AMOUNT),17,' '),17,' ')||' '||TRIM(NARRATION) || RRN ||'/'|| DDATE) "
+					+ " from cash_at_pos_data where filedate = ? order by TXN_INDCTR asc";
+			List<String> Data = new ArrayList<String>();
+			logger.info("getData  TEXT QUERY is " + getData);
 
-			Data= getJdbcTemplate().query(getData, new Object[] {mdate}, new ResultSetExtractor<List<String>>(){
-				public List<String> extractData(ResultSet rs)throws SQLException {
+			Data = getJdbcTemplate().query(getData, new Object[] { mdate }, new ResultSetExtractor<List<String>>() {
+				public List<String> extractData(ResultSet rs) throws SQLException {
 					List<String> beanList = new ArrayList<String>();
-					
+
 					while (rs.next()) {
-						
+
 						beanList.add(rs.getString(1));
 					}
 					return beanList;
 				}
 			});
-			
+
+			return Data;
+
+		} catch (Exception e) {
+			System.out.println("Exception in getInterchangeData " + e);
+			return null;
+
+		}
+
+	}
+
+	@Override
+	public List<String> getLateRev(String filedate) {
+		List<Object> data = new ArrayList<Object>();
+		String mdate = generalUtil.DateFunction(filedate);
+		try {
+			System.out.println("date mdate is" + mdate);
+//		String	getData = "select (LPAD(ACCOUNTID,'16',' ')||'INR'||SUBSTR(ACCOUNTID ,0,3)||'     '||TXN_INDCTR||RPAD(LPAD(TRIM(AMOUNT),17,' '),17,' ')||' '||TRIM(NARRATION) || RRN ||'/'|| DDATE) "
+//				 			             +" from cash_at_pos_data where filedate = ? order by TXN_INDCTR asc";
+
+			String getData = "select (LPAD(ACCOUNT_NO,'16',' ')||'INR'||SUBSTR(ACCOUNT_NO ,0,3)||'     '||TXN_IND||RPAD(LPAD(TRIM(AMOUNT),17,' '),17,' ')||' '||TRIM(TTUM_NARATION)  ||'/'|| REPLACE(FILEDATE,'-','')) "
+					+ "from LATE_REV_TTUM where filedate = ? order by TXN_IND desc  ";
+			List<String> Data = new ArrayList<String>();
+			logger.info("getData  TEXT QUERY is " + getData);
+
+			Data = getJdbcTemplate().query(getData, new Object[] { mdate }, new ResultSetExtractor<List<String>>() {
+				public List<String> extractData(ResultSet rs) throws SQLException {
+					List<String> beanList = new ArrayList<String>();
+
+					while (rs.next()) {
+
+						beanList.add(rs.getString(1));
+					}
+					return beanList;
+				}
+			});
+
 			return Data;
 
 		} catch (Exception e) {
@@ -708,7 +736,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 		Map<String, Object> inParams = new HashMap<>();
 		Map<String, Object> outParams1 = new HashMap<String, Object>();
 		Map<String, Object> outParams2 = new HashMap<String, Object>();
-		
+
 		try {
 
 			/*
@@ -858,9 +886,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 	@Override
 	public List<Object> getAdjTTUM(NFSSettlementBean beanObj) {
 		List<Object> data = new ArrayList<Object>();
-		
-		
-		
+
 		try {
 			String getData1 = null;// ,getData2 = null;
 			List<Object> DailyData = new ArrayList<Object>();
@@ -879,7 +905,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 					 * "AND upper(adjtype) like '%" + beanObj.getAdjType() +
 					 * "%'  order by part_tran_type desc";
 					 */
-					
+
 					getData1 = "SELECT LPAD(ACCOUNT_NUMBER,16,' ') AS ACCOUNT_NUMBER,SUBSTR(ACCOUNT_NUMBER,0,3) as FROM_ACCOUNT,PART_TRAN_TYPE,"
 							+ "LPAD(TRANSACTION_AMOUNT,17,' ') as TRANSACTION_AMOUNT,"
 							+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,"
@@ -887,18 +913,18 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 							+ ",TO_DATE(FILEDATE,'DD/MM/YYYY') AS FILEDATE,ADJTYPE"
 							+ " FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? and SUBCATEGORY = ? "
 							+ "AND upper(adjtype) like '%" + beanObj.getAdjType() + "%'  order by part_tran_type desc";
-					
-					logger.info("query 1 is "+ getData1);
 
-					DailyData = getJdbcTemplate().query(getData1,	
-							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory() },
+					logger.info("query 1 is " + getData1);
+
+					DailyData = getJdbcTemplate().query(getData1, new Object[] {
+							beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory() },
 							new ResultSetExtractor<List<Object>>() {
 								public List<Object> extractData(ResultSet rs) throws SQLException {
 									List<Object> beanList = new ArrayList<Object>();
 
 									while (rs.next()) {
 										logger.info("Inside rset");
-										//String passdate = generalUtil.DateFunction(rs.getString("FILEDATE"));
+										// String passdate = generalUtil.DateFunction(rs.getString("FILEDATE"));
 										Map<String, String> table_Data = new HashMap<String, String>();
 										table_Data.put("ACCOUNT_NUMBER", rs.getString("ACCOUNT_NUMBER"));
 										table_Data.put("FROM_ACCOUNT", rs.getString("FROM_ACCOUNT"));
@@ -923,10 +949,11 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 							+ " FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? and SUBCATEGORY = ? "
 							+ "AND (ADJTYPE) = ? AND adjtype not like '%Penalty%' order by part_tran_type desc ";
 
-					logger.info("query  2 is "+ getData1);
+					logger.info("query  2 is " + getData1);
 
-					DailyData = getJdbcTemplate().query(getData1,
-							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory(), beanObj.getAdjType() },
+					DailyData = getJdbcTemplate().query(
+							getData1, new Object[] { beanObj.getDatepicker().toString().toUpperCase(),
+									beanObj.getStSubCategory(), beanObj.getAdjType() },
 							new ResultSetExtractor<List<Object>>() {
 								public List<Object> extractData(ResultSet rs) throws SQLException {
 									List<Object> beanList = new ArrayList<Object>();
@@ -934,7 +961,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 									while (rs.next()) {
 										logger.info("Inside rset");
 
-										//String passdate1 = generalUtil.DateFunction(rs.getString("FILEDATE"));
+										// String passdate1 = generalUtil.DateFunction(rs.getString("FILEDATE"));
 
 										Map<String, String> table_Data = new HashMap<String, String>();
 										table_Data.put("ACCOUNT_NUMBER", rs.getString("ACCOUNT_NUMBER"));
@@ -1010,8 +1037,7 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 
 			if (beanObj.getFileName().contains("NFS")) {
 				if (beanObj.getAdjType().equals("PENALTY") || beanObj.getAdjType().equals("FEE")) {
-					getData1 = "SELECT RPAD(ACCOUNT_NUMBER,1"
-							+ ",' ') AS ACCOUNT_NUMBER,PART_TRAN_TYPE,"
+					getData1 = "SELECT RPAD(ACCOUNT_NUMBER,1" + ",' ') AS ACCOUNT_NUMBER,PART_TRAN_TYPE,"
 							+ "LPAD(TRANSACTION_AMOUNT,17,' ') as TRANSACTION_AMOUNT,"
 							+ "rpad(TRANSACTION_PARTICULAR,30,' ') as TRANSACTION_PARTICULAR,"
 							+ "LPAD(NVL(REFERENCE_NUMBER,' '),16,' ') AS REMARKS"

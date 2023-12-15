@@ -669,7 +669,7 @@ public class NFSUnmatchTTUMServiceImpl extends JdbcDaoSupport implements NFSUnma
 			
 		//	(ACCOUNTID||'INR'||FROM_ACCOUNT||'     '|| TXN_TYPE||'          '||AMOUNT||NARRATION)
 			
-			getData = "select (LPAD(ACCOUNTID,'16',' ')||'INR'||FROM_ACCOUNT||'        '|| TXN_TYPE||'      '||LPAD(AMOUNT,8,' ')||replace(NARRATION,'-',''))"
+			getData = "select (LPAD(ACCOUNTID,'16',' ')||'INR'||FROM_ACCOUNT||'     '|| TXN_TYPE||'      '||LPAD(AMOUNT,11,' ')||replace(NARRATION,'-',''))"
 					+ " from "+ttum_tableName
 			+dom_fetch_condition;
 			

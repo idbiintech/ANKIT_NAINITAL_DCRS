@@ -50,7 +50,9 @@ public interface LoginService {
 	
 	public List<ProcessDtlBean> getProcessdtls(String Flag);
 	
-	public List<ProcessDtlBean> getDetails();
+	
+
+	public List<ProcessDtlBean> getDetails(ProcessDtlBean processDtlBean);
 
 	
 }

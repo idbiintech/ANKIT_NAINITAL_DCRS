@@ -44,16 +44,16 @@ import com.recon.util.GenerateUCOTTUM;
 public class RupaySettlementController {
 	@Autowired
 	RupaySettlementService rupaySettlementService;
-	
+
 	@Autowired
 	GeneralUtil generalUtil;
-	
+
 	@Autowired
 	RupaySettelementDaoImpl rupayDao;
-	
+
 	@Autowired
 	ISourceService iSourceService;
-	
+
 	@Autowired
 	NFSSettlementTTUMService NFSttumService;
 
@@ -169,8 +169,7 @@ public class RupaySettlementController {
 		logger.info("***** RupaySettlementController.RupayFileUpload GET End ****");
 		return modelAndView;
 	}
-	
-	
+
 	@RequestMapping(value = "PresentmentFileUpload", method = RequestMethod.GET)
 	public ModelAndView presentmentFileUploadGet(ModelAndView modelAndView, @RequestParam("category") String category,
 			HttpServletRequest request) throws Exception {
@@ -204,7 +203,21 @@ public class RupaySettlementController {
 		logger.info("***** CashAtPOS GET End ****");
 		return modelAndView;
 	}
-	
+
+	@RequestMapping(value = "LateRevTtum", method = RequestMethod.GET)
+	public ModelAndView LateRevTtumGet(ModelAndView modelAndView, @RequestParam("category") String category,
+			HttpServletRequest request) throws Exception {
+		logger.info("***** LateRevTtum.Get Start ****");
+		RupayUploadBean rupaySettlementBean = new RupayUploadBean();
+		logger.info("LateRevTtum GET");
+		modelAndView.addObject("category", category);
+//		modelAndView.addObject("rupaySettlementBean", rupaySettlementBean);
+		modelAndView.setViewName("LateRevTtum");
+
+		logger.info("***** CashAtPOS GET End ****");
+		return modelAndView;
+	}
+
 	@RequestMapping(value = "PresentmentFileUpload", method = RequestMethod.POST)
 	@ResponseBody
 	public String PresentmentFileUploadPost(@ModelAttribute("rupaySettlementBean") RupayUploadBean rupayBean,
@@ -216,37 +229,36 @@ public class RupaySettlementController {
 		rupayBean.setCreatedBy(Createdby);
 		logger.info("Subcategory is " + rupayBean.getSubcategory());
 		logger.info(file.getOriginalFilename());
-		
+
 		String response = "";
-		if(file.getOriginalFilename().contains("Presentment")) {
+		if (file.getOriginalFilename().contains("Presentment")) {
 			response = rupaySettlementService.uploadPresentmentFile(rupayBean, file);
 		}
 		return response;
 	}
-	
+
 	@RequestMapping(value = "downloadCashAtPosReport", method = RequestMethod.POST)
-	public String CashAtPosDownload(@ModelAttribute("nfsSettlementBean")  NFSSettlementBean nfsSettlementBean,
-			@RequestParam("fileDate") String filedate,HttpServletRequest request,
-			HttpServletResponse response,
-		HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
+	public String CashAtPosDownload(@ModelAttribute("nfsSettlementBean") NFSSettlementBean nfsSettlementBean,
+			@RequestParam("fileDate") String filedate, HttpServletRequest request, HttpServletResponse response,
+			HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
 		logger.info("***** DownloadSettlement.DownloadSettlement.Get Start ****");
-		String display="";
+		String display = "";
 		String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
-		logger.info("Created by is "+Createdby);
-		System.out.println("DATE IS DATE IS "+filedate);
+		logger.info("Created by is " + Createdby);
+		System.out.println("DATE IS DATE IS " + filedate);
 		List<String> data = new ArrayList<String>();
-		
-		String TEMP_DIR = System.getProperty("java.io.tmpdir")+File.separator;
-		logger.info("TEMP_DIR"+TEMP_DIR);
-		
-		String stpath = TEMP_DIR ;
-		stpath = stpath+"CAST_TTUM";
+
+		String TEMP_DIR = System.getProperty("java.io.tmpdir") + File.separator;
+		logger.info("TEMP_DIR" + TEMP_DIR);
+
+		String stpath = TEMP_DIR;
+		stpath = stpath + "CAST_TTUM";
 		data = NFSttumService.getCashAtPos(filedate);
 		String fileName = "CASH_AT_POS_TTUM.txt";
 		GenerateDLBVoucher vouchObj = new GenerateDLBVoucher();
 		vouchObj.generateTTUMFile(stpath, fileName, data);
-		File file = new File(stpath+File.separator+fileName);
-		logger.info("path of zip file "+ stpath);
+		File file = new File(stpath + File.separator + fileName);
+		logger.info("path of zip file " + stpath);
 		FileInputStream inputstream = new FileInputStream(file);
 		response.setContentLength((int) file.length());
 		logger.info("before downloading zip file ");
@@ -260,22 +272,58 @@ public class RupaySettlementController {
 		logger.info("***** VisaSettlementController.DownloadVisaSettlementReport POST End ****");
 		return "GenerateVisaSettlementReport";
 	}
-	
+
+	@RequestMapping(value = "downloadLateRevReport", method = RequestMethod.POST)
+	public String LateRevDownload(@ModelAttribute("nfsSettlementBean") NFSSettlementBean nfsSettlementBean,
+			@RequestParam("fileDate") String filedate, HttpServletRequest request, HttpServletResponse response,
+			HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
+		logger.info("***** DownloadSettlement.DownloadSettlement.Get Start ****");
+		String display = "";
+		String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
+		logger.info("Created by is " + Createdby);
+		System.out.println("DATE IS DATE IS " + filedate);
+		List<String> data = new ArrayList<String>();
+
+		String TEMP_DIR = System.getProperty("java.io.tmpdir") + File.separator;
+		logger.info("TEMP_DIR" + TEMP_DIR);
+
+		String stpath = TEMP_DIR;
+		stpath = stpath + "CAST_TTUM";
+		data = NFSttumService.getLateRev(filedate);
+		String fileName = "Late_rev_text.txt";
+		GenerateDLBVoucher vouchObj = new GenerateDLBVoucher();
+		vouchObj.generateTTUMFile(stpath, fileName, data);
+		File file = new File(stpath + File.separator + fileName);
+		logger.info("path of zip file " + stpath);
+		FileInputStream inputstream = new FileInputStream(file);
+		response.setContentLength((int) file.length());
+		logger.info("before downloading zip file ");
+		response.setContentType("application/txt");
+		String headerKey = "Content-Disposition";
+		String headerValue = String.format("attachment; filename=\"%s\"", file.getName());
+		response.setHeader(headerKey, headerValue);
+		OutputStream outStream = response.getOutputStream();
+		IOUtils.copy(inputstream, outStream);
+		response.flushBuffer();
+		logger.info("***** VisaSettlementController.DownloadVisaSettlementReport POST End ****");
+		return "GenerateVisaSettlementReport";
+	}
+
 	@RequestMapping(value = "downloadReport", method = RequestMethod.POST)
-	public String InetSummuryDownload(@RequestParam("fileDate") String filedate,HttpServletRequest request, 
-		HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
+	public String InetSummuryDownload(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
 		logger.info("***** PresentmentDownload.POST Start ****");
 		List<Object> Excel_data = new ArrayList<Object>();
 		System.out.println(filedate);
 		// GET DATA FOR REPORT
 		Excel_data = rupayDao.getSummuryDownloadReport(filedate);
 //		System.out.println(Excel_data);
-		model.addAttribute("ReportName", "Presentment_Data_"+filedate);
+		model.addAttribute("ReportName", "Presentment_Data_" + filedate);
 		model.addAttribute("data", Excel_data);
 		logger.info("***** PresentmentDownload Daily POST End ****");
 		return "GenerateNFSDailyReport";
 	}
-	
+
 	@RequestMapping(value = "RupayFileUpload", method = RequestMethod.POST)
 	@ResponseBody
 	public String RupayFileUploadPost(@ModelAttribute("rupaySettlementBean") RupayUploadBean rupayBean,
@@ -286,7 +334,7 @@ public class RupaySettlementController {
 		logger.info("Created by is " + Createdby);
 		rupayBean.setCreatedBy(Createdby);
 		logger.info("Subcategory is " + rupayBean.getSubcategory());
-		
+
 		if (rupayBean.getFileName().equalsIgnoreCase("CHARGEBACK")) {
 			logger.info("Cycle is " + file.getOriginalFilename().substring(2, 3));
 			rupayBean.setCycle(file.getOriginalFilename().substring(2, 3));
@@ -339,43 +387,71 @@ public class RupaySettlementController {
 
 	@RequestMapping(value = "CashAtPOSRecon", method = RequestMethod.POST)
 	@ResponseBody
-	public String CashAtPOSRecon(@RequestParam("fileDate")String filedate, HttpServletRequest request, HttpSession httpSession) throws Exception {
-		
-		
-		System.out.println("date is" +filedate);
- 		boolean validateDate = false;
- 		
- 		String mdate1 = generalUtil.DateFunction(filedate);
- 		validateDate = rupaySettlementService.validateCashProcess(mdate1);
-		if(validateDate) {
+	public String CashAtPOSRecon(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession) throws Exception {
+
+		System.out.println("date is" + filedate);
+		boolean validateDate = false;
+
+		String mdate1 = generalUtil.DateFunction(filedate);
+		validateDate = rupaySettlementService.validateCashProcess(mdate1);
+		if (validateDate) {
 			boolean executeFlag = rupaySettlementService.processCashAtPos(filedate);
-			if(executeFlag)
+			if (executeFlag)
 				return "Recon Process is Done!!";
 			else
 				return "Recon Process Error!!";
-		}
-		else
+		} else
 			return "Recon is already processed.";
-		
+
 	}
-	
+
+	@RequestMapping(value = "LateRevRecon", method = RequestMethod.POST)
+	@ResponseBody
+	public String LateRevRecon(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession) throws Exception {
+
+		System.out.println("date is" + filedate);
+		boolean validateDate = false;
+		boolean checkrecord = false ;
+		
+		checkrecord =  rupaySettlementService.checkRecord(filedate);
+
+		if(checkrecord) {
+		validateDate = rupaySettlementService.validateLateRev(filedate);
+		if (validateDate) {
+			boolean executeFlag = rupaySettlementService.processLateRev(filedate);
+		
+			if (executeFlag)
+				return "Recon Process is Done!!";
+			else
+				return "Recon Process Error!!";
+		} else
+			return "Recon is already processed.";
+		}
+		else {
+			return "No records for processing";	
+		}
+	}
+		
+
 	@RequestMapping(value = "PresentmentRecon", method = RequestMethod.POST)
 	@ResponseBody
-	public String PresentmentRecon(@RequestParam("fileDate")String filedate, HttpServletRequest request, HttpSession httpSession) throws Exception {
+	public String PresentmentRecon(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession) throws Exception {
 		System.out.println(filedate);
 		boolean validateDate = false;
 		validateDate = rupaySettlementService.validatePresentmentProcess(filedate);
-		if(validateDate) {
+		if (validateDate) {
 			boolean executeFlag = rupaySettlementService.processPresentment(filedate);
-			if(executeFlag)
+			if (executeFlag)
 				return "Recon Process is Done!!";
 			else
 				return "Recon Process Error!!";
-		}
-		else
+		} else
 			return "Recon is already processed.";
 	}
-	
+
 	@RequestMapping(value = "RupaySettlementProcess", method = RequestMethod.POST)
 	@ResponseBody
 	public String RupaySettlementProcessPost(@ModelAttribute("mastercardUploadBean") RupayUploadBean beanObj,
@@ -853,5 +929,28 @@ public class RupaySettlementController {
 		}
 
 	}
+	
+	@RequestMapping(value = "CbsDataFetch", method = RequestMethod.POST)
+	@ResponseBody
+	public String CbsDataFetch(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession) throws Exception {
+
+		System.out.println("date is" + filedate);
+		boolean validateDate = false;
+		boolean checkrecord = false ;
+		
+		checkrecord =  rupaySettlementService.checkCbsRecordPresent(filedate);
+
+		if(!checkrecord) {
+			boolean executeFlag = rupaySettlementService.processCbs(filedate);
+		
+			if (executeFlag)
+				return "CBS data Fetching is Done!!";
+			else
+				return "CBS data Fetching Error!!";
+		} else
+			return "CBS data Fetching is already processed.";
+		}
+		
 
 }

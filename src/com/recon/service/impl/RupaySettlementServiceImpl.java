@@ -452,6 +452,13 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 		return rupayDao.validatePresentment(filedate);
 	}
 	
+	@Override
+	public Boolean validateLateRev(String filedate) {
+		return rupayDao.validateLateRev(filedate);
+
+	}
+	
+	
 	public HashMap<String, Object> validateSettlementFiles(RupayUploadBean beanObj) {
 
 		HashMap<String, Object> output = rupayDao.validateSettlementFiles(beanObj);
@@ -466,6 +473,25 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public Boolean processCashAtPos(String filedate) {
 		return rupayDao.processCashAtPos(filedate);
 	}
+	
+	public Boolean processLateRev(String filedate) {
+		return rupayDao.processLateRev(filedate);
+	}
+	
+	public Boolean processCbs(String filedate) {
+		return rupayDao.processCbs(filedate);
+	}
+	
+	public boolean checkRecord(String filedate) {
+		return rupayDao.checkRecord(filedate);
+	} // checkCbsRecordPresent
+	
+	
+	public boolean checkCbsRecordPresent(String filedate) {
+		return rupayDao.checkCbsRecordPresent(filedate);
+	}
+	
+	
 	public boolean processSettlement(RupayUploadBean beanObj) {
 		return rupayDao.processSettlement(beanObj);
 	}
@@ -547,5 +573,7 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public String uploadPresentmentFile(RupayUploadBean beanObj, MultipartFile file) throws SQLException, Exception {
 		return rupayDao.uploadPresentmentData(beanObj, file);
 	}
+
+
 	
 }

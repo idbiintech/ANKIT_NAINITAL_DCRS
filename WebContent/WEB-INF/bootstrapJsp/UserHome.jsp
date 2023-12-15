@@ -194,9 +194,11 @@ tbody.scrollContent tr.alternateRow td {
 			</div>
 		</div>
 
-
-
-<!-- <H4 style="background-color:lightyellow; color: red; text-align: center;"> LAST TRANSACTIONS </H4>
+       <%--  <c:forEach var="UploadBean" items="${CompareBean}">
+		<h6><span>${UploadBean.network_date}</span></h6>
+		</c:forEach>
+ --%>
+		<!--   <H4 style="background-color:lightyellow; color: red; text-align: center;"> LAST TRANSACTIONS </H4>
 
 		<table border='2px' style="width: 100%">
 		
@@ -233,7 +235,7 @@ tbody.scrollContent tr.alternateRow td {
 				<td>ACCOUNT NUMBER</td>
 				<td>ACCOUNT NUMBER</td>
 			</tr>
-		</table> -->
+		</table>  -->
 
 	</section>
 	<!-- /.content -->

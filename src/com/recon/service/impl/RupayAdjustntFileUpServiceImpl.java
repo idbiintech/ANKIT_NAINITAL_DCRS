@@ -455,7 +455,13 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 					output.put("msg", "TTUM is already processed");
 				} else {
 					// check whether data is present for ttum generation
-					String checkData = "select count(1) from rupay_network_adjustment where filedate = to_date(?,'dd/mm/yyyy') ";
+					String checkData = "";
+					if(adjType.equalsIgnoreCase("FEE")) {
+					 checkData = "select count(1) from rupay_network_adjustment where filedate = to_date(?,'dd/mm/yyyy') AND function_code IN ('470')";
+					}
+					else {
+						 checkData = "select count(1) from rupay_network_adjustment where filedate = to_date(?,'dd/mm/yyyy') ";
+					}
 					/*
 					 * + " and function_code_description not like '%262-Refund%'" +
 					 * "    and DIRECTION_IW_OW is not null and upper(direction_iw_ow) = 'INWARD'" +
@@ -536,6 +542,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 		System.out.println("filedate is"+ fileDate);
 		System.out.println("date is passsing is " + passdate);
 		System.out.println("data is saved");
+		System.out.println("ADJUSTMENT_TYPE IS"+adjType);
 
 		try {
 
@@ -641,13 +648,17 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 		String passdate = genetalUtil.DateFunction(fileDate);
 		//String ddate [] = fileDate.split("/");
  		String mdate = fileDate.replace("/", "-");
+ 		
  		String ddate [] = mdate.split("-");
 		String sdate  = ddate[0] + "-" + ddate[1] + "-" + ddate[2].substring(2);
 		
+		
+		
 		String ydate [] = passdate.split("-");
+	//	String ydate [] = mdate.split("-");
 		String zdate  = ydate[0] + "-" + ydate[1] + "-" + ydate[2].substring(2);
 
-		System.out.println("new date is"+ sdate);
+		System.out.println("new date is ZDATE"+ zdate);
 
 		List<Object> data = new ArrayList<Object>();
 		try {
@@ -666,14 +677,14 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 				 * " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = TO_DATE(?,'DD/MM/YYYY') and SUBCATEGORY = 'DOMESTIC' "
 				 * + "AND upper(adjtype) like '%"+adjType+"%'";
 				 */
+				
 
-				getData1 = "SELECT ACCOUNT_NUMBER AS ACCOUNT_NUMBER, ACCOUNT_REPORT_CODE , PART_TRAN_TYPE,"
-						+ "REFERENCE_AMOUNT as TRANSACTION_AMOUNT,"
-						+ "TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,REFERENCE_NUMBER AS REMARKS"
-						+ ",TO_DATE(FILEDATE,'DD/MM/YYYY') AS FILEDATE"
-						+ " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = TO_DATE(?,'dd-mm-yyyy')";
+				getData1 = "SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,TO_CHAR(LPAD(REFERENCE_AMOUNT,16,' '),'999999.99') as TRANSACTION_AMOUNT,"
+						+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , "
+						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + zdate +"'    AND TRANSACTION_PARTICULAR LIKE '%CA%' "
+						+ " order by PART_TRAN_TYPE desc ";
 
-				DailyData = getJdbcTemplate().query(getData1, new Object[] { fileDate },
+				DailyData = getJdbcTemplate().query(getData1, new Object[] {  },
 						new ResultSetExtractor<List<Object>>() {
 							public List<Object> extractData(ResultSet rs) throws SQLException {
 								List<Object> beanList = new ArrayList<Object>();
@@ -690,7 +701,6 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 									table_Data.put("TRANSACTION_PARTICULAR", rs.getString("TRANSACTION_PARTICULAR"));
 									table_Data.put("REMARKS", rs.getString("REMARKS"));
 									table_Data.put("FILEDATE", rs.getString("FILEDATE"));
-									// table_Data.put("ADJTYPE", rs.getString("ADJTYPE"));
 
 									beanList.add(table_Data);
 								}
@@ -719,7 +729,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 
 				getData1 = "SELECT LPAD(ACCOUNT_NUMBER, 16,' ') AS ACCOUNT_NUMBER ,PART_TRAN_TYPE ,SUBSTR(account_number ,0,3) AS ACCOUNT_REPORT_CODE,TO_CHAR(LPAD(REFERENCE_AMOUNT,16,' '),'999999.99') as TRANSACTION_AMOUNT,"
 						+ " TRANSACTION_PARTICULAR as TRANSACTION_PARTICULAR,LPAD(NVL(REFERENCE_NUMBER,' '),12,' ') AS REMARKS , "
-						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + zdate +"' "
+						+ "  CYCLE AS FILEDATE " + " FROM RUPAY_ADJUSTMENT_TTUM WHERE FILEDATE = '" + zdate +"'    AND TRANSACTION_PARTICULAR LIKE '%REF%' "
 						+ " order by PART_TRAN_TYPE desc ";
 				
 				

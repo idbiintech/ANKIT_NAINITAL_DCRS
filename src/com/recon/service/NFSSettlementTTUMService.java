@@ -44,4 +44,8 @@ public interface NFSSettlementTTUMService {
 	List<Object> getPBGBAdjTTUM(NFSSettlementBean beanObj);
 
 	List<String> getCashAtPos(String filedate);
+
+	//List<String> getLateRev(String filedate);
+
+	List<String> getLateRev(String filedate);
 }

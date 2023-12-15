@@ -163,6 +163,14 @@
 	</definition>
 	
 	
+	<definition name="CbsDatafetch" extends="baseLayout">
+		<put-attribute name="title" value="Manual Upload" />
+		
+		<put-attribute name="body" value="/WEB-INF/jsp/CbsDatafetch.jsp" />		
+	</definition>
+	
+	
+	
 		<definition name="classifyFile" extends="baseLayout">
 		<put-attribute name="title" value="Classify File" />
 		<put-attribute name="header" value="/WEB-INF/jsp/CompareMenu.jsp" />
@@ -436,6 +444,11 @@
 	<definition name="CashAtPos" extends="baseLayout">
 		<put-attribute name="title" value="Rupay File Upload" />
 		<put-attribute name="body" value="/WEB-INF/jsp/CashAtPos.jsp" />		
+	</definition>
+	
+	<definition name="LateRevTtum" extends="baseLayout">
+		<put-attribute name="title" value="Laterevttum file" />
+		<put-attribute name="body" value="/WEB-INF/jsp/LateRevTtum.jsp" />		
 	</definition>
 	
 	<!-- ADDED BY INT8624 FOR RUPAY SETTLEMENT -->

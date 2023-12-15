@@ -404,7 +404,7 @@ List<String> DataElements = new ArrayList<String>();
 	DataElements.add(term);
 	String user = "User|23|30";
 	DataElements.add(user);
-	String txn_code = "txn_code|34|41";
+	String txn_code = "txn_cooubde|34|41";
 	DataElements.add(txn_code);
 	String post_date = "post_date|42|54";
 	DataElements.add(post_date);

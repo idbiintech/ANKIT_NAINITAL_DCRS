@@ -368,3 +368,81 @@ function ValidateRollbackData()
 	return true;
 
 }
+
+
+
+function processLateRev() {
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (Validation()) {
+		var oMyForm = new FormData();
+		oMyForm.append('fileDate',fileDate);
+		$.ajax({
+			type : "POST",
+			url : "LateRevRecon.do",
+			data :oMyForm ,
+			processData : false,
+			contentType : false,
+			beforeSend : function() {
+				showLoader();
+			},
+			success : function(response) {
+				debugger;
+				hideLoader();
+				alert (response); 
+			},
+			error : function(err) {
+				hideLoader();
+				alert("Error Occurred");
+			},
+			complete : function(data) {
+				hideLoader();
+			},
+		});
+	}
+}
+
+
+
+function downloadLateRev() {
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (Validation()) {
+		document.getElementById("LateRevReport").submit();
+	}
+}
+
+
+function loadCbsData(){
+	
+	
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (Validation()) {
+		var oMyForm = new FormData();
+		oMyForm.append('fileDate',fileDate);
+		$.ajax({
+			type : "POST",
+			url : "CbsDataFetch.do",
+			data :oMyForm ,
+			processData : false,
+			contentType : false,
+			beforeSend : function() {
+				showLoader();
+			},
+			success : function(response) {
+				debugger;
+				hideLoader();
+				alert (response); 
+			},
+			error : function(err) {
+				hideLoader();
+				alert("Error Occurred");
+			},
+			complete : function(data) {
+				hideLoader();
+			},
+		});
+	}
+	
+}

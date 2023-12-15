@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.recon.model.CompareBean;
 import com.recon.model.LoginBean;
 import com.recon.model.NavigationBean;
 import com.recon.model.ProcessDtlBean;
@@ -65,7 +66,8 @@ public class NavigationController {
 			List<NavigationBean> menu = new ArrayList<NavigationBean>();
 			List <ProcessDtlBean> uploadDtlBeans = loginService.getProcessdtls("UPLOAD_FLAG");
 			List<ProcessDtlBean> compareDtlbean = loginService.getProcessdtls("COMAPRE_FLAG");
-			List<ProcessDtlBean> detailBean = loginService.getDetails();
+			System.out.println("passing parameter is"+ uploadDtlBeans.get(1));
+			//List<ProcessDtlBean> detailBean = loginService.getDetails();
 			
 			
 			if(menu.size() == 0){

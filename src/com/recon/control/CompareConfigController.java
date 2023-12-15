@@ -189,6 +189,40 @@ public class CompareConfigController {
 		}
 
 	}
+	
+	
+	
+	@RequestMapping(value = "CbsDatafetch", method = RequestMethod.GET)
+	public ModelAndView CbsDatafetch(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
+			HttpSession httpSession, HttpServletRequest request) throws Exception {
+		logger.info("***** CompareConfigController.ManualUpload start ****");
+		try {
+
+			compareSetupBean.setCreatedBy(((LoginBean) httpSession.getAttribute("loginBean")).getUser_id());
+			ArrayList<CompareSetupBean> setupBeanslist = null;
+
+			setupBeanslist = icompareConfigService.getFileList();
+
+			String csrf = CSRFToken.getTokenForSession(request.getSession());
+
+			// redirectAttributes.addFlashAttribute("CSRFToken", csrf);
+			modelAndView.addObject("CSRFToken", csrf);
+			model.addAttribute("configBeanlist", setupBeanslist);
+			modelAndView.setViewName("CbsDatafetch");
+			modelAndView.addObject("CompareSetupBean", compareSetupBean);
+
+			logger.info("***** CompareConfigController.ManualUpload End ****");
+
+			return modelAndView;
+		} catch (Exception ex) {
+			demo.logSQLException(ex, "CompareConfigController.ManualUpload");
+			logger.error(" error in CompareConfigController.ManualUpload",
+					new Exception("CompareConfigController.ManualUpload", ex));
+			modelAndView.setViewName("Login");
+			return modelAndView;
+		}
+
+	}
 
 	@RequestMapping(value = "ManualCompare", method = RequestMethod.GET)
 	public ModelAndView ManualCompare(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,

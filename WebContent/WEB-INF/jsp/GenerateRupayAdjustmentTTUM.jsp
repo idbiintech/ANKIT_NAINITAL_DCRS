@@ -76,6 +76,7 @@ function noBack() { window.history.forward(); }
 									<option value="Good faith chargeback Deemed Acceptance">Good faith chargeback Deemed Acceptance</option>
 									<option value="Chargeback Deemed Acceptance">Chargeback Deemed Acceptance</option> -->
 									<option value="ADJUSTMENT">Adjustment</option>
+									<option value="FEE">ChargeBack_ACC</option>
 									<!-- <option value="FEE">Fees</option> -->
 							</select> 
 						</div>

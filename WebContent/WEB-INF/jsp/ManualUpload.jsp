@@ -82,6 +82,7 @@ response.setHeader("X-Frame-Options", "deny");
 												value="${configfilelist.stFileName}">${configfilelist.stFileName}</form:option>
 										</c:if>
 									</c:forEach>
+									<!-- or configfilelist.stFileName == 'CBS' -->
 									<%-- <form:option id="ctf" value="CTF" >CTF</form:option> --%>
 								</form:select>
 								<!-- <img alt="" src="images/listbtn.png" title="Last Uploaded File" onclick="getfiledetails();" style="vertical-align:middle; height: 20px; width: 20px;"> -->

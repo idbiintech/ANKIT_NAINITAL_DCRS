@@ -1038,8 +1038,22 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 
 	public boolean validatePresentment(String filedate) {
 
-		String mdate =  generalUtil.DateFunction(filedate);
+		String mdate = generalUtil.DateFunction(filedate);
 		String var = "select count(*) from unmatched_bkp where filedate = '" + mdate + "'";
+		System.out.println("query is" + var);
+		int count = getJdbcTemplate().queryForObject(var, new Object[] {}, Integer.class);
+
+		if (count == 0)
+			return true;
+		else
+			return false;
+	}
+
+	public boolean validateLateRev(String filedate) {
+
+		String mdate = generalUtil.DateFunction(filedate);
+		System.out.println("date is printing" + mdate);
+		String var = "select count(*) from LATE_REV_TTUM where filedate = '" + mdate + "'";
 		System.out.println("query is" + var);
 		int count = getJdbcTemplate().queryForObject(var, new Object[] {}, Integer.class);
 
@@ -1244,6 +1258,82 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		private static final String insert_proc = "CASH_AT_POS_REPORT";
 
 		public RupayCashAtPos(JdbcTemplate jdbcTemplate) {
+			super(jdbcTemplate, insert_proc);
+			setFunction(false);
+			declareParameter(new SqlParameter("FILEDT", Types.VARCHAR));
+			declareParameter(new SqlOutParameter(O_ERROR_MESSAGE, Types.VARCHAR));
+			compile();
+		}
+
+	}
+
+	public boolean processLateRev(String filedate) {
+		String monthdate = generalUtil.DateFunction(filedate);
+		Map<String, Object> inParams = new HashMap<>();
+		Map<String, Object> outParams = new HashMap<String, Object>();
+
+		try {
+			NfsLateRev rollBackexe = new NfsLateRev(getJdbcTemplate());
+			inParams.put("FILEDT", monthdate);
+			outParams = rollBackexe.execute(inParams);
+
+			if (outParams != null && outParams.get("msg") != null) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception e) {
+			logger.info("Exception in processPresentment " + e);
+			return false;
+		}
+	}
+
+	public boolean checkRecord(String filedate) {
+
+		String mdate = generalUtil.DateFunction(filedate);
+		System.out.println("date is" + mdate);
+		try {
+			String checkRecords = "SELECT COUNT(*) FROM ntsl_nfs_rawdata where description like '%Late%'  and filedate = ? ";
+
+			int checkCount = getJdbcTemplate().queryForObject(checkRecords, new Object[] { mdate }, Integer.class);
+
+			if (checkCount == 0) {
+				return false;
+			} else
+				return true;
+
+		} catch (Exception e) {
+
+			logger.info("xception in checkRecordsPresent" + e);
+			return false;
+		}
+	}
+
+	public boolean checkCbsRecordPresent(String filedate) {
+
+		String mdate = generalUtil.DateFunction(filedate);
+		System.out.println("date is" + mdate);
+		try {
+			String checkRecords = "SELECT COUNT(*) FROM cbs_nainital_rawdata where  filedate = ? ";
+
+			int checkCount = getJdbcTemplate().queryForObject(checkRecords, new Object[] { mdate }, Integer.class);
+
+			if (checkCount == 0) {
+				return false;
+			} else
+				return true;
+
+		} catch (Exception e) {
+
+			logger.info("xception in checkRecordsPresent" + e);
+			return false;
+		}
+	}
+
+	private class NfsLateRev extends StoredProcedure {
+		private static final String insert_proc = "LATE_REV_TTUM_PROC";
+
+		public NfsLateRev(JdbcTemplate jdbcTemplate) {
 			super(jdbcTemplate, insert_proc);
 			setFunction(false);
 			declareParameter(new SqlParameter("FILEDT", Types.VARCHAR));
@@ -1722,7 +1812,8 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			char BLANK = ' ';
 			while ((line = br.readLine()) != null) {
 
-				if (line.contains("Report Date") || line.contains("Presentment Raise Date")
+				if (line.contains("Report Date") || line.contains("Presentment Raise Date") || line.contains("---END OF REPORT---")
+						|| line.contains("--END OF REPORT--") || line.contains("---End of Report---")
 						|| line.contains("End of Report"))
 					continue;
 				else {
@@ -1816,12 +1907,16 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			String sandesh_sir = "";
 			List<String> Column_list = new ArrayList<String>();
 			Column_list = getPresentmentColumnList("unmatched_bkp");
-			String mdate =  generalUtil.DateFunction(filedate);
+			String mdate = generalUtil.DateFunction(filedate);
 
 			System.out.println("DATA PASSING IS" + filedate);
 			// final Workbook wb = new HSSFWorkbook();
-			getInterchnage = "select TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   from unmatched_bkp where filedate = '"
-					+ mdate + "'  ORDER BY dcrs_remarks ASC , txn_type ASC  ";
+//			getInterchnage = "select TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   from unmatched_bkp where filedate = '"
+//					+ mdate + "'  ORDER BY dcrs_remarks ASC , txn_type ASC  ";
+
+			getInterchnage = "SELECT TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   FROM unmatched_bkp T1  WHERE SUBSTR(NARRATION,0,4) IN ('PRRR', 'PRCR') AND NOT EXISTS ( SELECT 1 FROM cbs_nainital_rawdata T2  WHERE T1.RRN = T2.RRN AND SUBSTR(NARRATION,0,4) <> SUBSTR(T1.NARRATION,0,4)) AND FILEDATE = '"
+					+ mdate + "' ORDER BY dcrs_remarks ASC , txn_type ASC ";
+
 			System.out.println(getInterchnage);
 			data.add(Column_list);
 //			System.out.println(data);
@@ -1851,4 +1946,39 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			return null;
 		}
 	}
+
+	public boolean processCbs(String filedate) {
+		String monthdate = generalUtil.DateFunction(filedate);
+		Map<String, Object> inParams = new HashMap<>();
+		Map<String, Object> outParams = new HashMap<String, Object>();
+
+		try {
+			CbsProcess rollBackexe = new CbsProcess(getJdbcTemplate());
+			inParams.put("P_FILEDATE", monthdate);
+			outParams = rollBackexe.execute(inParams);
+
+			if (outParams != null && outParams.get("msg") != null) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception e) {
+			logger.info("Exception in processCbsData " + e);
+			return false;
+		}
+	}
+
+	private class CbsProcess extends StoredProcedure {
+		private static final String insert_proc = "SP_CBS_NAINITAL_RAWDATA_DBLINK";
+
+		public CbsProcess(JdbcTemplate jdbcTemplate) {
+			super(jdbcTemplate, insert_proc);
+			setFunction(false);
+			declareParameter(new SqlParameter("P_FILEDATE", Types.VARCHAR));
+			declareParameter(new SqlOutParameter(O_ERROR_MESSAGE, Types.VARCHAR));
+			compile();
+		}
+
+	}
+
 }
