@@ -155,23 +155,10 @@ function processAdjTTUM() {
 	var category = document.getElementById("rectyp").value;
 	var  stSubCategory =document.getElementById("stSubCategory").value;
 	var  adjType =document.getElementById("adjType").value;
-	/*var userfile = document.getElementById("dataFile1");
-	alert("file is "+userfile);*/
-	//var CSRFToken = $('[name=CSRFToken]').val();
-	
-	//var  stSubCategory =document.getElementById("stSubCategory").value;
-	/*var fileDate = document.getElementById("datepicker").value;
-	alert("file date "+fileDate);*/
+	 
 		
 		var datepicker = document.getElementById("dailypicker").value;
-		/*if(filename == "NTSL-NFS")
-		{
-			var  cycle =document.getElementById("cycle").value;
-		}
-		else
-		{
-			var  cycle = "1";
-		}*/
+		 
 	
 	var oMyForm = new FormData();
 	

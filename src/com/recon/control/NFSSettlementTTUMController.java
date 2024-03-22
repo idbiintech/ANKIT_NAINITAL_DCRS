@@ -497,19 +497,7 @@ public class NFSSettlementTTUMController {
 	public String NFSAdjTTUMValidation(@ModelAttribute("nfsSettlementBean")  NFSSettlementBean nfsSettlementBean,HttpServletRequest request,
 			HttpSession httpSession,RedirectAttributes redirectAttributes,Model model) throws Exception {
 		logger.info("***** NFSAdjTTUMValidation.Post Start ****");
-		/*String lastDate = fileDate;
-		logger.info("NFSAdjTTUMValidation POST");
-		NFSSettlementBean nfsSettlementBean = new NFSSettlementBean();
-		nfsSettlementBean.setCategory("NFS_ADJUSTMENT");
-		logger.info("filename is "+filename);
-		nfsSettlementBean.setFileName(filename);
-		nfsSettlementBean.setStSubCategory(stSubCategory);
-		String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
-		logger.info("Created by is "+Createdby);
-		nfsSettlementBean.setCreatedBy(Createdby);
-		nfsSettlementBean.setCycle(Integer.parseInt(cycle));
-		//For Daily Settlement
-		nfsSettlementBean.setDatepicker(fileDate);*/
+		 
 		logger.info("ADjtype is "+nfsSettlementBean.getAdjType());
 		nfsSettlementBean.setCategory("NFS_ADJUSTMENT");
 		HashMap<String, Object> result = nfsSettlementService.ValidateForAdjTTUM(nfsSettlementBean);

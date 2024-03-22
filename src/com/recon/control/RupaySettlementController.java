@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -310,18 +311,52 @@ public class RupaySettlementController {
 	}
 
 	@RequestMapping(value = "downloadReport", method = RequestMethod.POST)
-	public String InetSummuryDownload(@RequestParam("fileDate") String filedate, HttpServletRequest request,
-			HttpSession httpSession, RedirectAttributes redirectAttributes, Model model) throws Exception {
+	public void InetSummuryDownload(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpServletResponse response, HttpSession httpSession, RedirectAttributes redirectAttributes, Model model)
+			throws Exception {
 		logger.info("***** PresentmentDownload.POST Start ****");
+		System.out.println("inside the excel download rupaysettlementcontroller 316");
 		List<Object> Excel_data = new ArrayList<Object>();
-		System.out.println(filedate);
+		System.out.println("rahul code " + filedate);
 		// GET DATA FOR REPORT
-		Excel_data = rupayDao.getSummuryDownloadReport(filedate);
-//		System.out.println(Excel_data);
+//		Excel_data = rupayDao.getSummuryDownloadReport(filedate);
 		model.addAttribute("ReportName", "Presentment_Data_" + filedate);
 		model.addAttribute("data", Excel_data);
 		logger.info("***** PresentmentDownload Daily POST End ****");
-		return "GenerateNFSDailyReport";
+		// return "GenerateNFSDailyReport";
+
+		ServletOutputStream sou = null;
+		ServletOutputStream sou2 = null;
+		String fileName = null;
+		String fileName2 = null;
+
+		try {
+
+			// System.out.println("REQUEST RECE");
+			fileName = NFSttumService.OutwardReport(filedate, filedate, "", "report");
+			model.addAttribute("message", "DONE");
+			response.setContentType("application/octet-stream");
+			response.setHeader("Content-Disposition", "attachment; filename= " + fileName);
+			FileInputStream ins = new FileInputStream(new File(fileName));
+			sou = response.getOutputStream();
+			sou.write(IOUtils.toByteArray(ins));
+			sou.flush();
+			ins.close();
+			sou.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				new File(fileName).delete();
+				sou.flush();
+				sou.close();
+				System.gc();
+			} catch (Exception e2) {
+			}
+
+		}
+
 	}
 
 	@RequestMapping(value = "RupayFileUpload", method = RequestMethod.POST)
@@ -413,27 +448,25 @@ public class RupaySettlementController {
 
 		System.out.println("date is" + filedate);
 		boolean validateDate = false;
-		boolean checkrecord = false ;
-		
-		checkrecord =  rupaySettlementService.checkRecord(filedate);
+		boolean checkrecord = false;
 
-		if(checkrecord) {
-		validateDate = rupaySettlementService.validateLateRev(filedate);
-		if (validateDate) {
-			boolean executeFlag = rupaySettlementService.processLateRev(filedate);
-		
-			if (executeFlag)
-				return "Recon Process is Done!!";
-			else
-				return "Recon Process Error!!";
-		} else
-			return "Recon is already processed.";
-		}
-		else {
-			return "No records for processing";	
+		checkrecord = rupaySettlementService.checkRecord(filedate);
+
+		if (checkrecord) {
+			validateDate = rupaySettlementService.validateLateRev(filedate);
+			if (validateDate) {
+				boolean executeFlag = rupaySettlementService.processLateRev(filedate);
+
+				if (executeFlag)
+					return "Recon Process is Done!!";
+				else
+					return "Recon Process Error!!";
+			} else
+				return "Recon is already processed.";
+		} else {
+			return "No records for processing";
 		}
 	}
-		
 
 	@RequestMapping(value = "PresentmentRecon", method = RequestMethod.POST)
 	@ResponseBody
@@ -929,7 +962,7 @@ public class RupaySettlementController {
 		}
 
 	}
-	
+
 	@RequestMapping(value = "CbsDataFetch", method = RequestMethod.POST)
 	@ResponseBody
 	public String CbsDataFetch(@RequestParam("fileDate") String filedate, HttpServletRequest request,
@@ -937,20 +970,19 @@ public class RupaySettlementController {
 
 		System.out.println("date is" + filedate);
 		boolean validateDate = false;
-		boolean checkrecord = false ;
-		
-		checkrecord =  rupaySettlementService.checkCbsRecordPresent(filedate);
+		boolean checkrecord = false;
 
-		if(!checkrecord) {
+		checkrecord = rupaySettlementService.checkCbsRecordPresent(filedate);
+
+		if (!checkrecord) {
 			boolean executeFlag = rupaySettlementService.processCbs(filedate);
-		
+
 			if (executeFlag)
 				return "CBS data Fetching is Done!!";
 			else
 				return "CBS data Fetching Error!!";
 		} else
 			return "CBS data Fetching is already processed.";
-		}
-		
+	}
 
 }

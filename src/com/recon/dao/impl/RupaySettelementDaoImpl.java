@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.DataSource;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.sl.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -36,6 +38,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.recon.dao.ManualFileDao;
 import com.recon.dao.RupaySettelementDao;
+import com.recon.model.Act4Bean;
+import com.recon.model.AddPresentmentData;
 import com.recon.model.ConfigurationBean;
 import com.recon.model.RupaySettlementBean;
 import com.recon.model.RupayUploadBean;
@@ -60,6 +64,14 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 	@Autowired
 	GeneralUtil generalUtil;
 
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+	public void setReconDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcTemplate.setQueryTimeout(3100);
+	}
+	
 	private static final String O_ERROR_MESSAGE = "o_error_message";
 
 	@Override
@@ -1900,53 +1912,79 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		return typeList;
 	}
 
-	public List<Object> getSummuryDownloadReport(String filedate) {
-		List<Object> data = new ArrayList<Object>();
-		try {
-			String getInterchnage = "";
-			String sandesh_sir = "";
-			List<String> Column_list = new ArrayList<String>();
-			Column_list = getPresentmentColumnList("unmatched_bkp");
-			String mdate = generalUtil.DateFunction(filedate);
 
-			System.out.println("DATA PASSING IS" + filedate);
-			// final Workbook wb = new HSSFWorkbook();
-//			getInterchnage = "select TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   from unmatched_bkp where filedate = '"
-//					+ mdate + "'  ORDER BY dcrs_remarks ASC , txn_type ASC  ";
+	/*
+	 * public List<Object> getSummuryDownloadReport(String filedate) { List<Object>
+	 * data = new ArrayList<Object>(); try { String getInterchnage = ""; String
+	 * sandesh_sir = ""; List<String> Column_list = new ArrayList<String>();
+	 * Column_list = getPresentmentColumnList("unmatched_bkp"); String mdate =
+	 * generalUtil.DateFunction(filedate);
+	 * 
+	 * System.out.println("DATA PASSING IS" + filedate);
+	 * 
+	 * getInterchnage =
+	 * "SELECT TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   FROM unmatched_bkp T1  WHERE SUBSTR(NARRATION,0,4) IN ('PRRR', 'PRCR') AND NOT EXISTS ( SELECT 1 FROM cbs_nainital_rawdata T2  WHERE T1.RRN = T2.RRN AND SUBSTR(NARRATION,0,4) <> SUBSTR(T1.NARRATION,0,4)) AND FILEDATE = '"
+	 * + mdate + "' ORDER BY dcrs_remarks ASC , txn_type ASC ";
+	 * 
+	 * System.out.println(getInterchnage); data.add(Column_list); final List<String>
+	 * columns = Column_list; List<Object> Dailydata =
+	 * getJdbcTemplate().query(getInterchnage, new Object[] {}, new
+	 * ResultSetExtractor<List<Object>>() { public List<Object>
+	 * extractData(ResultSet rs) throws SQLException { List<Object> beanList = new
+	 * ArrayList<>(); while (rs.next()) { Map<String, String> data = new
+	 * HashMap<>();
+	 * 
+	 * for (String cname : columns) { data.put(cname, rs.getString(cname)); }
+	 * beanList.add(data); } return beanList; } }); data.add(Dailydata);
+	 * System.out.print(data.size()); return data; } catch (Exception e) {
+	 * logger.info("Exception in SummuryDownload"); e.printStackTrace(); return
+	 * null; } }
+	 */
 
-			getInterchnage = "SELECT TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   FROM unmatched_bkp T1  WHERE SUBSTR(NARRATION,0,4) IN ('PRRR', 'PRCR') AND NOT EXISTS ( SELECT 1 FROM cbs_nainital_rawdata T2  WHERE T1.RRN = T2.RRN AND SUBSTR(NARRATION,0,4) <> SUBSTR(T1.NARRATION,0,4)) AND FILEDATE = '"
-					+ mdate + "' ORDER BY dcrs_remarks ASC , txn_type ASC ";
 
-			System.out.println(getInterchnage);
-			data.add(Column_list);
-//			System.out.println(data);
-			final List<String> columns = Column_list;
-			List<Object> Dailydata = getJdbcTemplate().query(getInterchnage, new Object[] {},
-					new ResultSetExtractor<List<Object>>() {
-						public List<Object> extractData(ResultSet rs) throws SQLException {
-							List<Object> beanList = new ArrayList<>();
-							while (rs.next()) {
-								Map<String, String> data = new HashMap<>();
+	public List<AddPresentmentData> getSummuryDownloadReport(String filedate) {
+		// String query = "select filename,filedate from upi_v2_filedetails
+		// where filedate='"+date+"' " ;
+		String getInterchnage = "";
+		
+		String mdate = generalUtil.DateFunction(filedate);
 
-								for (String cname : columns) {
-									System.out.print("cname is " + cname);
-									data.put(cname, rs.getString(cname));
-								}
-								beanList.add(data);
-							}
-							return beanList;
-						}
-					});
-			data.add(Dailydata);
+		System.out.println("DATA PASSING IS" + filedate);
 
-			return data;
-		} catch (Exception e) {
-			logger.info("Exception in SummuryDownload");
-			e.printStackTrace();
-			return null;
-		}
+		getInterchnage = "SELECT TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   FROM unmatched_bkp T1  WHERE SUBSTR(NARRATION,0,4) IN ('PRRR', 'PRCR') AND NOT EXISTS ( SELECT 1 FROM cbs_nainital_rawdata T2  WHERE T1.RRN = T2.RRN AND SUBSTR(NARRATION,0,4) <> SUBSTR(T1.NARRATION,0,4)) AND FILEDATE = '"
+				+ mdate + "' ORDER BY dcrs_remarks ASC , txn_type ASC ";
+
+		//String query = "select filename as file_name,count from settlement_file ";
+
+		///List<Act4Bean> records = jdbcTemplate.query(getInterchnage, new RowMapper<Act4Bean>() {
+			
+		List<AddPresentmentData> records = jdbcTemplate.query(getInterchnage, new RowMapper<AddPresentmentData>() {
+	
+
+			public AddPresentmentData mapRow(ResultSet rs, int row) throws SQLException {
+				AddPresentmentData u = new AddPresentmentData();
+				
+			
+
+			
+				u.setTRAN_DATE(rs.getString(1));
+				u.setACCOUNTID(rs.getString(2));//ACCOUNTID TXN_TYPE
+				u.setTXN_TYPE(rs.getString(3));
+				u.setRRN(rs.getString(4)); 
+				u.setAMOUNT(rs.getString(5));
+				u.setACCOUNT_NAME(rs.getString(6));
+				u.setDCRS_REMARKS(rs.getString(7));
+				u.setDIFF_AMOUNT(rs.getString(8));// AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT 
+				
+//				u.setDate(rs.getString(2));
+
+				return u;
+			}
+		});
+
+		return records;
+
 	}
-
 	public boolean processCbs(String filedate) {
 		String monthdate = generalUtil.DateFunction(filedate);
 		Map<String, Object> inParams = new HashMap<>();

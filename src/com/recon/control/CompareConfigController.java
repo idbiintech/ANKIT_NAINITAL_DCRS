@@ -189,9 +189,7 @@ public class CompareConfigController {
 		}
 
 	}
-	
-	
-	
+
 	@RequestMapping(value = "CbsDatafetch", method = RequestMethod.GET)
 	public ModelAndView CbsDatafetch(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
 			HttpSession httpSession, HttpServletRequest request) throws Exception {
@@ -258,9 +256,9 @@ public class CompareConfigController {
 
 	public ResponseEntity UploadFile(@ModelAttribute("CompareSetupBean") CompareSetupBean setupBean,
 			HttpServletRequest request, // @RequestParam("dataFile1") MultipartFile file,
-			@RequestParam("file") MultipartFile file, String filename, String excelType, String fileType, String category,
-			String stSubCategory, String fileDate, HttpSession httpSession, Model model, ModelAndView modelAndView,
-			RedirectAttributes redirectAttributes) throws Exception {
+			@RequestParam("file") MultipartFile file, String filename, String excelType, String fileType,
+			String category, String stSubCategory, String fileDate, HttpSession httpSession, Model model,
+			ModelAndView modelAndView, RedirectAttributes redirectAttributes) throws Exception {
 
 		String phyFileName = "";
 		logger.info("***** CompareConfigController.UploadFile Start ****");
@@ -287,7 +285,7 @@ public class CompareConfigController {
 		// Check File already uploaded or not
 
 		// icompareConfigService.chkFileupload(setupBean);
-		//icompareConfigService.chkFileupload(setupBean);
+		// icompareConfigService.chkFileupload(setupBean);
 		String chkFlag = "";
 
 		if (setupBean.getFileType().equalsIgnoreCase("Manual")) {
@@ -307,153 +305,155 @@ public class CompareConfigController {
 		setupBean.setP_FILE_NAME(phyFileName);
 		System.out.println("Physical File name::>" + phyFileName);
 
-		try {
-			// if( !(icompareConfigService.chkBeforeUploadFile(chkFlag, setupBean ))){
-			// //commented by int8624 on 19/jan/2022
-			// ADDED on 28 mar
-			Boolean checkFileName = false; //earlier false changed to true
-			if (setupBean.getCategory().equalsIgnoreCase("RUPAY")) {
-				checkFileName = icompareConfigService.chkBeforeUploadFile(chkFlag, setupBean);
-			}
-			
-//            if(setupBean.getFilename().equals("SWITCH") || setupBean.getFilename().equals("CBS")){
-//            	checkFileName =icompareConfigService.chkSwitchCbsFileupload(setupBean);
-//            }
-			
-			if (!checkFileName) {
-				// validate whether correct issuer / acquirer file is uploaded by user
-				if (!setupBean.getFilename().equalsIgnoreCase("REV_REPORT")) {
-					output = icompareConfigService.checkUploadedFileName(setupBean.getCategory(),
-							setupBean.getStSubCategory(), phyFileName);
+		String arr[] = phyFileName.split("\\.");
+		System.out.println("arr 0 is :" + arr[0]);
+		System.out.println("arr 1 is :" + arr[1]);
 
-				} else
-					output.put("result", true);
+		if (!(arr[1].equals("html") || arr[1].contains("txt"))) {
 
-				if (output != null && (Boolean) output.get("result")) {
-					// 2. check whether selected cycle is already uploaded
+			try {
+				Boolean checkFileName = false; // earlier false changed to true
+				if (setupBean.getCategory().equalsIgnoreCase("RUPAY")) {
+					checkFileName = icompareConfigService.chkBeforeUploadFile(chkFlag, setupBean);
+				}
+
+
+				if (!checkFileName) {
 					if (!setupBean.getFilename().equalsIgnoreCase("REV_REPORT")) {
-	//					output = compareconfigDao.checkUploadedCycle(fileDate, setupBean.getStSubCategory(),
-	//							setupBean.getFilename(), phyFileName);
+						output = icompareConfigService.checkUploadedFileName(setupBean.getCategory(),
+								setupBean.getStSubCategory(), phyFileName);
 
 					} else
 						output.put("result", true);
 
 					if (output != null && (Boolean) output.get("result")) {
-						if (icompareConfigService.chkUploadFlag(chkFlag, setupBean).equalsIgnoreCase("N")
-								&& (!setupBean.getFilename().equals("REV_REPORT") )) {
-							if (!file.isEmpty()) {
+						if (!setupBean.getFilename().equalsIgnoreCase("REV_REPORT")) {
 
-								try {
+						} else
+							output.put("result", true);
 
-									/*
-									 * byte[] bytes = file.getBytes();
-									 * 
-									 * 
-									 * File serverFile = new File("\\\\10.144.143.191\\led\\DCRS\\test"+
-									 * File.separator + file+".txt"); BufferedOutputStream stream = new
-									 * BufferedOutputStream(new FileOutputStream(serverFile)); stream.write(bytes);
-									 * stream.close();
-									 */
+						if (output != null && (Boolean) output.get("result")) {
+							if (icompareConfigService.chkUploadFlag(chkFlag, setupBean).equalsIgnoreCase("N")
+									&& (!setupBean.getFilename().equals("REV_REPORT"))) {
+								if (!file.isEmpty()) {
 
-									// Validating File.
-									 //if(icompareConfigService.validateFile(setupBean,file)){
+									try {
 
-									// Uploading File.
-									// ADDED BY INT8624 FOR DISPLAYING ERROR TO USER
-									output = icompareConfigService.uploadFile(setupBean, file);	//here 
-									boolean result = (boolean) output.get("result");
-									if (result) {
+										/*
+										 * byte[] bytes = file.getBytes();
+										 * 
+										 * 
+										 * File serverFile = new File("\\\\10.144.143.191\\led\\DCRS\\test"+
+										 * File.separator + file+".txt"); BufferedOutputStream stream = new
+										 * BufferedOutputStream(new FileOutputStream(serverFile)); stream.write(bytes);
+										 * stream.close();
+										 */
 
-										int recordcount = icompareConfigService.getrecordcount(setupBean);
+										// Validating File.
+										// if(icompareConfigService.validateFile(setupBean,file)){
 
-										logger.info("recordcount==" + recordcount);
+										// Uploading File.
+										// ADDED BY INT8624 FOR DISPLAYING ERROR TO USER
+										output = icompareConfigService.uploadFile(setupBean, file); // here
+										boolean result = (boolean) output.get("result");
+										if (result) {
 
-										// ADDED BY INT8624 FOR EXCEPTION HANDLING
-										try {
-											if (output.containsKey("msg")
-													&& !setupBean.getCategory().equalsIgnoreCase("RUPAY")) {
+											int recordcount = icompareConfigService.getrecordcount(setupBean);
+
+											logger.info("recordcount==" + recordcount);
+
+											// ADDED BY INT8624 FOR EXCEPTION HANDLING
+											try {
+												if (output.containsKey("msg")
+														&& !setupBean.getCategory().equalsIgnoreCase("RUPAY")) {
+													String msg = (String) output.get("msg");
+													return new ResponseEntity("File Uploaded Successfuly!! \n " + msg,
+															HttpStatus.OK);
+												} else {
+													return new ResponseEntity(
+															"File Uploaded Successfuly!! \n Total Record Count : "
+																	+ recordcount + "",
+															HttpStatus.OK);
+												}
+											} catch (Exception e) {
+												logger.error("Exception while getting msg from hashmap");
+											}
+
+											return new ResponseEntity(
+													"File Uploaded Successfuly!! \n Total Record Count : " + recordcount
+															+ "",
+													HttpStatus.OK);
+
+										} else {
+											// ADDED BY BHAGYASHREE FOR EXCEPTION WHILE FILE READING FILE
+											if (output.containsKey("msg")) {
+												logger.info("Inside else code " + output.containsKey("msg"));
 												String msg = (String) output.get("msg");
-												return new ResponseEntity("File Uploaded Successfuly!! \n " + msg,
+												return new ResponseEntity("File not Uploaded!! \n " + msg,
 														HttpStatus.OK);
 											} else {
-												return new ResponseEntity(
-														"File Uploaded Successfuly!! \n Total Record Count : "
-																+ recordcount + "",
-														HttpStatus.OK);
+												return new ResponseEntity("File not Uploaded!!", HttpStatus.OK);
 											}
-										} catch (Exception e) {
-											logger.error("Exception while getting msg from hashmap");
+
 										}
+										// icompareConfigService.updateFlag("Upload_FLAG", setupBean);
 
-										return new ResponseEntity("File Uploaded Successfuly!! \n Total Record Count : "
-												+ recordcount + "", HttpStatus.OK);
+										// logger.info("***** CompareConfigController.UploadFile End ****");
 
-									} else {
-										// ADDED BY BHAGYASHREE FOR EXCEPTION WHILE FILE READING FILE
-										if (output.containsKey("msg")) {
-											logger.info("Inside else code " + output.containsKey("msg"));
-											String msg = (String) output.get("msg");
-											return new ResponseEntity("File not Uploaded!! \n " + msg, HttpStatus.OK);
-										} else {
-											return new ResponseEntity("File not Uploaded!!", HttpStatus.OK);
-										}
-
+									} catch (Exception e) {
+										demo.logSQLException(e, "CompareConfigController.UploadFile");
+										logger.error(" error in CompareConfigController.UploadFile",
+												new Exception("CompareConfigController.UploadFile", e));
+										redirectAttributes.addFlashAttribute(ERROR_MSG,
+												"error occured while uploading file");
+										return new ResponseEntity(ERROR_MSG, HttpStatus.OK);
 									}
-									// icompareConfigService.updateFlag("Upload_FLAG", setupBean);
+								}
+							} else if ((setupBean.getFilename().equals("REV_REPORT"))) {
+								output = icompareConfigService.uploadREV_File(setupBean, file);
+								if (output != null && (Boolean) output.get("result")) {
+									String count = output.get("msg").toString();
+									// int recordcount = icompareConfigService.getREVrecordcount(setupBean);
+									logger.info("recordcount==" + count);
+									return new ResponseEntity(
+											"File Uploaded Successfuly!! \n Total Record Count : " + count + "",
+											HttpStatus.OK);
 
-									// logger.info("***** CompareConfigController.UploadFile End ****");
+								} else {
+									logger.info("msg is " + output.get("msg").toString());
+									return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK);
+								}
+							} else {
+								// ADDED BY INT8624 FOR EMPTY FILES
+								if (file.isEmpty()) {
 
-								} catch (Exception e) {
-									demo.logSQLException(e, "CompareConfigController.UploadFile");
-									logger.error(" error in CompareConfigController.UploadFile",
-											new Exception("CompareConfigController.UploadFile", e));
-									redirectAttributes.addFlashAttribute(ERROR_MSG,
-											"error occured while uploading file");
-									return new ResponseEntity(ERROR_MSG, HttpStatus.OK);
+									logger.info("File is Empty");
+									return new ResponseEntity("Uploaded File is Empty", HttpStatus.OK);
+
+								} else {
+									redirectAttributes.addFlashAttribute(ERROR_MSG, "File already uploaded");
+									logger.info("File already uploaded_for file not empty");
 								}
 							}
-						} else if ((setupBean.getFilename().equals("REV_REPORT"))) {
-							output = icompareConfigService.uploadREV_File(setupBean, file);
-							if (output != null && (Boolean) output.get("result")) {
-								String count = output.get("msg").toString();
-								// int recordcount = icompareConfigService.getREVrecordcount(setupBean);
-								logger.info("recordcount==" + count);
-								return new ResponseEntity(
-										"File Uploaded Successfuly!! \n Total Record Count : " + count + "",
-										HttpStatus.OK);
 
-							} else {
-								logger.info("msg is " + output.get("msg").toString());
-								return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK);
-							}
 						} else {
-							// ADDED BY INT8624 FOR EMPTY FILES
-							if (file.isEmpty()) {
+							return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK); // direct jumps here
 
-								logger.info("File is Empty");
-								return new ResponseEntity("Uploaded File is Empty", HttpStatus.OK);
-
-							} else {
-								redirectAttributes.addFlashAttribute(ERROR_MSG, "File already uploaded");
-								logger.info("File already uploaded_for file not empty");
-							}
 						}
-
 					} else {
-						return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK); //direct jumps here
+						return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK);
 
 					}
 				} else {
-					return new ResponseEntity(output.get("msg").toString(), HttpStatus.OK);
 
+					redirectAttributes.addFlashAttribute(ERROR_MSG, "File already uploaded");
+					logger.info("File already uploaded_else of checkfilename");
 				}
-			} else {
-
-				redirectAttributes.addFlashAttribute(ERROR_MSG, "File already uploaded");
-				logger.info("File already uploaded_else of checkfilename");
+			} catch (Exception e) {
+				return new ResponseEntity(e.getMessage(), HttpStatus.OK);
 			}
-		} catch (Exception e) {
-			return new ResponseEntity(e.getMessage(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity("Please check the format of the File ", HttpStatus.OK);
 		}
 
 		if (file.isEmpty()) {

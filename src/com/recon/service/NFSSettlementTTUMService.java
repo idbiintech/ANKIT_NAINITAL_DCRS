@@ -48,4 +48,7 @@ public interface NFSSettlementTTUMService {
 	//List<String> getLateRev(String filedate);
 
 	List<String> getLateRev(String filedate);
+	
+	public String OutwardReport(String fdate, String tdate, String type,String reportName) throws Exception;
+
 }

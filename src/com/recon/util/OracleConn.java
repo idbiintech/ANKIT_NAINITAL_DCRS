@@ -107,7 +107,7 @@ public class OracleConn implements java.io.Serializable {
 
 		url = "jdbc:oracle:thin:@172.23.99.45:1621:RECUATDB";
 		login = "DEBITCARD_RECON";
-		password = "DEBIT127";
+		password = "DEBIT120";
 
 // UAT NAINITAL
 

@@ -2,15 +2,25 @@ package com.recon.service.impl;
 
 import static com.recon.util.GeneralUtil.GET_FILE_ID;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.apache.logging.log4j.LogManager;
 //import org.apache.logging.log4j.Logger;
@@ -22,7 +32,11 @@ import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.object.StoredProcedure;
 
+import com.opencsv.CSVWriter;
 import com.recon.control.NFSSettlementController;
+import com.recon.dao.impl.RupaySettelementDaoImpl;
+import com.recon.model.Act4Bean;
+import com.recon.model.AddPresentmentData;
 import com.recon.model.NFSSettlementBean;
 import com.recon.service.NFSSettlementTTUMService;
 import com.recon.util.GeneralUtil;
@@ -31,6 +45,9 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 
 	@Autowired
 	GeneralUtil generalUtil;
+
+	@Autowired
+	RupaySettelementDaoImpl rupayDao;
 
 	private static final Logger logger = Logger.getLogger(NFSSettlementTTUMServiceImpl.class);
 	private static final String O_ERROR_MESSAGE = "o_error_message";
@@ -1435,6 +1452,204 @@ public class NFSSettlementTTUMServiceImpl extends JdbcDaoSupport implements NFSS
 			compile();
 		}
 
+	}
+
+	@Override
+	public String OutwardReport(String fdate, String tdate, String type, String reportName) throws Exception {
+
+//		String OUTWARD = "OUTWARD-" + reportName + ".xlsx";
+		String OUTWARD = "presentment" + reportName + ".csv";
+
+//		new ToXlsx(rupayDao, fdate, tdate, "O", OUTWARD, reportName).GenrateBook();
+
+		new ToCSV(rupayDao, fdate, tdate, "O", OUTWARD).generateBook();
+		return OUTWARD;
+	}
+
+	private class ToXlsx {
+
+		private RupaySettelementDaoImpl upireport;
+		private String Fdate;
+		private String Tdate;
+		private String Type;
+		private String fileName;
+		private String reportName;
+
+		ToXlsx(RupaySettelementDaoImpl upi, String fdate, String tdate, String type, String filename,
+				String reportName) {
+			this.upireport = upi;
+			this.Fdate = fdate;
+			this.Tdate = tdate;
+			this.Type = type;
+			this.fileName = filename;
+			this.reportName = reportName;
+		}
+
+		@SuppressWarnings("unchecked")
+		void GenrateBook() throws Exception {
+
+			OutputStream strm = null;
+			SXSSFWorkbook book = new SXSSFWorkbook(1000);
+
+			{
+
+				List<String> Column_list = new ArrayList<String>();
+				Column_list = getPresentmentColumnList("unmatched_bkp");
+				System.out.println("data fetching started ");
+
+				List<AddPresentmentData> a = upireport.getSummuryDownloadReport(Fdate);
+				System.out.println("data fetiching end");
+
+				SXSSFSheet summSheet = book.createSheet("Summary");
+				SXSSFRow summSheetheadrow = summSheet.createRow(0);
+
+				summSheetheadrow.createCell(0).setCellValue("DIFF_AMOUNT");
+				summSheetheadrow.createCell(1).setCellValue("TRAN_DATE");
+				summSheetheadrow.createCell(2).setCellValue("ACCOUNTID");
+				summSheetheadrow.createCell(3).setCellValue("TXN_TYPE");
+				summSheetheadrow.createCell(4).setCellValue("RRN");
+				summSheetheadrow.createCell(5).setCellValue("AMOUNT");
+				summSheetheadrow.createCell(6).setCellValue("ACCOUNT_NAME");
+				summSheetheadrow.createCell(7).setCellValue("DCRS_REMARKS");
+
+				for (int rowdata = 0; rowdata < a.size(); rowdata++) {
+					SXSSFRow row = summSheet.createRow(rowdata + 1);
+
+					System.out.println(a.get(rowdata));
+					row.createCell(0).setCellValue(a.get(rowdata).getDIFF_AMOUNT());
+					row.createCell(1).setCellValue(a.get(rowdata).getTRAN_DATE());
+					row.createCell(2).setCellValue(a.get(rowdata).getACCOUNTID());
+					row.createCell(3).setCellValue(a.get(rowdata).getTXN_TYPE());
+					row.createCell(4).setCellValue(a.get(rowdata).getRRN());
+					row.createCell(5).setCellValue(a.get(rowdata).getAMOUNT());
+					row.createCell(6).setCellValue(a.get(rowdata).getACCOUNT_NAME());
+					row.createCell(7).setCellValue(a.get(rowdata).getDCRS_REMARKS());
+
+				}
+
+			}
+
+			try {
+
+				strm = new FileOutputStream(new File(fileName));
+				book.write(strm);
+				book.close();
+				strm.flush();
+				strm.close();
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				System.gc();
+				try {
+					strm.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
+	private class ToCSV {
+		private RupaySettelementDaoImpl upireport;
+		private String Fdate;
+		private String Tdate;
+		private String Type;
+		private String fileName;
+
+		public ToCSV(RupaySettelementDaoImpl upireport, String fdate, String tdate, String type, String fileName) {
+			super();
+			this.upireport = upireport;
+			Fdate = fdate;
+			Tdate = tdate;
+			Type = type;
+			this.fileName = fileName;
+		}
+
+		void generateBook() throws Exception {
+//DIFF_AMOUNT	TRAN_DATE	ACCOUNTID	TXN_TYPE	RRN	AMOUNT	ACCOUNT_NAME	DCRS_REMARKS
+
+			String head[] = { "DIFF_AMOUNT", "TRAN_DATE", "ACCOUNTID", "TXN_TYPE", "RRN", "AMOUNT", "ACCOUNT_NAME",
+					"DCRS_REMARKS" };
+
+
+			String DIR = "E:\\UPI\\DATA\\";
+			Collection<String> Column_list = new ArrayList<String>();
+			Column_list = getPresentmentColumnList("unmatched_bkp");
+
+			// upireport.getSummuryDownloadReport(Fdate);
+
+			List<AddPresentmentData> rep1 = upireport.getSummuryDownloadReport(Fdate);
+
+			System.out.println("rep1 " + rep1.size());
+
+			File dir = new File(DIR);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			File file = new File(fileName);
+
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			if (file.exists() && !file.canWrite()) {
+				file.setWritable(true);
+			}
+
+			if (!file.canRead())
+				file.setReadable(true);
+
+			try (CSVWriter writer = new CSVWriter(new FileWriter(file))) {
+
+				List<String[]> datas = new ArrayList<String[]>();
+				List<String[]> datas2 = new ArrayList<String[]>();
+				// datas.add(head);
+
+				datas.add(head);
+
+				if (rep1 != null)
+					if (!rep1.isEmpty()) {
+						for (int rowdata = 0; rowdata < rep1.size(); rowdata++) {
+							datas.add(
+									new String[] { rep1.get(rowdata).getDIFF_AMOUNT(), rep1.get(rowdata).getTRAN_DATE(),
+											rep1.get(rowdata).getACCOUNTID(), rep1.get(rowdata).getTXN_TYPE(),
+											rep1.get(rowdata).getRRN(), rep1.get(rowdata).getAMOUNT(),
+											rep1.get(rowdata).getACCOUNT_NAME(), rep1.get(rowdata).getDCRS_REMARKS() });
+							if (rowdata == 1000000) { // 100000 --> 1000000
+								writer.writeAll(datas);
+							}
+						}
+
+						writer.writeAll(datas);
+
+						try {
+							datas = null;
+							rep1 = null;
+						} finally {
+							System.gc();
+
+						}
+
+					}
+			}
+		}
+	}
+
+	public ArrayList<String> getPresentmentColumnList(String tableName) throws SQLException, Exception {
+
+		String query1 = "SELECT column_name FROM USER_TAB_COLUMNS WHERE table_name = 'UNMATCHED_BKP' and column_name in ('ACCOUNTID' , 'RRN' ,'AMOUNT' , 'ACCOUNT_NAME' , 'TRAN_DATE','TXN_TYPE','DCRS_REMARKS', 'DIFF_AMOUNT')  ";
+		ArrayList<String> typeList = (ArrayList<String>) getJdbcTemplate().query(query1.toUpperCase(),
+				new RowMapper<String>() {
+					public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+						return rs.getString(1);
+					}
+				});
+		System.out.println(typeList);
+		return typeList;
 	}
 
 }
