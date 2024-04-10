@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.recon.model.CompareSetupBean;
 import com.recon.model.RupaySettlementBean;
 import com.recon.model.RupayUploadBean;
+import com.recon.model.SingleRRN;
 
 public interface RupaySettlementService {
 	public HashMap<String, Object> uploadExcelFile(RupaySettlementBean beanObj, MultipartFile file) throws Exception;
@@ -37,6 +39,15 @@ public interface RupaySettlementService {
 	List<Object> getSettlementData(RupayUploadBean beanObj);
 
 	public Boolean validateSettlementTTUM(RupayUploadBean beanObj);
+	
+	public Boolean validatePresentmentUpload(RupayUploadBean beanObj , MultipartFile file);
+	
+	public Boolean validateNfsIssUpload(CompareSetupBean setupBean, MultipartFile file);
+
+	public List<SingleRRN>  upiReport(String rrnNo,String task) throws Exception; 
+
+	
+	
 
 	public Boolean validateFileUpload(RupayUploadBean beanObj);
 

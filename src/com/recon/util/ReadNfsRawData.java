@@ -8,14 +8,18 @@ import java.sql.ResultSet;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.recon.model.CompareSetupBean;
 import com.recon.model.FileSourceBean;
+import com.recon.service.RupaySettlementService;
 
 public class ReadNfsRawData {
 
 	private static final Logger logger = Logger.getLogger(ReadNfsRawData.class);
+	
+	
 	
 	public boolean readData(CompareSetupBean setupBean, Connection con,
 			MultipartFile file, FileSourceBean sourceBean) {
@@ -31,6 +35,11 @@ public class ReadNfsRawData {
 		if(setupBean.getStSubCategory().equalsIgnoreCase("ISSUER"))//ISSUER
 		{
 			logger.info("Entered CBS File is Issuer");
+			
+			
+			
+			
+			
 			
 			uploaded = uploadIssuerData(setupBean, con, file, sourceBean);
 		}
@@ -77,11 +86,11 @@ public boolean uploadIssuerData(CompareSetupBean setupBean,Connection con,Multip
 				
 		String query = "insert /*+APPEND*/into nfs_nfs_iss_rawdata ("
 				+ sourceBean.getTblHeader()
-				+ " ,part_id,dcrs_tran_no ,createddate , createdby , filedate,fpan,cycle ) values "
+				+ " ,part_id,dcrs_tran_no ,createddate , createdby , filedate,fpan,cycle,file_name ) values "
 				+ "(?,?,?,?,?" + ",?,?,?,?,?" + ",?,?,?,?,?"
 				+ ",?,?,?,?,?" + ",?,?,?,?,?" + ",?,?,?,?,?"
 				+ ",?,?,?,?,?," + "?,?,?,?,?," + "sysdate,?, to_date('"
-				+ setupBean.getFileDate() + "','dd/mm/yyyy'),?,?) ";
+				+ setupBean.getFileDate() + "','dd/mm/yyyy'),?,?,'"+fileName+"') ";
 		
 		logger.info("query=="+query);
 				

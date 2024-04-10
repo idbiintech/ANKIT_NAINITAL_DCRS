@@ -40,6 +40,7 @@ import com.recon.dao.ManualFileDao;
 import com.recon.dao.RupaySettelementDao;
 import com.recon.model.Act4Bean;
 import com.recon.model.AddPresentmentData;
+import com.recon.model.CompareSetupBean;
 import com.recon.model.ConfigurationBean;
 import com.recon.model.RupaySettlementBean;
 import com.recon.model.RupayUploadBean;
@@ -71,7 +72,7 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.jdbcTemplate.setQueryTimeout(3100);
 	}
-	
+
 	private static final String O_ERROR_MESSAGE = "o_error_message";
 
 	@Override
@@ -1527,6 +1528,58 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		}
 	}
 
+	// validatePresentmentUpload
+
+	public Boolean validatePresentmentUpload(RupayUploadBean beanObj, MultipartFile file) {
+		try {
+			String checkSettlementTTUM = "select count(1) from presentment_data where filedate = to_date(?,'dd/mm/yyyy')"
+					+ "and file_name = ? ";
+
+			System.out.println("filedate is" + beanObj.getFileDate());
+			System.out.println("filename is" + file.getOriginalFilename());
+
+			logger.info(checkSettlementTTUM);
+
+			int getCountTTUM = getJdbcTemplate().queryForObject(checkSettlementTTUM,
+					new Object[] { beanObj.getFileDate(), file.getOriginalFilename() }, Integer.class);
+
+			if (getCountTTUM > 0) {
+				return false;
+			} else
+				return true;
+
+		} catch (Exception e) {
+			logger.info("Exception in validateSettlementTTUM " + e);
+			return false;
+		}
+	}
+
+	// validateNfsIssUpload
+
+	public Boolean validateNfsIssUpload(CompareSetupBean setupBean, MultipartFile file) {
+		try {
+			String checkSettlementTTUM = "select count(1) from nfs_nfs_iss_rawdata  where filedate = to_date(?,'dd/mm/yyyy')"
+					+ "and file_name = ? ";
+
+			System.out.println("filedate is" + setupBean.getFileDate());
+			System.out.println("filename is" + file.getOriginalFilename());
+
+			logger.info(checkSettlementTTUM);
+
+			int getCountTTUM = getJdbcTemplate().queryForObject(checkSettlementTTUM,
+					new Object[] { setupBean.getFileDate(), file.getOriginalFilename() }, Integer.class);
+
+			if (getCountTTUM > 0) {
+				return false;
+			} else
+				return true;
+
+		} catch (Exception e) {
+			logger.info("Exception in validateSettlementTTUM " + e);
+			return false;
+		}
+	}
+
 	public Boolean validateFileUpload(RupayUploadBean beanObj) {
 		try {
 			String checkSettlementTTUM = "Select count(1) from RUPAY_DSCR_RAWDATA WHERE FILEDATE = to_date(?,'dd/mm/yyyy') ";
@@ -1811,8 +1864,13 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		OracleConn oracObj = new OracleConn();
 		Connection conn = oracObj.getconn();
 
+		System.out.println("FILENAME OF PRESENTMENT IS " + file.getOriginalFilename());
+
+		String fname = file.getOriginalFilename();
+
 		String passdate = generalUtil.DateFunction(beanObj.getFileDate());
-		String query = "insert into Presentment_data(Report_Date, Presentment_Raise_Date, Presentment_Settlement_Date, Function_Code_and_Description, PAN, Local_Transaction, RRN, Processing_Code, Currency_Code, E_Commerce_Indicator, Amount_Transaction, Amount_Additional, Settlement_Amount_Transaction, Settlement_Amount_Additional, Approval_Code, Originator_Point, POS_Entry_Mode, POS_Condition_Code, Acquirer_Institution_ID_code, Transaction_Originator_Institution_ID_code, Acquirer_Name_and_Country, Issuer_Institution_ID_code, Transaction_Destination_Institution_ID_code, Issuer_Name_and_Country, Card_Type, Card_Brand, Card_Acceptor_Terminal_ID, Card_Acceptor_Name, Card_Acceptor_Location, Card_Acceptor_Country_Code, Card_Acceptor_Business_Code, Card_Acceptor_ID_Code, Card_Acceptor_State_Name, Card_Acceptor_City, Days_Aged, MTI, FileDate) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String query = "insert into Presentment_data(Report_Date, Presentment_Raise_Date, Presentment_Settlement_Date, Function_Code_and_Description, PAN, Local_Transaction, RRN, Processing_Code, Currency_Code, E_Commerce_Indicator, Amount_Transaction, Amount_Additional, Settlement_Amount_Transaction, Settlement_Amount_Additional, Approval_Code, Originator_Point, POS_Entry_Mode, POS_Condition_Code, Acquirer_Institution_ID_code, Transaction_Originator_Institution_ID_code, Acquirer_Name_and_Country, Issuer_Institution_ID_code, Transaction_Destination_Institution_ID_code, Issuer_Name_and_Country, Card_Type, Card_Brand, Card_Acceptor_Terminal_ID, Card_Acceptor_Name, Card_Acceptor_Location, Card_Acceptor_Country_Code, Card_Acceptor_Business_Code, Card_Acceptor_ID_Code, Card_Acceptor_State_Name, Card_Acceptor_City, Days_Aged, MTI, FileDate,FILE_NAME) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,'"
+				+ fname + "')";
 		String line = "";
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()));
@@ -1824,9 +1882,9 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			char BLANK = ' ';
 			while ((line = br.readLine()) != null) {
 
-				if (line.contains("Report Date") || line.contains("Presentment Raise Date") || line.contains("---END OF REPORT---")
-						|| line.contains("--END OF REPORT--") || line.contains("---End of Report---")
-						|| line.contains("End of Report"))
+				if (line.contains("Report Date") || line.contains("Presentment Raise Date")
+						|| line.contains("---END OF REPORT---") || line.contains("--END OF REPORT--")
+						|| line.contains("---End of Report---") || line.contains("End of Report"))
 					continue;
 				else {
 					sr_no = 1;
@@ -1912,7 +1970,6 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		return typeList;
 	}
 
-
 	/*
 	 * public List<Object> getSummuryDownloadReport(String filedate) { List<Object>
 	 * data = new ArrayList<Object>(); try { String getInterchnage = ""; String
@@ -1941,12 +1998,11 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 	 * null; } }
 	 */
 
-
 	public List<AddPresentmentData> getSummuryDownloadReport(String filedate) {
 		// String query = "select filename,filedate from upi_v2_filedetails
 		// where filedate='"+date+"' " ;
 		String getInterchnage = "";
-		
+
 		String mdate = generalUtil.DateFunction(filedate);
 
 		System.out.println("DATA PASSING IS" + filedate);
@@ -1954,28 +2010,25 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		getInterchnage = "SELECT TRAN_DATE , ACCOUNTID,TXN_TYPE, RRN, AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT   FROM unmatched_bkp T1  WHERE SUBSTR(NARRATION,0,4) IN ('PRRR', 'PRCR') AND NOT EXISTS ( SELECT 1 FROM cbs_nainital_rawdata T2  WHERE T1.RRN = T2.RRN AND SUBSTR(NARRATION,0,4) <> SUBSTR(T1.NARRATION,0,4)) AND FILEDATE = '"
 				+ mdate + "' ORDER BY dcrs_remarks ASC , txn_type ASC ";
 
-		//String query = "select filename as file_name,count from settlement_file ";
+		// String query = "select filename as file_name,count from settlement_file ";
 
-		///List<Act4Bean> records = jdbcTemplate.query(getInterchnage, new RowMapper<Act4Bean>() {
-			
+		/// List<Act4Bean> records = jdbcTemplate.query(getInterchnage, new
+		/// RowMapper<Act4Bean>() {
+
 		List<AddPresentmentData> records = jdbcTemplate.query(getInterchnage, new RowMapper<AddPresentmentData>() {
-	
 
 			public AddPresentmentData mapRow(ResultSet rs, int row) throws SQLException {
 				AddPresentmentData u = new AddPresentmentData();
-				
-			
 
-			
 				u.setTRAN_DATE(rs.getString(1));
-				u.setACCOUNTID(rs.getString(2));//ACCOUNTID TXN_TYPE
+				u.setACCOUNTID(rs.getString(2));// ACCOUNTID TXN_TYPE
 				u.setTXN_TYPE(rs.getString(3));
-				u.setRRN(rs.getString(4)); 
+				u.setRRN(rs.getString(4));
 				u.setAMOUNT(rs.getString(5));
 				u.setACCOUNT_NAME(rs.getString(6));
 				u.setDCRS_REMARKS(rs.getString(7));
-				u.setDIFF_AMOUNT(rs.getString(8));// AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT 
-				
+				u.setDIFF_AMOUNT(rs.getString(8));// AMOUNT, ACCOUNT_NAME,DCRS_REMARKS, DIFF_AMOUNT
+
 //				u.setDate(rs.getString(2));
 
 				return u;
@@ -1985,6 +2038,7 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		return records;
 
 	}
+
 	public boolean processCbs(String filedate) {
 		String monthdate = generalUtil.DateFunction(filedate);
 		Map<String, Object> inParams = new HashMap<>();
@@ -2017,6 +2071,11 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			compile();
 		}
 
+	}
+
+	@Override
+	public Map<String, Object> bbps_report(String type, String rrnNo, String task) throws Exception {
+		return null;
 	}
 
 }

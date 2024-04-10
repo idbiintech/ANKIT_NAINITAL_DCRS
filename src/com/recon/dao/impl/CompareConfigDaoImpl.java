@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.SystemOutLogger;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -57,6 +58,7 @@ import com.recon.model.ManualCompareBean;
 import com.recon.model.ManualFileColumnDtls;
 import com.recon.model.Pos_Bean;
 import com.recon.model.ReadVisaFile;
+import com.recon.service.RupaySettlementService;
 import com.recon.util.CardTocard_cbs;
 import com.recon.util.OracleConn;
 import com.recon.util.Pos_Reading;
@@ -79,6 +81,9 @@ import com.recon.util.demo;
 
 @Component
 public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConfigDao {
+
+	@Autowired
+	RupaySettlementService rupaySettlementService;
 
 	private static final String O_ERROR_MESSAGE = "o_error_message";
 	int reconcount = 0, manreconcount = 0, manmatchcount = 0;
@@ -896,7 +901,17 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 			} else if (setupBean.getFilename().equalsIgnoreCase("NFS")) {
 
 				ReadNfsRawData nfsRawData = new ReadNfsRawData();
-				result = nfsRawData.readData(setupBean, getConnection(), file, sourceBean);
+
+				Boolean checkFlag = rupaySettlementService.validateNfsIssUpload(setupBean, file);
+
+				if (checkFlag) {
+
+					result = nfsRawData.readData(setupBean, getConnection(), file, sourceBean);
+				} else {
+
+					output.put("result", false);
+					output.put("msg", "This file is already Uploaded");
+				}
 
 			} else if (setupBean.getFilename().equalsIgnoreCase("CASHNET")) {
 
@@ -1307,16 +1322,15 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 	public boolean updatefile(CompareSetupBean setupBean) throws Exception {
 		String File_category = "";
 		String File_subcategory = "";
-		
-		if(setupBean.getExcelType().equalsIgnoreCase("ATM")) {
-			File_category = "NFS" ;
+
+		if (setupBean.getExcelType().equalsIgnoreCase("ATM")) {
+			File_category = "NFS";
 			File_subcategory = "ISSUER";
-		}
-		else {
+		} else {
 			File_category = "RUPAY";
-			File_subcategory = "DOMESTIC" ;
+			File_subcategory = "DOMESTIC";
 		}
-		
+
 		try {
 
 			String getUploadCount = "select count(*) from main_file_upload_dtls where filedate = to_date(?,'dd/mm/yyyy')"
@@ -1327,8 +1341,9 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 					|| setupBean.getFilename().equalsIgnoreCase("VISA")) {
 				getUploadCount = "select count(*) from main_file_upload_dtls where filedate = to_date(?,'dd/mm/yyyy')"
 						+ " and fileid in (select fileid from main_filesource where filename = '"
-						+ setupBean.getFilename() + "' AND file_category ='"+File_category+"' and File_subcategory = '"+ File_subcategory+"')";
-				
+						+ setupBean.getFilename() + "' AND file_category ='" + File_category
+						+ "' and File_subcategory = '" + File_subcategory + "')";
+
 //				if (setupBean.getFilename().equalsIgnoreCase("SWITCH") || setupBean.getFilename().equalsIgnoreCase("CBS")
 //						|| setupBean.getFilename().equalsIgnoreCase("VISA")) {
 //					getUploadCount = "select count(*) from main_file_upload_dtls where filedate = to_date(?,'dd/mm/yyyy')"
@@ -1343,12 +1358,10 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 					Integer.class);
 
 			logger.info("count is " + count);
-		
-			
 
 			if (count == 0) {
 				// insert into main file table
-				if (setupBean.getFilename().equalsIgnoreCase("SWITCH") 
+				if (setupBean.getFilename().equalsIgnoreCase("SWITCH")
 						|| setupBean.getFilename().equalsIgnoreCase("CBS")
 						|| setupBean.getFilename().equalsIgnoreCase("VISA")) {
 //					String query = "insert into main_file_upload_dtls (fileid,filedate,updlodby,uploaddate,category,file_subcategory,upload_flag,filter_flag,knockoff_flag,"
@@ -1357,17 +1370,16 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 //							+ setupBean.getCreatedBy()
 //							+ "', sysdate, file_category, file_subcategory, 'Y','N','N','N','N','Y','1'"
 //							+ "from main_filesource where filename = '" + setupBean.getFilename() + "'";
-					
+
 					String query = "insert into main_file_upload_dtls (fileid,filedate,updlodby,uploaddate,category,file_subcategory,upload_flag,filter_flag,knockoff_flag,"
 							+ "	comapre_flag,manualcompare_flag,manupload_flag,file_count) "
 							+ "select fileid , to_date('" + setupBean.getFileDate() + "', 'dd/mm/yyyy') , '"
 							+ setupBean.getCreatedBy()
 							+ "', sysdate, file_category, file_subcategory, 'Y','N','N','N','N','Y','1'"
 							+ "from main_filesource where filename = '" + setupBean.getFilename() + "' "
-									+ " AND  file_category ='"+File_category+"' and File_subcategory = '"+ File_subcategory+"' ";	
-					
-					
-					
+							+ " AND  file_category ='" + File_category + "' and File_subcategory = '" + File_subcategory
+							+ "' ";
+
 					getJdbcTemplate().execute(query);
 
 					return true;
@@ -1390,7 +1402,8 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 			} else {
 				/// check file count and then update
 				String getfile_count = "select distinct file_count from main_file_upload_dtls where filedate = ? and "
-						+ "fileid in (select fileid from main_filesource where filename = '" + setupBean.getFilename()+  "' and file_subcategory = '" + setupBean.getStSubCategory() + "') ";
+						+ "fileid in (select fileid from main_filesource where filename = '" + setupBean.getFilename()
+						+ "' and file_subcategory = '" + setupBean.getStSubCategory() + "') ";
 
 				if (setupBean.getFilename().equalsIgnoreCase("SWITCH")
 						|| setupBean.getFilename().equalsIgnoreCase("CBS")
@@ -1398,10 +1411,11 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 //					getfile_count = "select distinct file_count from main_file_upload_dtls where filedate = to_date (?, 'dd/mm/yyyy') and "
 //							+ "fileid in (select fileid from main_filesource where filename = '"
 //							+ setupBean.getFilename() + "')";
-					
+
 					getfile_count = "select distinct file_count from main_file_upload_dtls where filedate = to_date (?, 'dd/mm/yyyy') and "
 							+ "fileid in (select fileid from main_filesource where filename = '"
-							+ setupBean.getFilename() + "' and file_category = '" + File_category + "' and file_subcategory = '"+ File_subcategory + "')";
+							+ setupBean.getFilename() + "' and file_category = '" + File_category
+							+ "' and file_subcategory = '" + File_subcategory + "')";
 
 				}
 
@@ -1418,13 +1432,12 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 						|| setupBean.getFilename().equalsIgnoreCase("VISA")) {
 //					getfile_count = "select distinct file_count from main_filesource where filename = '"
 //							+ setupBean.getFilename() + "'  ";
-					
+
 					getfile_count = "select distinct file_count from main_filesource where filename = '"
-							+ setupBean.getFilename() + "' and file_category = '" + File_category + "' and file_subcategory = '"+ File_subcategory + "'";
+							+ setupBean.getFilename() + "' and file_category = '" + File_category
+							+ "' and file_subcategory = '" + File_subcategory + "'";
 				}
 				int fileCount2 = getJdbcTemplate().queryForObject(getfile_count, new Object[] {}, Integer.class);
-				
-								
 
 				if (fileCount1 < fileCount2) {
 					if (setupBean.getFilename().equalsIgnoreCase("SWITCH")
@@ -1435,11 +1448,12 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 //								+ setupBean.getFileDate() + "','dd/mm/yyyy') and fileid in "
 //								+ "(select fileid from main_filesource where filename = '" + setupBean.getFilename()
 //								+ "')";
-						
+
 						String query = "update main_file_upload_dtls set file_count = file_count+1 where filedate = to_date('"
 								+ setupBean.getFileDate() + "','dd/mm/yyyy') and fileid in "
 								+ "(select fileid from main_filesource where filename = '" + setupBean.getFilename()
-								+ "' and file_category = '" + File_category + "' and file_subcategory = '"+ File_subcategory + "' )";
+								+ "' and file_category = '" + File_category + "' and file_subcategory = '"
+								+ File_subcategory + "' )";
 						getJdbcTemplate().execute(query);
 						return true;
 
@@ -2194,12 +2208,13 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 				 * "','dd/mm/yyyy')  and fileid in (select fileid from main_filesource where filename = '"
 				 * + setupBean.getFilename() + "'" + ") and file_count = '" + fileCount + "'";
 				 */
-				
+
 				getMainFileCount = "select count(*) from main_file_upload_dtls where filedate = to_Date('"
 						+ setupBean.getFileDate()
 						+ "','dd/mm/yyyy')  and fileid in (select fileid from main_filesource where filename = '"
-						+ setupBean.getFilename() + "' and FILE_CATEGORY = '" + fileCategory +"' AND FILE_SUBCATEGORY = '" + fileSubCategory + "'" 
-						+ ") and file_count = '" + fileCount + "'";
+						+ setupBean.getFilename() + "' and FILE_CATEGORY = '" + fileCategory
+						+ "' AND FILE_SUBCATEGORY = '" + fileSubCategory + "'" + ") and file_count = '" + fileCount
+						+ "'";
 				logger.info("getMainFileCount " + getMainFileCount);
 
 				int uploadCount = getJdbcTemplate().queryForObject(getMainFileCount, new Object[] {}, Integer.class);

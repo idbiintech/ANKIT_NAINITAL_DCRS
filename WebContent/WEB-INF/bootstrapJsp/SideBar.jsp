@@ -39,6 +39,19 @@
 					class="fa fa-upload"></i> <span>CBS Data Fetch</span>
 			</a></li>
 
+			<!-- <li id="upi_RRN" class=""><a
+				href="javascript:onSubmitMenu('upi.do')"> <i
+					class="fa fa-upload"></i> <span>RRN-DETAILS</span> 
+			</a></li> -->
+
+
+<!-- COMMENTED  -->
+
+		<!-- 	<li class="treeview"><a href="upi.do"> <i
+					class="fa fa-upload"></i> <span>RRN-DETAILS</span>
+			</a></li> -->
+
+
 			<li class="treeview"><a href="#"> <i class="fa fa-wifi"></i>
 					<span>Networks</span> <i class="fa fa-angle-left pull-right"></i>
 			</a>

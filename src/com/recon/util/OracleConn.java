@@ -93,9 +93,9 @@ public class OracleConn implements java.io.Serializable {
 		 * password = "debitcard_recon";
 		 */
 ////            uco uat db
-//            url="jdbc:oracle:thin:@203.112.157.164:1621:orcl";
-//            login = "DEBITCARDRECON_UCO";
-//            password = "debitcardrecon_uco";
+//		url = "jdbc:oracle:thin:@203.112.157.164:1621:orcl";
+//		login = "DEBITCARDRECON_UCO";
+//		password = "debitcardrecon_uco";
 
 		// UAT MGB
 		/*
@@ -107,7 +107,7 @@ public class OracleConn implements java.io.Serializable {
 
 		url = "jdbc:oracle:thin:@172.23.99.45:1621:RECUATDB";
 		login = "DEBITCARD_RECON";
-		password = "DEBIT120";
+		password = "DEBIT121";
 
 // UAT NAINITAL
 

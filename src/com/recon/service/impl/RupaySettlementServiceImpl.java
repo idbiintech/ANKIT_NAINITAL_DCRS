@@ -47,8 +47,10 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.recon.dao.impl.RupaySettelementDaoImpl;
+import com.recon.model.CompareSetupBean;
 import com.recon.model.RupaySettlementBean;
 import com.recon.model.RupayUploadBean;
+import com.recon.model.SingleRRN;
 import com.recon.service.RupaySettlementService;
 
 @Service
@@ -447,18 +449,17 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public Boolean validatePresentmentProcess(String filedate) {
 		return rupayDao.validatePresentment(filedate);
 	}
-	
+
 	public Boolean validateCashProcess(String filedate) {
 		return rupayDao.validatePresentment(filedate);
 	}
-	
+
 	@Override
 	public Boolean validateLateRev(String filedate) {
 		return rupayDao.validateLateRev(filedate);
 
 	}
-	
-	
+
 	public HashMap<String, Object> validateSettlementFiles(RupayUploadBean beanObj) {
 
 		HashMap<String, Object> output = rupayDao.validateSettlementFiles(beanObj);
@@ -469,29 +470,27 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public Boolean processPresentment(String filedate) {
 		return rupayDao.processPresentment(filedate);
 	}
-	
+
 	public Boolean processCashAtPos(String filedate) {
 		return rupayDao.processCashAtPos(filedate);
 	}
-	
+
 	public Boolean processLateRev(String filedate) {
 		return rupayDao.processLateRev(filedate);
 	}
-	
+
 	public Boolean processCbs(String filedate) {
 		return rupayDao.processCbs(filedate);
 	}
-	
+
 	public boolean checkRecord(String filedate) {
 		return rupayDao.checkRecord(filedate);
 	} // checkCbsRecordPresent
-	
-	
+
 	public boolean checkCbsRecordPresent(String filedate) {
 		return rupayDao.checkCbsRecordPresent(filedate);
 	}
-	
-	
+
 	public boolean processSettlement(RupayUploadBean beanObj) {
 		return rupayDao.processSettlement(beanObj);
 	}
@@ -508,7 +507,25 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public Boolean validateSettlementTTUM(RupayUploadBean beanObj) {
 		return rupayDao.validateSettlementTTUM(beanObj);
 	}
-	
+
+	// validatePresentmentUpload
+
+	public Boolean validatePresentmentUpload(RupayUploadBean beanObj, MultipartFile file) {
+		return rupayDao.validatePresentmentUpload(beanObj, file);
+	}
+
+	// validateNfsIssUpload
+
+	public Boolean validateNfsIssUpload(CompareSetupBean setupBean, MultipartFile file) {
+		return rupayDao.validateNfsIssUpload(setupBean, file);
+	}
+
+//	@Override
+//	public Boolean validateNfsIssUpload(RupayUploadBean beanObj, MultipartFile file) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
 	public Boolean validateFileUpload(RupayUploadBean beanObj) {
 		return rupayDao.validateFileUpload(beanObj);
 	}
@@ -574,6 +591,19 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 		return rupayDao.uploadPresentmentData(beanObj, file);
 	}
 
+	@Override
+	public List<SingleRRN> upiReport(String rrnNo, String task) throws Exception {
 
-	
+		List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
+
+		@SuppressWarnings("unchecked")
+		List<SingleRRN> rrnList = (List<SingleRRN>) rupayDao.bbps_report("S", rrnNo, task).get("rrn_rep");
+
+		SingleRRN rrnBean = null;
+
+		Map<String, Object> rrnmap = null;
+
+		return rrnList;
+	}
+
 }

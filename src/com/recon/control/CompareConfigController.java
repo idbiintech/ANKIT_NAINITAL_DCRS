@@ -317,7 +317,6 @@ public class CompareConfigController {
 					checkFileName = icompareConfigService.chkBeforeUploadFile(chkFlag, setupBean);
 				}
 
-
 				if (!checkFileName) {
 					if (!setupBean.getFilename().equalsIgnoreCase("REV_REPORT")) {
 						output = icompareConfigService.checkUploadedFileName(setupBean.getCategory(),
@@ -367,7 +366,9 @@ public class CompareConfigController {
 												if (output.containsKey("msg")
 														&& !setupBean.getCategory().equalsIgnoreCase("RUPAY")) {
 													String msg = (String) output.get("msg");
-													return new ResponseEntity("File Uploaded Successfuly!! \n " + msg,
+													return new ResponseEntity(
+															"File Uploaded Successfuly!! \n  Total Record Count :"
+																	+ recordcount,
 															HttpStatus.OK);
 												} else {
 													return new ResponseEntity(

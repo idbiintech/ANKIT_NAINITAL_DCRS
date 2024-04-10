@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,6 @@ boolean settlementFilesRollback(RupayUploadBean beanObj);
 String uploadPresentmentData(RupayUploadBean beanObj, MultipartFile file) throws IOException, Exception, SQLException;
 public boolean validatePresentment(String filedate);
 public boolean processPresentment(String filedate);
+Map<String,Object> bbps_report(String type,String rrnNo,String task) throws Exception;
+
 }

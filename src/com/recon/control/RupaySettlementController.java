@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ import com.recon.util.CSRFToken;
 import com.recon.util.GeneralUtil;
 import com.recon.util.GenerateDLBVoucher;
 import com.recon.util.GenerateUCOTTUM;
-
+import com.recon.model.*;
 @Controller
 public class RupaySettlementController {
 	@Autowired
@@ -219,6 +220,28 @@ public class RupaySettlementController {
 		return modelAndView;
 	}
 
+	// VALIDATION METHOD FOR PRESENTMENT FILE UPLOADED OR NOT
+
+//	@RequestMapping(value = "ValidateSettlementTTUM", method = RequestMethod.POST)
+//	@ResponseBody
+//	public String ValidateSettlementTTUM(@ModelAttribute("mastercardUploadBean") RupayUploadBean beanObj,
+//			HttpServletRequest request, HttpSession httpSession) throws Exception {
+//		logger.info("***** RupaySettlementController.ValidateSettlementTTUM post Start ****");
+//		logger.info("ValidateSettlementTTUM POST");
+//		String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
+//		logger.info("Created by is " + Createdby);
+//		beanObj.setCreatedBy(Createdby);
+//
+//		Boolean checkFlag = rupaySettlementService.validateSettlementTTUM(beanObj);
+//
+//		if (checkFlag) {
+//			return "success";
+//		} else {
+//			return "success";
+//		}
+//
+//	}
+
 	@RequestMapping(value = "PresentmentFileUpload", method = RequestMethod.POST)
 	@ResponseBody
 	public String PresentmentFileUploadPost(@ModelAttribute("rupaySettlementBean") RupayUploadBean rupayBean,
@@ -231,9 +254,17 @@ public class RupaySettlementController {
 		logger.info("Subcategory is " + rupayBean.getSubcategory());
 		logger.info(file.getOriginalFilename());
 
+		Boolean checkFlag = rupaySettlementService.validatePresentmentUpload(rupayBean, file);
+
+		// if (checkFlag) { true then in upload
 		String response = "";
-		if (file.getOriginalFilename().contains("Presentment")) {
-			response = rupaySettlementService.uploadPresentmentFile(rupayBean, file);
+		if (checkFlag) {
+
+			if (file.getOriginalFilename().contains("Presentment")) {
+				response = rupaySettlementService.uploadPresentmentFile(rupayBean, file);
+			}
+		} else {
+			return "This File is Already Uploaded";
 		}
 		return response;
 	}
@@ -983,6 +1014,25 @@ public class RupaySettlementController {
 				return "CBS data Fetching Error!!";
 		} else
 			return "CBS data Fetching is already processed.";
+	}
+
+	@RequestMapping(value = "upi", method = RequestMethod.GET)
+	public ModelAndView getRrnSearch(ModelAndView modelAndView, HttpServletRequest request) throws Exception {
+		RupayUploadBean rupaySettlementBean = new RupayUploadBean();
+		logger.info("rrn search GET");
+		modelAndView.setViewName("upi");
+
+		logger.info("***** CashAtPOS GET End ****");
+		return modelAndView;
+	}
+
+	@RequestMapping(value = "/downloadSingleUpi.do", method = RequestMethod.POST)
+	public @ResponseBody List<SingleRRN> upireport(HttpSession session, HttpServletResponse response,
+			HttpServletRequest req, @RequestParam Map<String, String> reqParams, @RequestParam("task") String task)
+			throws Exception {
+// done testing remain
+		return rupaySettlementService.upiReport(reqParams.get("rrnNo"), task);
+
 	}
 
 }
