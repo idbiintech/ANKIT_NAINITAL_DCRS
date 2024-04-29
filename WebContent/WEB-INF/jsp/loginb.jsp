@@ -9,6 +9,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<%
+response.setHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+//response.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' https://i.imgur.com; object-src 'none'");
+response.setHeader("Content-Security-Policy", "none");
+
+response.setHeader("Referrer-Policy", "same-origin");
+response.setHeader("X-Content-Type-Options", "nosniff");
+response.setHeader("X-XSS-Protection", "1; mode=block");
+//response.setHeader("Content-Type", "application/font-woff2"); // this line download loginprocess.do
+
+response.setHeader("Cache-Control", "no-store");
+response.setHeader("X-Frame-Options", "DENY");
+response.setHeader("Pragma", "no-cache");
+response.setHeader("X-XSS-Protection", "0");
+/* 
+response.setHeader("Server", "Apache");
+response.setHeader("X-FRAME-OPTIONS", "DENY");
+response.setHeader("X-FRAME-OPTIONS", "SAMEORIGIN"); */
+response.setHeader("Access-Control-Allow-Methods", "POST");
+response.setHeader("Access-Control-Max-Age", "1728000");
+response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+response.setHeader("Expires", "0");
+%>
+
+
+
+
 <meta charset="UTF-8">
 <title>Login</title>
 <meta
@@ -36,9 +63,8 @@
 	type="text/css" />
 
 <script type="text/javascript">
-    
-    document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    </script>
+	document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+</script>
 
 
 
@@ -235,46 +261,37 @@
 	  }
     </script> -->
 	<script>
-   
-      function loginSelectionShow() {
-    	
-    	  document.getElementById("processvalue").value="true";
-    	  if(isValidLogin()){ 
-      
-			$("#loginSelection").modal("show");
-    	  } 
-	  }
-    /*   $("#loginPage").keyup(function(event) {
-    	    if (event.keyCode === 13) {
-    	        $("#signIn").click();
-    	    }
-      }); */
-      function submitform(processType) {
-    	  
-    	  
-    	
-    	  document.getElementById("processType").value = processType;
-    	  var form = document.getElementById("login");
-    	  form.submit();
-    	  
-    	  
-      }
- 
-      
-      $("#loginPage").keyup(function(event) {
-          if (event.keyCode === 13) {
-              $("#signIn").click();
-          }
-      });
+		function loginSelectionShow() {
 
-/*       $("#signIn").click(function() {
-        alert("Button code executed.");
-      }); */
-      
-      
-      
-      
-    </script>
+			document.getElementById("processvalue").value = "true";
+			if (isValidLogin()) {
+
+				$("#loginSelection").modal("show");
+			}
+		}
+		/*   $("#loginPage").keyup(function(event) {
+			    if (event.keyCode === 13) {
+			        $("#signIn").click();
+			    }
+		  }); */
+		function submitform(processType) {
+
+			document.getElementById("processType").value = processType;
+			var form = document.getElementById("login");
+			form.submit();
+
+		}
+
+		$("#loginPage").keyup(function(event) {
+			if (event.keyCode === 13) {
+				$("#signIn").click();
+			}
+		});
+
+		/*       $("#signIn").click(function() {
+		 alert("Button code executed.");
+		 }); */
+	</script>
 </body>
 
 </html>
