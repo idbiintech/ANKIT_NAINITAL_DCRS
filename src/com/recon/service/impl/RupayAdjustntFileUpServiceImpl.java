@@ -616,7 +616,7 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 			MMM = "APR";
 			break;
 		case "05":
-			MMM = "MAY";
+			MMM = "05";
 			break;
 		case "06":
 			MMM = "JUN";
