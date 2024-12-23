@@ -222,6 +222,38 @@ public class CompareConfigController {
 
 	}
 
+	@RequestMapping(value = "datadelete", method = RequestMethod.GET)
+	public ModelAndView Datadelete(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
+			HttpSession httpSession, HttpServletRequest request) throws Exception {
+		logger.info("***** CompareConfigController.datadelete start ****");
+		try {
+
+			compareSetupBean.setCreatedBy(((LoginBean) httpSession.getAttribute("loginBean")).getUser_id());
+			ArrayList<CompareSetupBean> setupBeanslist = null;
+
+			setupBeanslist = icompareConfigService.getFileList();
+
+			String csrf = CSRFToken.getTokenForSession(request.getSession());
+
+			// redirectAttributes.addFlashAttribute("CSRFToken", csrf);
+			modelAndView.addObject("CSRFToken", csrf);
+			model.addAttribute("configBeanlist", setupBeanslist);
+			modelAndView.setViewName("datadelete");
+			modelAndView.addObject("CompareSetupBean", compareSetupBean);
+
+			logger.info("***** CompareConfigController.ManualUpload End ****");
+
+			return modelAndView;
+		} catch (Exception ex) {
+			demo.logSQLException(ex, "CompareConfigController.ManualUpload");
+			logger.error(" error in CompareConfigController.ManualUpload",
+					new Exception("CompareConfigController.ManualUpload", ex));
+			modelAndView.setViewName("Login");
+			return modelAndView;
+		}
+
+	}
+
 	@RequestMapping(value = "ManualCompare", method = RequestMethod.GET)
 	public ModelAndView ManualCompare(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
 			HttpSession httpSession) throws Exception {
@@ -739,4 +771,14 @@ public class CompareConfigController {
 
 	}
 
+	@RequestMapping(value = "datadelete", method = RequestMethod.POST)
+
+	public String datadelete(HttpServletRequest request, String filename, String fileType, String fileDate,
+			HttpSession httpSession, Model model, ModelAndView modelAndView, RedirectAttributes redirectAttributes)
+			throws Exception {
+		System.out.println("shilpii ai developer");
+		String shilpii = "AI";
+		return "redirect:datadelete.do";
+
+	}
 }

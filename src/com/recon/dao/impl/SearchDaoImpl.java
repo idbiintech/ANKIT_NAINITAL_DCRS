@@ -29,7 +29,7 @@ public class SearchDaoImpl extends JdbcDaoSupport implements ISearchDAO  {
 		
 		List<String> headList = new ArrayList<String>();
 		List<String> dataList = new ArrayList<String>();
-		try{
+		try{			
 		// GET Columns headers
 		//String query = "SELECT column_name FROM   all_tab_cols WHERE  table_name = 'SETTLEMENT_CASHNET_ISS_CBS' order by segment_column_id asc";
 		//System.out.println(query);
@@ -382,7 +382,7 @@ public class SearchDaoImpl extends JdbcDaoSupport implements ISearchDAO  {
 
 
  class searchdataRowMapper implements RowMapper
-{
+{ 	
 	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 		SearchData searchdata = new SearchData();
 		searchdata.setCategory(rs.getString("category"));

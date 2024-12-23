@@ -510,7 +510,7 @@ public class GenerateUCOTTUM {
 //						lineData.append("|"+table_Data.get("TRANSACTION_AMOUNT")+"|"+table_Data.get("TRANSACTION_PARTICULAR")+"|"+table_Data.get("REMARKS"));
 
 					lineData.append(
-							" " + table_Data.get("TRANSACTION_AMOUNT") + "/" + (table_Data.get("TRANSACTION_PARTICULAR") == null ? "" : table_Data.get("TRANSACTION_PARTICULAR").replace("-", "")));
+							" " + table_Data.get("TRANSACTION_AMOUNT") + "/" + (table_Data.get("TRANSACTION_PARTICULAR") == null ? "" : table_Data.get("TRANSACTION_PARTICULAR")));
 
 					/*
 					 * lineData.append(table_Data.get("ACCOUNT_NUMBER")+"  "+"INR0391"+"    "

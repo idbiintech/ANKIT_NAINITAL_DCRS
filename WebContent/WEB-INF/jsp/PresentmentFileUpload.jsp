@@ -76,7 +76,7 @@ function noBack() { window.history.forward(); }
 							<label for="exampleInputEmail1">Sub Category</label> 
 							<select class="form-control" name="stSubCategory" id="stSubCategory">
 								<option value="-">--Select --</option>
-									<option value="DOMESTIC">Domestic</option>
+									<option value="DOMESTI">Domestic</option>
 									<!-- <option value="INTERNATIONAL">International</option> -->
 							</select>
 						</div>

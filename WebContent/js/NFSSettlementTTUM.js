@@ -8,6 +8,7 @@ function seerule(e) {
 
 function showLoader(location) {
 	
+	
 	$("#Loader").show();
 }
 

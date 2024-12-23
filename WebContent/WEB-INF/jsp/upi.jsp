@@ -9,7 +9,7 @@
 			<!-- <small>Version 2.0</small> -->
 		</h1>
 		<ol class="breadcrumb">
-			<li><a href="#"> Home</a></li>
+			<li><a href="#">Home</a></li>
 			<li class="active">Support</li>
 		</ol>
 	</section>
@@ -188,6 +188,163 @@
 		<img style="margin-left: 20px; margin-top: 200px;"
 			src="images/hourglass.gif" alt="loader">
 		<div style="font-size: 17px; color: #695fa9;"></div>
+		
+		<!-- 
+		       <button type="button" id="NpciFiles"
+								onclick="getNpciUploadedFiles()" class="btn btn-primary">View
+								Uploaded Files</button> 
+								
+			<div class="row" style="padding-left: -50%">
+				<div class="col-md-12">
+					<div style="overflow-x: auto; margin-top: 10px;">
+
+						<table id="viewNpciFiles" class='table table-bordered'>
+							<tr>
+								<td width="100px" td align="center"><b>COUNT</b></td>
+								<td width="100px" td align="center"><b>FILE_NAME</b></td>
+								<td width="100px" td align="center"><b>FILEDATE</b></td>
+								<td width="100px" td align="center"><b>NETWORK</b></td>
+								<td width="100px" td align="center"><b>SELECT</b></td>
+							</tr>
+						</table>
+
+
+
+					</div>
+					<div style="padding-left: 47%;">
+						<input style='text-align: center;' type='button'
+							class="btn btn-danger" value='Delete' id='deleteId'
+							onclick='getSelectedDeleteValues();' name='deleteId' />
+					</div>
+
+				</div>
+			</div>				
+			
+			//////////////////////////////////////////////////////////////
+			function getNpciUploadedFiles() {
+	// alert("rabi");
+	$.ajax({
+		url: 'getNpciFiles.do',
+		type: 'POST',
+		async: false,
+		data: {
+
+			"CSRFToken": $("meta[name='_csrf']").attr("content")
+
+		},
+		success: function(data) {
+
+			// console.log("rabuuu");
+			console.log(data);
+
+			$('.datarow').remove();
+			var obj = data;
+			// console.log("rabuuu 1");
+			console.log(data);
+			displayNpciRecord(data);
+
+		},
+		error: function(xhr) {
+			alert(xhr.responseText);
+		}
+	});
+
+}
+
+function displayNpciRecord(data) {
+	var obj = data;
+	// console.log(data) ;
+	if (!$.trim(obj)) {
+		// document.getElementById("emptyResponse").style.visibility =
+		// "visible";
+		alert("No Data Found for NPCI!!");
+	} else {
+
+		var tableBody = "";
+		for (var i in data) {
+			var tableRow = "";
+			tableRow += "<td style='text-align:center;' >" + (data[i].count) + "</td>";
+			tableRow += "<td style='text-align:center;'>" + (data[i].file_name) + "</td>";
+			tableRow += "<td style='text-align:center;'>" + (data[i].filedate) + "</td>";
+			tableRow += "<td style='text-align:center;'>" + (data[i].network) + "</td>";
+
+			tableRow += "<td style='text-align:center;'> <input type='checkbox' class='deleteCheckBox' id='" + data[i].file_name + i + "' value='" + data[i].file_name + "'> </td>";
+
+
+
+
+
+
+			tableBody = tableBody + "<tr id='datarow' class='datarow'>"
+				+ tableRow + "</tr>";
+
+
+		}
+		$('#viewNpciFiles').append(tableBody);
+		$('#viewNpciFiles').show();
+	}
+
+	function newFunction() {
+		return " value=";
+	}
+
+
+
+
+}
+function getSelectedDeleteValues() {
+	const checkboxes = document.querySelectorAll('.deleteCheckBox');
+
+	
+
+	//querySelectorAll('.deleteCheckBox');
+	const selectedValues = [];
+	var oMyForm = new FormData();
+
+
+	checkboxes.forEach(function(checkboxes) {
+
+
+
+		if (checkboxes.checked == true) {
+			selectedValues.push(checkboxes.value);
+			alert(JSON.stringify("selectedValues = "+selectedValues))
+		}
+
+
+		oMyForm.append('data', selectedValues);
+		oMyForm.append('CSRFToken', CSRFToken);
+
+
+
+	})
+
+	$.ajax({
+		url: 'deleteDataFiles.do',
+		type: 'POST',
+		data: oMyForm,
+		async: false,
+		 
+		processData: false,
+		contentType: false,
+		success: function(data) {
+			alert('here inside the success');
+			$('.datarow').remove();
+			var obj = data;
+			console.log(data);
+			getNpciUploadedFiles();
+		},
+		error: function(xhr) {
+			alert(xhr.responseText);
+		}
+	});
+
+
+
+}
+			//////////////////////////////////////////////////////////////	  -->
+		
+		
 	</div>
 </div>
 

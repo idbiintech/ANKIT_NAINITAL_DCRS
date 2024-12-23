@@ -516,6 +516,7 @@ public class ReadMGBGLFiles {
 		Switch_POS reading = new Switch_POS();
 		boolean failedFile = false, posFile = false;
 		List<String> elements = reading.readMGBSuccessCBS();
+		String fname = file.getOriginalFilename();
 
 		String InsertQuery = "insert into cbs_nainital_rawdata(tran_date, tran_time, accountid, narration, txn_type, rrn, txn_indctr, amount, branch_code, account_name, customer_id, unq_txn_id, from_account, to_account, filedate) "
 				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, to_date(?,'dd/mm/yyyy'))";

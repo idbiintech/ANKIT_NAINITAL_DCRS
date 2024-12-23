@@ -18,6 +18,7 @@ function hideLoader(location) {
 
 function ValidateData()
 {
+	debugger ;
 	var timePeriod = document.getElementById("timePeriod").value;
 	var category = document.getElementById("rectyp").value;
 	var subcategory = document.getElementById("stSubCategory").value;
@@ -31,6 +32,8 @@ function ValidateData()
 		var fileDate = document.getElementById("monthpicker").value;
 		//var cycle = "0";
 	}
+	
+	debugger ;
 	var fileSelected = document.getElementById("fileName").value;
 	//var  cycle =document.getElementById("cycle").value;
 	var dataFile= document.getElementById("dataFile1").value;
@@ -71,7 +74,7 @@ function ValidateData()
 	{
 		alert("Upload Excel file format");
 		return false;
-	}
+	} 
 	
 	return true;
 

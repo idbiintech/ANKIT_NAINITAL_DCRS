@@ -73,7 +73,7 @@ function noBack() { window.history.forward(); }
 	<!-- Content Header (Page header) -->
 	<section class="content-header">
 		<h1>
-			Adjustment File Upload
+			Adjustment File Uploads
 			<!-- <small>Version 2.0</small> -->
 		</h1>
 		<ol class="breadcrumb">

@@ -3013,6 +3013,8 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 			}
 			out.flush();
 			out.close();
+			
+			logger.info("INSIDE generate dhana reports");
 
 			// File file = new File(beanObj.getStPath());
 			// String[] filelist = file.list();
@@ -3331,6 +3333,8 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 					}
 					zipOut.flush();
 					fis.close();
+					
+					logger.info("INSIDE knockoff REPORTS");
 				}
 				zipOut.close();
 				// System.out.println("Done... Zipped the files...");
@@ -3601,6 +3605,8 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 			}
 			out.flush();
 			out.close();
+			
+			logger.info("INSIDE dhana reports failed ");
 
 			// File file = new File(beanObj.getStPath());
 			// String[] filelist = file.list();
@@ -3888,6 +3894,8 @@ public class SettlmentDaoImpl extends JdbcDaoSupport implements ISettelmentDao {
 			}
 			out.flush();
 			out.close();
+			
+			logger.info("INSIDE matched REPORTS");
 
 			// File file = new File(beanObj.getStPath());
 			// String[] filelist = file.list();

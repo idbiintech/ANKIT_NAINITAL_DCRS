@@ -215,6 +215,14 @@
 	</definition>
 
 
+	<definition name="datadelete" extends="baseLayout">
+		<put-attribute name="title" value="Manual Upload" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/datadelete.jsp" />
+	</definition>
+
+
 
 	<definition name="classifyFile" extends="baseLayout">
 		<put-attribute name="title" value="Classify File" />
@@ -846,7 +854,11 @@
 	</definition>
 
 
-
+	<definition name="CloseFile" extends="baseLayout">
+		<put-attribute name="title" value="CloseFile file" />
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/CloseFile.jsp" />
+	</definition>
 
 
 

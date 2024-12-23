@@ -52,6 +52,7 @@ public class ReadNFSAdjustmentFile {
           String description = null;
           double no_of_txns = 0,debit= 0, credit = 0;
           int count = 0;
+          String fname = file.getOriginalFilename();
           
           while(rs.next())
           {
@@ -62,8 +63,8 @@ public class ReadNFSAdjustmentFile {
                         + " values (?,?,?,?,?,?,?,?,?,?,6346)";*/
            String sql = "INSERT INTO "+tableName.toLowerCase()+"(txnuid,txntype,u_id,adjdate,adjtype,acq,isr,response,txndate,txntime,rrn,atmid,cardno,chbdate,chbref,txnamount,adjamount,acqfee,issfee,issfeesw,npcifee,acqfeetax,issfeetax,npcitax,adjref,bankadjref," + 
            		"adjproof,reasondesc,pincode,atmlocation,multidisputegroup,fcqm,adjsettlementdate,customerpenalty,adjtime,cycle,tat_expiry_date,acqstlamount,acqcc,pan_entry_mode,service_code,card_dat_input_capability," + 
-           		"mcc_code,complaint_no, complaint_closed_reason, remark, createdby,filedate) "
-           		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'))";
+           		"mcc_code,complaint_no, complaint_closed_reason, remark, createdby,filedate,file_name) "
+           		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'),?)";
            
           // Connection con = getConnection();
            try {
@@ -195,7 +196,8 @@ public class ReadNFSAdjustmentFile {
                                }
                                ps.setString(cellCount++, beanObj.getCreatedBy());
                                logger.info("cellcount is "+cellCount);
-                               ps.setString(cellCount, beanObj.getDatepicker()); 
+                               ps.setString(cellCount++, beanObj.getDatepicker()); 
+                               ps.setString(cellCount, fname); 
                                ps.addBatch();
                                
                         }

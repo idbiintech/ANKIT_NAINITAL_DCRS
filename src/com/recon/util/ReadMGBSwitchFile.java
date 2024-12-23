@@ -87,10 +87,12 @@ public class ReadMGBSwitchFile extends JdbcDaoSupport {
 			FileSourceBean sourceBean) {
 		HashMap<String, Object> output = new HashMap<String, Object>();
 
+		String fname = file.getOriginalFilename();
+
 		String InsertQuery = "insert into switch_rawdata_nainital(tranxdate, tranxtime, terminalid, terminaltype, switch,"
 				+ "stan_no, card_type, cardno, account_type, account_no, acqbank, retrefno, txntype, amt_requested, "
-				+ "amt_approved, intftype, void_code, atmlocation, embossed_name, status, error, blank, filedate) "
-				+ "VALUES(to_date(?,'dd/mm/yyyy'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, to_date(?,'dd/mm/yyyy'))";
+				+ "amt_approved, intftype, void_code, atmlocation, embossed_name, status, error, blank, filedate,file_name) "
+				+ "VALUES(to_date(?,'dd/mm/yyyy'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, to_date(?,'dd/mm/yyyy'), ?)";
 
 		String stLine = null;
 		Switch_POS reading = new Switch_POS();
@@ -111,7 +113,7 @@ public class ReadMGBSwitchFile extends JdbcDaoSupport {
 			BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()));
 			PreparedStatement ps = con.prepareStatement(InsertQuery);
 
-			int num = lineNumber - 1 ;
+			int num = lineNumber - 1;
 			while ((stLine = br.readLine()) != null) {
 				lineNumber++;
 				batchExecuted = false;
@@ -133,8 +135,9 @@ public class ReadMGBSwitchFile extends JdbcDaoSupport {
 						}
 					}
 					ps.setString(++sr_no, setupBean.getFileDate());
+					ps.setString(++sr_no, file.getOriginalFilename());
 					ps.addBatch();
-					
+
 					batchSize++;
 					if (batchSize == 10000) {
 						batchNumber++;
@@ -143,9 +146,9 @@ public class ReadMGBSwitchFile extends JdbcDaoSupport {
 						batchSize = 0;
 						batchExecuted = true;
 						output.put("result", true);
-						
+
 						output.put("msg", "Records Count is " + num);
-					
+
 					}
 
 				}

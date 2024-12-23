@@ -2264,7 +2264,7 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 			String query = "SELECT distinct lower(tableName) FROM main_filesource filesrc "
 					+ " WHERE (filesrc.filename='" + setupBean.getFilename() + "') ";// or filesrc.FILENAME like '%SUR%'
 
-			if (!setupBean.getFilename().equals("SWITCH")) {
+			if (!setupBean.getFilename().equals("SWITCH") && !setupBean.getFilename().equals("CBS")) {
 
 				if (setupBean.getFilename().equals("VISA")) {
 					query = query + " and filesrc.file_subcategory ='ISSUER' ";
@@ -2299,10 +2299,10 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 //			if(setupBean.getFilename().equals("CBS"))
 //			{
 //				query = query;
-//			}	
-			} else {
-				query = query + " and  filesrc.tablename ='SWITCH_RAWDATA_NAINITAL' ";
-			}
+		}	
+//			} else {
+//				query = query + " and  filesrc.tablename ='SWITCH_RAWDATA_NAINITAL' ";
+//			}
 
 			logger.info("query==" + query);
 			String tablename = "";
@@ -2331,7 +2331,19 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 						+ setupBean.getFileDate() + "','dd/mm/yyyy')");
 				count = getJdbcTemplate().queryForObject("Select  count(*) from " + tablename
 						+ " where filedate = to_date('" + setupBean.getFileDate() + "','dd/mm/yyyy')", Integer.class);
-			} else {
+			} else if (setupBean.getFilename().equalsIgnoreCase("CBS")) {
+				logger.info("Select  count(*) from cbs_nainital_rawdata where filedate = to_date('"
+						+ setupBean.getFileDate() + "','dd/mm/yyyy')");
+				count = getJdbcTemplate().queryForObject("Select  count(*) from cbs_nainital_rawdata "
+						+ " where filedate = to_date('" + setupBean.getFileDate() + "','dd/mm/yyyy')", Integer.class);
+			} else if (setupBean.getFilename().equalsIgnoreCase("SWITCH")) {
+				logger.info("Select  count(*) from switch_rawdata_nainital where filedate = to_date('"
+						+ setupBean.getFileDate() + "','dd/mm/yyyy')");
+				count = getJdbcTemplate().queryForObject("Select  count(*) from switch_rawdata_nainital "
+						+ " where filedate = to_date('" + setupBean.getFileDate() + "','dd/mm/yyyy')", Integer.class);
+			}
+
+			else {
 				logger.info("Select  count(*) from " + tablename + " where filedate = to_date('"
 						+ setupBean.getFileDate() + "','dd/mm/yyyy')");
 				count = getJdbcTemplate().queryForObject("Select  count(*) from " + tablename
@@ -2500,7 +2512,7 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 
 						ps.setString(4, row.getCell(3).getStringCellValue().replace("'", ""));
 
-						BigDecimal bd = new BigDecimal(row.getCell(4).getNumericCellValue());
+						BigDecimal bd = new BigDecimal(row.getCell(4).getStringCellValue());
 
 						ps.setLong(5, bd.longValue());
 						ps.setString(6, row.getCell(5).getStringCellValue().replace("'", ""));
@@ -2513,15 +2525,16 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 						ps.setString(9, new SimpleDateFormat("Kmmss").format(dateObj));
 						ps.setString(10, (atmid.replaceAll("\u00A0", "")).replace("'", ""));
 						ps.setString(11, (settldt.replaceAll("\u00A0", "")).replace("'", ""));
-						ps.setString(12, String.valueOf(row.getCell(11).getNumericCellValue()).replace(".0", ""));
+						
+//						ps.setString(12, String.valueOf(row.getCell(11).getNumericCellValue()).replace(".0", ""));
+						
+						ps.setString(12, String.valueOf(row.getCell(11).getStringCellValue()).replace(".0", ""));
 
-						logger.info("String.valueOf(row.getCell(12).getNumericCellValue()) "
-								+ String.valueOf(row.getCell(12).getNumericCellValue()));
+					 
 
-						logger.info("check this "
-								+ String.valueOf(row.getCell(12).getNumericCellValue()).replace(".0", ""));
-
-						ps.setString(13, String.valueOf(row.getCell(12).getNumericCellValue()).replace(".0", ""));
+					 
+						ps.setString(13, String.valueOf(row.getCell(12).getStringCellValue()).replace(".0", ""));
+						
 						ps.setString(14, row.getCell(13).getStringCellValue().replace("'", ""));
 						ps.setString(15, "UNMATCHED");
 						ps.setString(16, setupBean.getFileDate());

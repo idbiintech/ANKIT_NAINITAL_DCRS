@@ -2,22 +2,22 @@ function setfilename(e) {
 	debugger;
 
 	//|| e.value=="VISA"
-/*	if (e.value == "SWITCH") {
-
-		//document.getElementById("excelfileType").style.display='none';
-		document.getElementById("trfileType").style.display = 'none';
-		document.getElementById("trcategory").style.display = 'none';
-		document.getElementById("trsubcat").style.display = 'none';
+	/*	if (e.value == "SWITCH") {
+	
+			//document.getElementById("excelfileType").style.display='none';
+			document.getElementById("trfileType").style.display = 'none';
+			document.getElementById("trcategory").style.display = 'none';
+			document.getElementById("trsubcat").style.display = 'none';
+			
+			// trfileTypeforATMECON
+	
+		} 
 		
-		// trfileTypeforATMECON
+		else
+		*/
 
-	} 
-	
-	else
-	*/
-	
-	
-	 if (e.value == "CBS" || e.value == "SWITCH") {
+
+	if (e.value == "CBS" || e.value == "SWITCH") {
 		document.getElementById("trfileType").style.display = 'none';
 		document.getElementById("trsubcat").style.display = 'none';
 		document.getElementById("trcategory").style.display = 'none';
@@ -368,3 +368,8 @@ function processFileUpload() {
 	}
 
 }
+
+
+
+
+

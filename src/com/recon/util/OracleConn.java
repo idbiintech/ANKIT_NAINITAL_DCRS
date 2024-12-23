@@ -93,9 +93,9 @@ public class OracleConn implements java.io.Serializable {
 		 * password = "debitcard_recon";
 		 */
 ////            uco uat db
-//		url = "jdbc:oracle:thin:@203.112.157.164:1621:orcl";
-//		login = "DEBITCARDRECON_UCO";
-//		password = "debitcardrecon_uco";
+		url = "jdbc:oracle:thin:@203.112.157.164:1621:orcl";
+		login = "DEBITCARDRECON_UCO";
+		password = "debitcardrecon_uco";
 
 		// UAT MGB
 		/*
@@ -103,11 +103,20 @@ public class OracleConn implements java.io.Serializable {
 		 * password = "debitcard_recon";
 		 */
 
-		// PROD NAINITAL
+		// This is UAT nainital bank war deployment / for accessing DB on our machine
 
-		url = "jdbc:oracle:thin:@172.23.99.45:1621:RECUATDB";
-		login = "DEBITCARD_RECON";
-		password = "DEBIT122";
+//		url = "jdbc:oracle:thin:@172.23.99.45:1621:RECUATDB";
+//		login = "DEBITCARD_RECON";
+//		password = "DEBITCARD##RECON##2024";
+	
+		
+		// This is proper production connection when u r giving war file to bank u have to 
+		// enable this credentials
+		
+
+//		url = "jdbc:oracle:thin:@172.23.3.64:1521:RECPRDB";
+//		login = "DEBITCARD_RECON";
+//		password = "Recon@124";
 
 // UAT NAINITAL
 

@@ -131,6 +131,9 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 				// ReadNTSLFile readObj = new ReadNTSLFile();
 				ReadNFSNTSLFile readObj = new ReadNFSNTSLFile();
 				mapObj = readObj.fileupload(beanObj, file, getConnection());
+			} else if (beanObj.getFileName().contains("Closing")) {
+				ReadNFSNTSLFile readObj = new ReadNFSNTSLFile();
+				mapObj = readObj.fileuploadClosing(beanObj, file, getConnection());
 			} else {
 				ReadDFSandJCBNTSLFile readObj = new ReadDFSandJCBNTSLFile();
 				if (beanObj.getFileName().contains("DFS")) {
@@ -143,22 +146,30 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 			System.out.println("result is " + mapObj);
 			boolean result = (boolean) mapObj.get("result");
 			int count = (Integer) mapObj.get("count");
-			if (result) {
-				int file_id = getJdbcTemplate().queryForObject(GET_FILE_ID,
-						new Object[] { beanObj.getFileName(), beanObj.getCategory(), beanObj.getStSubCategory() },
-						Integer.class);
-				System.out.println("File id is " + file_id);
-				String insertData = "insert into main_settlement_file_upload(fileid, filedate, uploadby, category, upload_flag, file_subcategory,cycle,settlement_flag,interchange_flag,file_count) "
-						+ "VALUES('" + file_id + "',TO_DATE('" + beanObj.getDatepicker() + "','dd/mm/yyyy'),'"
-						+ beanObj.getCreatedBy() + "','" + beanObj.getCategory() + "','Y','"
-						+ beanObj.getStSubCategory() + "','" + beanObj.getCycle() + "'," + "'N','N','1')";
-				getJdbcTemplate().execute(insertData);
+
+			if (!beanObj.getFileName().contains("Closing")) {
+
+				if (result) {
+					int file_id = getJdbcTemplate().queryForObject(GET_FILE_ID,
+							new Object[] { beanObj.getFileName(), beanObj.getCategory(), beanObj.getStSubCategory() },
+							Integer.class);
+					System.out.println("File id is " + file_id);
+					String insertData = "insert into main_settlement_file_upload(fileid, filedate, uploadby, category, upload_flag, file_subcategory,cycle,settlement_flag,interchange_flag,file_count) "
+							+ "VALUES('" + file_id + "',TO_DATE('" + beanObj.getDatepicker() + "','dd/mm/yyyy'),'"
+							+ beanObj.getCreatedBy() + "','" + beanObj.getCategory() + "','Y','"
+							+ beanObj.getStSubCategory() + "','" + beanObj.getCycle() + "'," + "'N','N','1')";
+					getJdbcTemplate().execute(insertData);
+					mapObj.put("entry", true);
+				}
+			} else {
 				mapObj.put("entry", true);
 			}
 
 			return mapObj;
 
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			logger.info("Exception in uploadNTSLFile " + e);
 			mapObj.put("result", false);
 			mapObj.put("count", 0);
@@ -173,7 +184,7 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 		List<String> subcategories = new ArrayList<String>();
 		subcategories.add("ISSUER");
 		System.out.println("inside the valiate");
-		//subcategories.add("ACQUIRER");
+		// subcategories.add("ACQUIRER");
 		int uploadCount = 0;
 		int file_id = 0;
 		int adjustmentFileCount = 0;
@@ -801,9 +812,9 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 		try {
 
 			// check if ttum is already processed
-			//String checkProcess = "select count(*) from nfs_settlement_ttum where filedate = to_date(?,'dd/mm/yyyy')";
+			// String checkProcess = "select count(*) from nfs_settlement_ttum where
+			// filedate = to_date(?,'dd/mm/yyyy')";
 			String checkProcess = "select count(*) from NFS_SETTLEMENT_DATA_TTUM where filedate = to_date(?,'dd/mm/yyyy')";
-			
 
 			int processCount = getJdbcTemplate().queryForObject(checkProcess, new Object[] { beanObj.getDatepicker() },
 					Integer.class);
@@ -843,7 +854,7 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 		} catch (Exception e) {
 			logger.info("Exception while validating settlement Voucher " + e);
 			output.put("result", false);
-			output.put("msg", "Exception while validating settlement Voucher"+e);
+			output.put("msg", "Exception while validating settlement Voucher" + e);
 		}
 		return output;
 	}
@@ -926,17 +937,19 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 				file_id = getJdbcTemplate().queryForObject(GET_FILE_ID, new Object[] { beanObj.getFileName(),
 						beanObj.getFileName().split("-")[1] + "_SETTLEMENT", "-" }, Integer.class);
 				logger.info("File id is " + file_id);
-				 
+
 				String checkAdjProcess = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? and adjtype = ?";
 				int processCount = 0;
 				if (beanObj.getAdjType().equalsIgnoreCase("PENALTY") || beanObj.getAdjType().equalsIgnoreCase("FEE")) {
 					checkAdjProcess = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? "
 							+ "AND Upper(adjtype) like '%" + beanObj.getAdjType() + "%'";
-					processCount = getJdbcTemplate().queryForObject(checkAdjProcess,
-							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory() }, Integer.class);
+					processCount = getJdbcTemplate().queryForObject(checkAdjProcess, new Object[] {
+							beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory() },
+							Integer.class);
 				} else {
 					processCount = getJdbcTemplate().queryForObject(checkAdjProcess,
-							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory(), beanObj.getAdjType() },
+							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory(),
+									beanObj.getAdjType() },
 							Integer.class);
 				}
 
@@ -1006,21 +1019,22 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 			// int file_id = getJdbcTemplate().queryForObject(GET_FILE_ID, new Object[] {
 			// beanObj.getFileName(),beanObj.getCategory(),"-" },Integer.class);
 			int procCount = 0;
-			System.out.println("date is upper "+beanObj.getDatepicker().toString().toUpperCase());
-			System.out.println("date is "+beanObj.getDatepicker());
+			System.out.println("date is upper " + beanObj.getDatepicker().toString().toUpperCase());
+			System.out.println("date is " + beanObj.getDatepicker());
 
 			String checkProcessFlag = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? and ADJTYPE = ?";
 			if (beanObj.getAdjType().equalsIgnoreCase("PENALTY") || beanObj.getAdjType().equalsIgnoreCase("FEE")) {
 				checkProcessFlag = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? "
 						+ "AND upper(adjtype) like '%" + beanObj.getAdjType() + "%'";
 				procCount = getJdbcTemplate().queryForObject(checkProcessFlag,
-						new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory().toString().toUpperCase() }, Integer.class);
+						new Object[] { beanObj.getDatepicker().toString().toUpperCase(),
+								beanObj.getStSubCategory().toString().toUpperCase() },
+						Integer.class);
 			} else {
-				
-				
-				
+
 				procCount = getJdbcTemplate().queryForObject(checkProcessFlag,
-						new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory().toString().toUpperCase(), beanObj.getAdjType() },
+						new Object[] { beanObj.getDatepicker().toString().toUpperCase(),
+								beanObj.getStSubCategory().toString().toUpperCase(), beanObj.getAdjType() },
 						Integer.class);
 			}
 
@@ -1290,14 +1304,10 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 //				checkFlag = getJdbcTemplate().queryForObject(checkSettProcess,
 //						new Object[] { beanObj.getDatepicker(), beanObj.getCycle(), beanObj.getFileName() },
 //						String.class);
-				
-				
+
 				checkFlag = getJdbcTemplate().queryForObject(checkSettProcess,
-						new Object[] { maindate, beanObj.getCycle(), beanObj.getFileName() },
-						String.class);
-				
-				
-				
+						new Object[] { maindate, beanObj.getCycle(), beanObj.getFileName() }, String.class);
+
 				if (checkFlag.equalsIgnoreCase("Y")) {
 					result.put("result", true);
 				} else {
@@ -1315,9 +1325,9 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 				checkSettProcess = "SELECT COUNT(*) from " + tableName + " where filedate = to_date(?,'dd/mm/yyyy')";
 //				int settCount = getJdbcTemplate().queryForObject(checkSettProcess,
 //						new Object[] { beanObj.getDatepicker() }, Integer.class);
-				
-				int settCount = getJdbcTemplate().queryForObject(checkSettProcess,
-						new Object[] { maindate }, Integer.class);
+
+				int settCount = getJdbcTemplate().queryForObject(checkSettProcess, new Object[] { maindate },
+						Integer.class);
 
 				if (settCount == 0) {
 					result.put("result", false);
@@ -1330,7 +1340,7 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 		} catch (Exception e) {
 			logger.info("Exception in checking settlement process " + e);
 			result.put("result", false);
-			result.put("msg", "Exception while checking settlement process"+e);
+			result.put("msg", "Exception while checking settlement process" + e);
 		}
 		return result;
 
@@ -1383,6 +1393,13 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 			result.put("msg", "Exception occurred while validating");
 		}
 		return result;
+	}
+
+	@Override
+	public HashMap<String, Object> validateClosing(String fname) {
+		HashMap<String, Object> validate = new HashMap<String, Object>();
+		validate.put("result", false);
+		return validate;
 	}
 
 }

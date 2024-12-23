@@ -125,11 +125,21 @@ public class GenerateDhanaReportsController {
 			} else
 				SettlementBean.setStMergerCategory(SettlementBean.getCategory());
 
+			logger.info("INSIDE step 2 download reports");
 			String stFileName = isettelmentservice.generate_Dhana_Reports(SettlementBean);
+			
+			
+			logger.info("INSIDE step 3 download reports");
 			String stFileName2 = isettelmentservice.generate_Dhana_Reports_Failed(SettlementBean);
+			
+			logger.info("INSIDE step 4 download reports");
 			String stFileName4 = isettelmentservice.generate_Dhana_Reports_Matched(SettlementBean);
+			
+			logger.info("INSIDE step 5 download reports");
 			String stFileName3 = isettelmentservice.generate_Dhana_Reports_Knockoff(SettlementBean);
 
+			
+			logger.info("INSIDE step 6 download reports");
 //				stpath = "";
 //				stpath = TEMP_DIR+File.separator+SettlementBean.getCategory();
 //				System.out.println("stpath is "+stpath);
@@ -245,6 +255,7 @@ public class GenerateDhanaReportsController {
 		} catch (Exception e) {
 			logger.info("Exception in downloadReports " + e);
 			System.out.println("Exception in downloadReports " + e);
+			e.printStackTrace();
 			redirectAttributes.addFlashAttribute(ERROR_MSG, e.getMessage());
 		}
 

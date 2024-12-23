@@ -94,8 +94,8 @@ response.setHeader("X-Frame-Options", "deny");
 						<option value="opt2">option 2</option>
 						<option value="opt3">option 3</option>
 					  </select> -->
-							</div>							
-							
+							</div>
+
 							<div class="form-group" id="excelFileType" style="display: none">
 								<label for="exampleInputEmail1">Taxation Type</label>
 								<form:select class="form-control" path="fileType" id="excelType">
@@ -103,8 +103,8 @@ response.setHeader("X-Frame-Options", "deny");
 									<form:option value="ECOM">E-COM POS</form:option>
 								</form:select>
 							</div>
-							
-							
+
+
 							<div class="form-group" id="trfileType" style="display: none">
 								<label for="exampleInputEmail1">File Type</label>
 								<!-- <input type="email" class="form-control" id="exampleInputEmail1" placeholder=""> -->
@@ -155,8 +155,8 @@ response.setHeader("X-Frame-Options", "deny");
 									readonly="readonly" id="datepicker" placeholder="dd/mm/yyyy" />
 							</div>
 							<div class="form-group">
-								<label for="exampleInputFile">File Upload</label> 
-								<input type="file" name="file" id="dataFile1" title="Upload File" />
+								<label for="exampleInputFile">File Upload</label> <input
+									type="file" name="file" id="dataFile1" title="Upload File" />
 								</td>
 								<!-- <p class="help-block">Example block-level help text here.</p> -->
 							</div>
@@ -167,18 +167,29 @@ response.setHeader("X-Frame-Options", "deny");
 						<div class="box-footer">
 							<button type="button" value="UPLOAD" id="upload"
 								onclick="return processFileUpload();" class="btn btn-primary">Upload</button>
+
+							
 						</div>
 						<div class="box-footer" style="display: none">
 							<input type="text" id="dummy" value="012">
 						</div>
+
+
+
+
+
 					</form:form>
 				</div>
+
 				<!-- /.box -->
 
 
 
 			</div>
 			<!--/.col (left) -->
+
+			
+
 
 		</div>
 		<!-- /.row -->

@@ -39,15 +39,20 @@
 					class="fa fa-upload"></i> <span>CBS Data Fetch</span>
 			</a></li>
 
+
+			<!-- <li class="treeview"><a href="datadelete.do"> <i
+					class="fa fa-upload"></i> <span>DELETE DATA</span>
+			</a></li>
+ -->
 			<!-- <li id="upi_RRN" class=""><a
 				href="javascript:onSubmitMenu('upi.do')"> <i
 					class="fa fa-upload"></i> <span>RRN-DETAILS</span> 
 			</a></li> -->
 
 
-<!-- COMMENTED  -->
+			<!-- COMMENTED  -->
 
-		<!-- 	<li class="treeview"><a href="upi.do"> <i
+			<!-- 	<li class="treeview"><a href="upi.do"> <i
 					class="fa fa-upload"></i> <span>RRN-DETAILS</span>
 			</a></li> -->
 
@@ -93,9 +98,9 @@
 
 					<!-- <li><a href="NCMCFileUpload.do?category=RUPAY"><i class="fa fa-angle-right"></i> NCMC Settlement File Upload</a></li> -->
 
-					<li><a href="RupaySettlementProcess.do?category=RUPAY"><i
+					<!-- <li><a href="RupaySettlementProcess.do?category=RUPAY"><i
 							class="fa fa-angle-right"></i> Settlement Processing</a></li>
-
+ -->
 					<li><a href="RupaySettlementProcessTTUM.do?category=RUPAY"><i
 							class="fa fa-angle-right"></i> Settlement TTUM</a></li>
 					<li><a href="RupaySettFileRollback.do?category=CASHNET"><i
@@ -137,14 +142,14 @@
 		<li><a href="AdjustmentFileUpload.do?category=NFS"><i
 				class="fa fa-angle-right"></i>Adjustment Report Upload</a></li>
 
-		<li><a href="NFSSettlement.do?category=NFS"><i
+		<!-- <li><a href="NFSSettlement.do?category=NFS"><i
 				class="fa fa-angle-right"></i>Settlement Report</a></li>
 
 
 
 
 		<li><a href="NFSSettVoucher.do?category=NFS"><i
-				class="fa fa-angle-right"></i>Settlement Rectification</a></li>
+				class="fa fa-angle-right"></i>Settlement Rectification</a></li> -->
 
 		<li><a href="NFSSettlementVouc.do?category=NFS"><i
 				class="fa fa-angle-right"></i>Settlement TTUM</a></li>
@@ -159,6 +164,7 @@
 				class="fa fa-angle-right"></i>Late Reversal TTUM</a></li>
 
 
+		
 
 		</ul>
 		</li>
