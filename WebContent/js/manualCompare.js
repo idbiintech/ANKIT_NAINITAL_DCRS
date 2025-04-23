@@ -196,6 +196,53 @@ function validateupload() {
 
 }
 
+
+function validatedelete() {
+
+
+
+	var datepicker = document.getElementById("datepicker").value;
+	
+	var filelist = document.getElementById("filename").value;
+	
+	var excelType = document.getElementById("excelType").value;
+	var category = document.getElementById("category").value;
+	var msg = "";
+
+	if (datepicker == "") {
+
+		msg = msg + "Please Select Date for File.\n";
+	} if (filelist == "0") {
+
+		msg = msg + "Please Select File Name.\n";
+	
+	} if (filelist != 'REV_REPORT' && filelist != 'NFS' && filelist != 'RUPAY') {
+		if (excelType == "") {
+			msg = msg + "Please select Excel Type.\n";
+		}
+	} if (filelist != 'SWITCH' && filelist != 'CBS' && filelist != 'VISA') {
+		if (category == "") {
+
+			msg = msg + "Please select category.\n "
+		}
+	}
+
+	if (msg != "") {
+
+		alert(msg);
+		return false;
+	} else {
+
+		document.getElementById("upload").disabled = "disabled";
+
+
+
+		return true;
+	}
+
+
+}
+
 function getSubCategory(e) {
 	debugger;
 
@@ -368,6 +415,172 @@ function processFileUpload() {
 	}
 
 }
+
+function DeleteUploadedFiles() {
+	debugger;
+
+	var frm = $('#uploadform');
+
+	var filename = document.getElementById("filename").value;
+	var fileType = document.getElementById("fileType").value;
+	var excelType = document.getElementById("excelType").value;
+	var category = document.getElementById("category").value;
+	
+	var CSRFToken = $('[name=CSRFToken]').val();
+
+	var stSubCategory = document.getElementById("stSubCategory").value;
+	var fileDate = document.getElementById("datepicker").value;
+	var oMyForm = new FormData();
+	/*if(typeof FormData == "undefined"){
+		var data = [];
+		data.push('data', JSON.stringify(inputData));
+		}
+		else{
+		var data = new FormData();
+			data.append('data', JSON.stringify(inputData));
+		}*/
+
+	
+	oMyForm.append('filename', filename);
+	oMyForm.append('fileType', fileType);
+	oMyForm.append('excelType', excelType);
+	oMyForm.append('category', category);
+	oMyForm.append('stSubCategory', stSubCategory);
+	oMyForm.append('fileDate', fileDate);
+	oMyForm.append('CSRFToken', CSRFToken);
+	//"file=" + files[0] + "&filename=" + filename+"&fileType=" + fileType + "&category=" + category+"&fileDate=" + fileDate + "&stSubCategory=" + stSubCategory 
+	if (validatedelete()) {
+		$.ajax({
+			type: "POST",
+			url: "DeleteUplodedFiles.do",
+			
+			data: oMyForm,
+
+			processData: false,
+			contentType: false,
+			//type : 'POST',
+			beforeSend: function() {
+				showLoader();
+			},
+			complete: function(data) {
+				document.getElementById("upload").disabled = "";
+				hideLoader();
+
+			},
+			success: function(response) {
+				debugger;
+				hideLoader();
+
+				alert(response);
+				// document.getElementById("filename").value="0";
+				document.getElementById("fileType").value = "ONLINE";
+				// document.getElementById("category").value="";
+				//document.getElementById("stSubCategory").value="-";
+				// document.getElementById("datepicker").value="";
+
+
+			},
+			/*  complete: function() {
+				window.location = 'SourceFileUpload.jsp';
+			  },
+			 */
+
+			error: function(err) {
+				alert(err);
+			}
+		});
+
+	}
+
+}
+
+
+
+function viewFileUpload(){
+	
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (fileDate == "") {
+
+	
+		alert("Please Select Date for File");
+		return false;
+	}
+	
+	 $.ajax({
+        url: 'viewUploadFile.do',
+        type: 'POST',
+        async: false,
+    data:{
+	"CSRFToken":$("meta[name='_csrf']").attr("content"),
+	"fileDate":fileDate
+},
+
+   
+        success: function(data) {
+	
+	    $('.datarow').remove();
+          var obj=data;
+
+            console.log(data);
+            dispalyFilelist(data);
+        },
+        error: function(error) {
+            console.error("Error:", error);
+        }
+    });
+	
+	
+}
+
+function dispalyFilelist(data)
+{
+	debugger;
+	var obj=data;
+	if(!$.trim(obj)){
+		
+		alert("No data Found");
+		
+		
+	}else{
+		
+		
+		var tableBody="";
+		for(var i in data){
+			
+			
+			var tableRow="";
+			tableRow+="<td>"
+			 + (data[i].file_name)
+             +"</td>";
+           tableRow+="<td>"
+			 + (data[i].count)
+             +"</td>";
+  /*        tableRow+="<td>"
+
+        + "<a href=ManualUpload.do?filename="+(data[i].file_name)+""
+           +">Delete"+"</a>"
+
+           
+
+			
+							 
+             +"</td>";*/
+    tableBody=tableBody
+     + "<tr id='datarow' class='datarow'>"
+    + tableRow
+   + "</tr>";
+			
+		}
+		$('#viewuloadedfile').append(tableBody);
+		$('#viewuloadedfile').show();
+	}
+	
+	
+	
+	
+}
+
 
 
 

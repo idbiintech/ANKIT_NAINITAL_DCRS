@@ -10,6 +10,7 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
@@ -101,6 +102,7 @@ public class LoginServiceImpl implements LoginService {
 	public void validateUser(LoginBean loginBean) throws Exception {
 
 		try {
+
 			CharSequence cs1 = "int";
 			CharSequence cs2 = "INT";
 			String username_db = "";
@@ -164,12 +166,14 @@ public class LoginServiceImpl implements LoginService {
 				throw new Exception("Employee details unavailable.");
 			}
 
-		} catch (AuthenticationException e) {
+		}catch(AuthenticationException e){
 			throw new AuthenticationException("Invalid Username and/or Password.");
-		} catch (Exception e) {
+		}catch (Exception e) {
 			throw e;
 		}
+	
 	}
+	
 	
 	
 	@Override
@@ -213,6 +217,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public List<ProcessDtlBean> getProcessdtls(String Flag) {
+		System.out.println("Flag: "+Flag);
 
 		return loginDao.getProcessdtls(Flag);
 	}

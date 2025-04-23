@@ -88,7 +88,9 @@ public class ManualKnockoffDaoImpl extends JdbcDaoSupport implements ManualKnock
 				inParams.put("I_FILEDATE", fileDate);
 				if(subCategory.equalsIgnoreCase("DOMESTIC"))
 				{
+					logger.info("above Rupay Domestic");
 					RupayDomRollBack  rollBackexe = new RupayDomRollBack(getJdbcTemplate());
+					logger.info("Inside Rupay Domestic");
 					outParams = rollBackexe.execute(inParams);
 				}
 				else if(subCategory.equalsIgnoreCase("INTERNATIONAL"))

@@ -833,6 +833,11 @@
 		<put-attribute name="body"
 			value="/WEB-INF/jsp/NFSRawRollback.jsp" />
 	</definition>
+	<!-- INT12725 -->
+	 <definition name="NTSLFileRollback" extends="baseLayout">
+		<put-attribute name="title" value="Manual RollBack Process" />
+		<put-attribute name="body" value="/WEB-INF/jsp/NTSLFileRollback.jsp"/>		
+	</definition> 
 
 	<definition name="VisaRawRollback" extends="baseLayout">
 		<put-attribute name="title" value="Visa TTUM" />

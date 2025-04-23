@@ -89,5 +89,7 @@ public interface RupaySettlementService {
 	public boolean checkCbsRecordPresent(String filedate);
 	
 	public Boolean processCbs(String filedate);
+	
+	public Boolean deleteCbs(String filedate);
 
 }

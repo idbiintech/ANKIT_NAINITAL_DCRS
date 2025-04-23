@@ -455,6 +455,7 @@ public class ReconProcessDaoImpl extends JdbcDaoSupport implements IReconProcess
 		String msg = null;
 		try {
 			for (CompareSetupBean setupBean : compareSetupBeans) {
+				
 				String getcompareFlag = "select comapre_flag from main_file_upload_dtls where filedate = to_date('"
 						+ filedate + "','dd/mm/yyyy') and fileid = '" + setupBean.getInFileId() + "'";
 

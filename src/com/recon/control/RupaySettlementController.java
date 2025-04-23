@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 //import org.apache.logging.log4j.Logger;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,10 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.recon.dao.impl.RupaySettelementDaoImpl;
-import com.recon.model.LoginBean;
-import com.recon.model.NFSSettlementBean;
-import com.recon.model.RupaySettlementBean;
-import com.recon.model.RupayUploadBean;
 import com.recon.service.ISourceService;
 import com.recon.service.NFSSettlementTTUMService;
 import com.recon.service.RupaySettlementService;
@@ -268,6 +265,30 @@ public class RupaySettlementController {
 		}
 		return response;
 	}
+	//int12725
+
+	@RequestMapping(value = "DeleteUplodedData", method = RequestMethod.POST)
+	@ResponseBody
+	public String DeleteUplodedData(@RequestParam("fileDate") String filedate, HttpServletRequest request,
+			HttpSession httpSession) throws Exception {
+
+		System.out.println("date is" + filedate);
+		boolean validateDate = false;
+		boolean checkrecord = false;
+
+		checkrecord = rupaySettlementService.checkCbsRecordPresent(filedate);
+
+		if (checkrecord) {
+			boolean executeFlag = rupaySettlementService.deleteCbs(filedate);
+
+			if (executeFlag)
+				return "CBS data Deleting is Done!!";
+			else
+				return "CBS data Deleting Error!!";
+		} else
+			return "CBS data deleting is already processed.";
+	}
+	
 
 	@RequestMapping(value = "downloadCashAtPosReport", method = RequestMethod.POST)
 	public String CashAtPosDownload(@ModelAttribute("nfsSettlementBean") NFSSettlementBean nfsSettlementBean,
@@ -666,6 +687,12 @@ public class RupaySettlementController {
 			} else {
 				return "Already Processed";
 			}
+			/*
+			 * if (rupaySettlementService.processSettlementTTUM(beanObj)) { return
+			 * "Settlement is Completed Successfully! \n Please download Reports"; } else {
+			 * return "Issue while processing TTUM"; }
+			 */
+	
 		}
 
 		return "File is Not Uploaded for Selected Date";

@@ -86,7 +86,7 @@ function noBack() { window.history.forward(); }
 							<select class="form-control" name="fileName" id="fileName">
 								<option value="0">--Select --</option>
 									<option value="INTERCHANGE">Interchange</option>
-									<option value="SETTLEMENT">Settlement</option>
+									<!-- <option value="SETTLEMENT">Settlement</option> -->
 									<option value="BILLING">NPCI Billing</option>
 									<option value="DSCR">DSCR Report</option>
 							</select>

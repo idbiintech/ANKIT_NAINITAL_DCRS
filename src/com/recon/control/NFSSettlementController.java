@@ -185,7 +185,7 @@ public class NFSSettlementController {
 				String cycle = fileNames[1].substring(0, 1);
 
 				logger.info("Cycle is: " + cycle);
-				cycle = "1";
+				//cycle = "1";
 				nfsSettlementBean.setCycle(Integer.parseInt(cycle));
 			}
 		} else {

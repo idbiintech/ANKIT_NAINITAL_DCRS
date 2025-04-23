@@ -98,7 +98,7 @@ public class LoginController {
 				loginBean.setPassword(
 						new com.recon.util.UnwarpRequest(request.getParameter("salt"), request.getParameter("iv"),
 								request.getParameter("passphrase"), request.getParameter("password")).decrypt());
-				//loginService.validateUser(loginBean); //commented ad login part
+				// loginService.validateUser(loginBean); //commented ad login part
 				loginBean.setSession_id(request.getSession().getId());
 				loginBean.setIp_address(IP.getHostAddress());
 

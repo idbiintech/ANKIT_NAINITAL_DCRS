@@ -110,7 +110,7 @@ response.setHeader("X-Frame-Options", "deny");
 								<!-- <input type="email" class="form-control" id="exampleInputEmail1" placeholder=""> -->
 								<form:select class="form-control" path="fileType" id="fileType">
 									<form:option value="ONLINE">ONLINE</form:option>
-									<form:option value="MANUAL">MA NUAL</form:option>
+									<%-- <form:option value="MANUAL">MA NUAL</form:option> --%>
 								</form:select>
 							</div>
 
@@ -120,16 +120,16 @@ response.setHeader("X-Frame-Options", "deny");
 								<form:select class="form-control" path="category" id="category"
 									onchange="getSubCategory(this)">
 									<option value="">--SELECT--</option>
-									<option value="ONUS">ONUS</option>
+									<!-- <option value="ONUS">ONUS</option> -->
 									<option value="RUPAY">RUPAY</option>
-									<option value="AMEX">AMEX</option>
-									<option value="VISA">VISA</option>
+									<!-- <option value="AMEX">AMEX</option> -->
+									<!-- <option value="VISA">VISA</option> -->
 									<option value="NFS">NFS</option>
-									<option value="CASHNET">CASHNET</option>
+									<!-- <option value="CASHNET">CASHNET</option>
 									<option value="MASTERCARD">MASTERCARD</option>
 									<option value="CARDTOCARD">CARD TO CARD</option>
 									<option value="POS">ONUS POS</option>
-									<option value="WCC">WCC</option>
+									<option value="WCC">WCC</option> -->
 									<!-- <option value="POS">POS</option> -->
 								</form:select>
 							</div>
@@ -160,6 +160,7 @@ response.setHeader("X-Frame-Options", "deny");
 								</td>
 								<!-- <p class="help-block">Example block-level help text here.</p> -->
 							</div>
+							
 
 						</div>
 						<!-- /.box-body -->
@@ -170,6 +171,19 @@ response.setHeader("X-Frame-Options", "deny");
 
 							
 						</div>
+						
+						<div class="box-footer"> 
+						
+						
+							 <button type="button" value="VIEW" id="view"
+								onclick="return viewFileUpload();" class="btn btn-primary">View uploaded files </button> 
+								</div>
+						<div class="box-footer"> 
+						
+						
+							 <button type="button" value="DELETE" id="DELETE"
+								onclick="return DeleteUploadedFiles();" class="btn btn-primary">Delete uploaded files </button> 
+								</div>
 						<div class="box-footer" style="display: none">
 							<input type="text" id="dummy" value="012">
 						</div>
@@ -193,6 +207,33 @@ response.setHeader("X-Frame-Options", "deny");
 
 		</div>
 		<!-- /.row -->
+		
+		<div class="row">
+		  <div class="col-md-1"></div>			
+			<div class="col-md-10">
+			<div class="box box-primary">
+			<div class="box-body">
+			<table id="viewuloadedfile" cellpadding="2" cellspacing="0" border="0" width="100%" class="table table-bordered">
+	  <tr class="footerBtns">
+		
+		<th class="leftSolid">File name</th>
+		
+		<!-- <th class="leftSolid">File Date </th> -->
+		<th class="leftSolid">Count</th>
+		<!-- <th class="leftSolid">Action</th> -->
+		<!-- <th class="leftSolid" colspan="2">Action</th> -->
+	   </tr>
+		
+			</table>
+			</div>	
+			
+			</div>
+			</div>
+		
+		
+		
+		</div>
+		
 	</section>
 </div>
 <!-- /.content-wrapper -->

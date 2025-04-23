@@ -74,10 +74,6 @@ public class GlBalanceController {
 		
 		System.out.println( "NEW"+item_setdt +  item_settlamnt);
 		
-		System.out.println(arrsetdt);
-		System.out.println(arritem_settlamnt);
-		
-		System.out.println("closing_balance"+closing_balance);
 		System.out.println("cash_dispense"+cash_dispense);
 		
 	float closingbal =	Float.parseFloat(closing_balance);

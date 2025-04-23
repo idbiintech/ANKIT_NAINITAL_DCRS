@@ -114,6 +114,7 @@ public class UserController {
 		try
 		{
 			userBean.setUser_id(user_id);
+			System.out.println("vaishnvai");
 		
 			userBean = userService.viewUserDetail(userBean);
 			model.addAttribute("user", userBean);

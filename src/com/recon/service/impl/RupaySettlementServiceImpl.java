@@ -606,4 +606,10 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 		return rrnList;
 	}
 
+	@Override
+	public Boolean deleteCbs(String filedate) {
+		
+		return rupayDao.deleteCbs(filedate);
+	}
+
 }

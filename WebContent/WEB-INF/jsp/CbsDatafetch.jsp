@@ -33,6 +33,8 @@ response.setHeader("X-Frame-Options", "deny");
 			dateFormat : "dd/mm/yy",
 			maxDate : 0
 		});
+		
+		
 	});
 
 	window.history.forward();
@@ -96,7 +98,20 @@ response.setHeader("X-Frame-Options", "deny");
 							<!-- <a onclick="presentmentFileUpload();" class="btn btn-primary">Upload</a> -->
 							<a onclick="loadCbsData();" class="btn btn-primary">Load Data</a>
 
-						</div>
+						<!-- </div>
+						<div class="box-footer">  -->
+						
+						
+							 <button type="button" value="VIEW" id="view"
+								onclick="return viewFileUpload();" class="btn btn-primary">View Data </button> 
+								</div>
+								
+								<div class="box-footer" style="text-align: center"> 
+						
+						
+							 <button type="button" value="DELETE" id="DELETE"
+								onclick="return deleteCbsData();" class="btn btn-primary">Delete uploaded Data </button> 
+								</div>
 					</form:form>
 				</div>
 				<!-- /.box -->
@@ -107,6 +122,33 @@ response.setHeader("X-Frame-Options", "deny");
 			<!--/.col (left) -->
 
 		</div>
+		
+				<div class="row">
+		  <div class="col-md-2"></div>			
+			<div class="col-md-8">
+			<div class="box box-primary">
+			<div class="box-body">
+			<table id="viewuloadedfile" cellpadding="2" cellspacing="0" border="0" width="100%" class="table table-bordered">
+	  <tr class="footerBtns">
+		
+		<th class="leftSolid" >File name</th>
+		
+		<!-- <th class="leftSolid">File Date </th> -->
+		<th class="leftSolid" >Count</th>
+		<!-- <th class="leftSolid">Action</th> -->
+		<!-- <th class="leftSolid" colspan="2">Action</th> -->
+	   </tr>
+		
+			</table>
+			</div>	
+			
+			</div>
+			</div>
+		
+		
+		
+		</div>
+		
 		<!-- /.row -->
 		<!-- /.content-wrapper -->
 	</section>

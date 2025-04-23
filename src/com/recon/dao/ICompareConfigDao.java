@@ -8,6 +8,7 @@ import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.recon.model.CompareSetupBean;
+import com.recon.model.FileUploadView;
 import com.recon.model.ManualCompareBean;
 import com.recon.model.Pos_Bean;
 
@@ -28,6 +29,12 @@ public interface ICompareConfigDao {
 	public ArrayList<CompareSetupBean> getrecparamlist(int rec_set_id,String Cate) throws Exception;
 
 	public  ArrayList<CompareSetupBean> getFileList();
+	
+	public boolean DeleteUploadedFiles(CompareSetupBean setupBean);
+
+	public List<FileUploadView> viewUploadFileList(String filedate);
+	
+	public List<FileUploadView> viewCbsUploadFileList(String filedate);
 	
 	public boolean chkFileupload(CompareSetupBean setupBean) throws Exception;
 	

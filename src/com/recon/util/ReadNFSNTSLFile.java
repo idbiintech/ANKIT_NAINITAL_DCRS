@@ -189,7 +189,8 @@ public class ReadNFSNTSLFile {
 		 * + " values (?,?,?,?,?,?,?,?,?,?,6346)";
 		 */
 		String sql = "INSERT INTO " + tableName
-				+ "(DESCRIPTION,NO_OF_TXNS,DEBIT,CREDIT,CYCLE,FILEDATE,CREATEDBY,CREATEDDATE,SR_NO,file_name) VALUES(?,?,?,?,?,to_date(?,'dd/mm/yyyy'),?,SYSDATE,?,?)";
+				//+ "(DESCRIPTION,NO_OF_TXNS,DEBIT,CREDIT,CYCLE,FILEDATE,CREATEDBY,CREATEDDATE,SR_NO,file_name) VALUES(?,?,?,?,?,to_date(?,'dd/mm/yyyy'),?,SYSDATE,?,?)";
+				+ "(DESCRIPTION,NO_OF_TXNS,DEBIT,CREDIT,CYCLE,FILEDATE,CREATEDBY,CREATEDDATE,SR_NO) VALUES(?,?,?,?,?,to_date(?,'dd/mm/yyyy'),?,SYSDATE,?)";
 
 		String CoopBank_sql = "INSERT INTO COOP_NTSL_NFS_RAWDATA (BANK_NAME,DESCRIPTION,DEBIT,CREDIT,CYCLE,FILEDATE,CREATEDBY,CREATEDDATE,SR_NO) "
 				+ "VALUES(?,?,?,?,?,to_date(?,'dd/mm/yyyy'),?,SYSDATE,?)";
@@ -274,7 +275,7 @@ public class ReadNFSNTSLFile {
 										ps.setString(6, beanObj.getDatepicker());
 										ps.setString(7, beanObj.getCreatedBy());
 										ps.setInt(8, srl_no++);
-										ps.setString(9, fname);
+										//ps.setString(9, fname);
 										ps.addBatch();
 										count = 1;
 									}

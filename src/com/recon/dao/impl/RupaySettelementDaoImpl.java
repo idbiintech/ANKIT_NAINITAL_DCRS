@@ -1032,13 +1032,21 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			} else {
 				tableName = "RUPAY_INT_" + beanObj.getFileName() + "_RAWDATA";
 			}
+			
+			
+			String var = "select count(*) from "+tableName.toLowerCase()+" where filedate = to_date('"+beanObj.getFileDate()+"','dd/mm/yyyy') AND cycle ='"+beanObj.getCycle()+"'";
+			System.out.println("query is" + var);
+			int recordCount = getJdbcTemplate().queryForObject(var, new Object[] {}, Integer.class);
 
-			int recordCount = getJdbcTemplate().queryForObject(
-					"SELECT count(1) FROM " + tableName.toLowerCase()
-							+ " WHERE filedate = to_date(?,'dd/mm/yyyy') AND cycle = ?",
-					new Object[] { beanObj.getFileDate(), beanObj.getCycle() }, Integer.class);
-			if (recordCount > 0)
+
+//			int recordCount = getJdbcTemplate().queryForObject(
+//					"SELECT count(*) FROM " + tableName.toLowerCase()
+//							+ " WHERE filedate = to_date(?,'dd/mm/yyyy') AND cycle = ?",
+//					new Object[] { beanObj.getFileDate(), beanObj.getCycle() }, Integer.class);
+			if (recordCount > 0 )
 				return true;
+			
+			
 			else
 				return false;
 		} catch (Exception e) {
@@ -2060,6 +2068,28 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 		}
 	}
 
+	public boolean deleteCbs(String filedate) {
+		String monthdate = generalUtil.DateFunction(filedate);
+		
+
+		try {
+			
+			
+			String deleteQuery = "delete from cbs_nainital_rawdata where filedate ='"+monthdate+"'";
+			String deleteQuery1 = "delete from MAIN_FILE_UPLOAD_DTLS where FILEID in (2,17) and filedate ='"+monthdate+"'";
+
+			getJdbcTemplate().execute(deleteQuery);
+			getJdbcTemplate().execute(deleteQuery1);
+
+			
+			
+		} catch (Exception e) {
+			logger.info("Exception while deleting cbsdata " + e);
+			return false;
+		}
+		return true;
+	}
+	
 	private class CbsProcess extends StoredProcedure {
 		private static final String insert_proc = "SP_CBS_NAINITAL_RAWDATA_DBLINK";
 

@@ -64,6 +64,7 @@ $(function(){
 	});
 
 	$('#live_user').click(function(){
+		
 
 		try{
 			if($('#liveUserDiv').length){

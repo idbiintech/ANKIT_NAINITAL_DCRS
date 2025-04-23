@@ -147,6 +147,73 @@ function presentmentFileUpload() {
 			});
 	//	}	
 }
+//int12725
+function DeleteUploadedData() {
+	debugger;
+
+	//var frm = $('#uploadform');
+
+	//var filename = document.getElementById("filename").value;
+	//var fileType = document.getElementById("fileType").value;
+	//var excelType = document.getElementById("excelType").value;
+	//var category = document.getElementById("category").value;
+	
+	var CSRFToken = $('[name=CSRFToken]').val();
+
+	//var stSubCategory = document.getElementById("stSubCategory").value;
+	var fileDate = document.getElementById("datepicker").value;
+	var oMyForm = new FormData();
+	
+	
+	//oMyForm.append('filename', filename);
+	//oMyForm.append('fileType', fileType);
+	//oMyForm.append('excelType', excelType);
+	//oMyForm.append('category', category);
+	//oMyForm.append('stSubCategory', stSubCategory);
+	oMyForm.append('fileDate', fileDate);
+	oMyForm.append('CSRFToken', CSRFToken);
+	if (validatedelete()) {
+		$.ajax({
+			type: "POST",
+			url: "DeleteUplodedData.do",
+			
+			data: oMyForm,
+
+			processData: false,
+			contentType: false,
+			//type : 'POST',
+			beforeSend: function() {
+				showLoader();
+			},
+			complete: function(data) {
+				document.getElementById("upload").disabled = "";
+				hideLoader();
+
+			},
+			success: function(response) {
+				debugger;
+				hideLoader();
+
+				alert(response);
+				// document.getElementById("filename").value="0";
+				//document.getElementById("fileType").value = "ONLINE";
+				// document.getElementById("category").value="";
+				//document.getElementById("stSubCategory").value="-";
+				 document.getElementById("datepicker").value="";
+
+
+			},
+			
+			error: function(err) {
+				alert(err);
+			}
+		});
+
+	}
+
+}
+
+
 function ValidateData()
 {
 	var subcategory = document.getElementById("stSubCategory").value;
@@ -243,7 +310,7 @@ function processFileUpload() {
 				success : function(response) {
 					debugger;
 					hideLoader();
-					if(i == userfile.files.length)
+					/*if(i == userfile.files.length)*/
 						alert (response); 
 					//document.getElementById("fileName").value="0";
 					// alert("2");
@@ -403,6 +470,87 @@ function processLateRev() {
 }
 
 
+function viewFileUpload(){
+	
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (fileDate == "") {
+
+	
+		alert("Please Select Date for File");
+		return false;
+	}
+	
+	 $.ajax({
+        url: 'viewCbsUploadFile.do',
+        type: 'POST',
+        async: false,
+    data:{
+	"CSRFToken":$("meta[name='_csrf']").attr("content"),
+	"fileDate":fileDate
+},
+        success: function(data) {
+	
+	    $('.datarow').remove();
+          var obj=data;
+
+            console.log(data);
+            dispalyFilelist(data);
+        },
+        error: function(error) {
+            console.error("Error:", error);
+        }
+    });
+	
+	
+}
+
+function dispalyFilelist(data)
+{
+	debugger;
+	var obj=data;
+	if(!$.trim(obj)){
+		
+		alert("No data Found");
+		
+		
+	}else{
+		
+		
+		var tableBody="";
+		for(var i in data){
+			
+			
+			var tableRow="";
+			tableRow+="<td>"
+			 + "CBSDATA"
+             +"</td>";
+           tableRow+="<td>"
+			 + (data[i].count)
+             +"</td>";
+  /*        tableRow+="<td>"
+
+        + "<a href=ManualUpload.do?filename="+(data[i].file_name)+""
+           +">Delete"+"</a>"
+
+           
+
+			
+							 
+             +"</td>";*/
+    tableBody=tableBody
+     + "<tr id='datarow' class='datarow'>"
+    + tableRow
+   + "</tr>";
+			
+		}
+		$('#viewuloadedfile').append(tableBody);
+		$('#viewuloadedfile').show();
+	}
+}	
+	
+
+
 
 function downloadLateRev() {
 	debugger;
@@ -424,6 +572,40 @@ function loadCbsData(){
 		$.ajax({
 			type : "POST",
 			url : "CbsDataFetch.do",
+			data :oMyForm ,
+			processData : false,
+			contentType : false,
+			beforeSend : function() {
+				showLoader();
+			},
+			success : function(response) {
+				debugger;
+				hideLoader();
+				alert (response); 
+			},
+			error : function(err) {
+				hideLoader();
+				alert("Error Occurred");
+			},
+			complete : function(data) {
+				hideLoader();
+			},
+		});
+	}
+	
+}
+
+function deleteCbsData(){
+	
+	
+	debugger;
+	var fileDate = document.getElementById("datepicker").value;
+	if (Validation()) {
+		var oMyForm = new FormData();
+		oMyForm.append('fileDate',fileDate);
+		$.ajax({
+			type : "POST",
+			url : "DeleteUplodedData.do",
 			data :oMyForm ,
 			processData : false,
 			contentType : false,

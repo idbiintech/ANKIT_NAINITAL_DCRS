@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.recon.dao.ICompareConfigDao;
 import com.recon.model.CompareSetupBean;
+import com.recon.model.FileUploadView;
 import com.recon.model.ManualCompareBean;
 import com.recon.model.Pos_Bean;
 import com.recon.service.ICompareConfigService;
@@ -60,6 +61,23 @@ public class CompareConfigServiceImpl implements ICompareConfigService {
 	public ArrayList<CompareSetupBean> getFileList() {
 		
 		return compareDao.getFileList();
+	}
+	
+	@Override
+	public boolean DeleteUploadedFiles(CompareSetupBean setupBean) {
+		
+		return compareDao.DeleteUploadedFiles(setupBean);
+	}
+	
+	@Override
+	public List<FileUploadView> viewFileUploadList(String filedate) {
+		
+		return compareDao.viewUploadFileList(filedate);
+	}
+	@Override
+	public List<FileUploadView> viewCbsFileUploadList(String filedate) {
+		
+		return compareDao.viewCbsUploadFileList(filedate);
 	}
 
 	@Override

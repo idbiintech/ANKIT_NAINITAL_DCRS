@@ -11,11 +11,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -38,6 +40,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -54,6 +57,7 @@ import com.recon.dao.ICompareConfigDao;
 import com.recon.model.CompareSetupBean;
 import com.recon.model.FileColumnDtls;
 import com.recon.model.FileSourceBean;
+import com.recon.model.FileUploadView;
 import com.recon.model.ManualCompareBean;
 import com.recon.model.ManualFileColumnDtls;
 import com.recon.model.Pos_Bean;
@@ -565,7 +569,319 @@ public class CompareConfigDaoImpl extends JdbcDaoSupport implements ICompareConf
 
 		return (ArrayList<CompareSetupBean>) filelist;
 	}
+	
+	@Override
+	public boolean DeleteUploadedFiles(CompareSetupBean setupBean) {
+		String File_category="";
+		String File_subcategory="";
+		boolean result=false;
+		if (setupBean.getFilename().equalsIgnoreCase("SWITCH"))
+		{
+			if (setupBean.getExcelType().equalsIgnoreCase("ATM")) {
+				File_category = "NFS";
+				File_subcategory = "ISSUER";
+				
+				
+			} else {
+				File_category = "RUPAY";
+				File_subcategory = "DOMESTIC";
+			}
 
+			String query = "SELECT fileid FROM main_filesource WHERE filename = ? AND file_subcategory = ? AND file_category = ?";
+
+			String fileId = getJdbcTemplate().queryForObject(
+			    query, 
+			    new Object[] { setupBean.getFilename(), File_subcategory, File_category }, 
+			    String.class
+			);
+			
+			String exelType=setupBean.getExcelType();
+			String filedate=setupBean.getFileDate();
+			
+			result=SwitchFileDelete(exelType,fileId,filedate);
+			
+			System.out.println("fileId="+fileId);
+			
+			
+		}else if(setupBean.getFilename().equalsIgnoreCase("RUPAY"))
+		{
+			String query = "SELECT fileid FROM main_filesource WHERE filename = ? AND file_subcategory = ? AND file_category = ?";
+
+			String fileId = getJdbcTemplate().queryForObject(
+			    query, 
+			    new Object[] { setupBean.getFilename(), setupBean.getStSubCategory(),setupBean.getCategory()}, 
+			    String.class
+			);
+			
+			String filedate=setupBean.getFileDate();
+			
+			result=RupayFileDelete(fileId,filedate);
+			
+			
+		}else if(setupBean.getFilename().equalsIgnoreCase("NFS"))
+		{
+
+			String query = "SELECT fileid FROM main_filesource WHERE filename = ? AND file_subcategory = ? AND file_category = ?";
+
+			String fileId = getJdbcTemplate().queryForObject(
+			    query, 
+			    new Object[] { setupBean.getFilename(), setupBean.getStSubCategory(),setupBean.getCategory()}, 
+			    String.class
+			);
+			
+			String filedate=setupBean.getFileDate();
+			String subcategory=setupBean.getStSubCategory();
+			
+			result=NFSFileDelete(fileId,filedate,subcategory);
+			
+		}
+		
+		
+		
+	return true;	
+	}
+	
+	
+	public boolean SwitchFileDelete(String exelType,String fileId,String filedate) {
+		Map<String, Object> inParams = new HashMap<String, Object>();
+
+		inParams.put("P_EXEL_TYPE", exelType);
+		inParams.put("P_FILE_ID", fileId);
+		inParams.put("P_FILE_DATE", filedate);
+
+		SwitchFileDelete chk = new SwitchFileDelete(getJdbcTemplate());
+		Map<String, Object> outParams = chk.execute(inParams);
+
+		System.out.println("AfterDelete=" + outParams.get("MSG"));
+		if(outParams.get("MSG").equals("SUCCESS")) {
+		return true;}else {
+			
+			return false;
+		}
+
+	}
+
+	private class SwitchFileDelete extends StoredProcedure {
+		private static final String procName = "DELETE_SWITCH_UPLOADED_FILES";
+
+		SwitchFileDelete(JdbcTemplate template) {
+			super(template, procName);
+
+			declareParameter(new SqlParameter("P_EXEL_TYPE", Types.VARCHAR));
+			declareParameter(new SqlParameter("P_FILE_ID", Types.VARCHAR));
+			declareParameter(new SqlParameter("P_FILE_DATE", Types.VARCHAR));
+
+			declareParameter(new SqlOutParameter("MSG", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	
+	
+	public boolean RupayFileDelete(String fileId,String filedate) {
+		Map<String, Object> inParams = new HashMap<String, Object>();
+
+				inParams.put("P_FILE_ID", fileId);
+		inParams.put("P_FILE_DATE", filedate);
+
+		RupayFileDelete chk = new RupayFileDelete(getJdbcTemplate());
+		Map<String, Object> outParams = chk.execute(inParams);
+
+		System.out.println("AfterDelete=" + outParams.get("MSG"));
+		if(outParams.get("MSG").equals("SUCCESS")) {
+		return true;
+		}
+		else {
+			
+			return false;
+		}
+
+	}
+
+	private class RupayFileDelete extends StoredProcedure {
+		private static final String procName = "DELETE_RUPAY_UPLOADED_FILES";
+
+		RupayFileDelete(JdbcTemplate template) {
+			super(template, procName);
+
+			
+			declareParameter(new SqlParameter("P_FILE_ID", Types.VARCHAR));
+			declareParameter(new SqlParameter("P_FILE_DATE", Types.VARCHAR));
+
+			declareParameter(new SqlOutParameter("MSG", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	public boolean NFSFileDelete(String fileId,String filedate,String subcategory) {
+		Map<String, Object> inParams = new HashMap<String, Object>();
+
+				inParams.put("P_FILE_ID", fileId);
+		inParams.put("P_FILE_DATE", filedate);
+		inParams.put("P_SUBCATEGORY", subcategory);
+
+		NFSFileDelete chk = new NFSFileDelete(getJdbcTemplate());
+		Map<String, Object> outParams = chk.execute(inParams);
+
+		System.out.println("AfterDelete=" + outParams.get("MSG"));
+		if(outParams.get("MSG").equals("SUCCESS")) {
+		return true;}else {
+			
+			return false;
+		}
+
+	}
+
+	private class NFSFileDelete extends StoredProcedure {
+		private static final String procName = "DELETE_NFS_UPLOADED_FILES";
+
+		NFSFileDelete(JdbcTemplate template) {
+			super(template, procName);
+
+			
+			declareParameter(new SqlParameter("P_FILE_ID", Types.VARCHAR));
+			declareParameter(new SqlParameter("P_FILE_DATE", Types.VARCHAR));
+			declareParameter(new SqlParameter("P_SUBCATEGORY", Types.VARCHAR));
+
+			declareParameter(new SqlOutParameter("MSG", Types.VARCHAR));
+			compile();
+		}
+	}
+
+	
+
+	
+	@Override
+	public List<FileUploadView> viewUploadFileList(String filedate) {
+
+		logger.info("***** CompareConfigDaoImpl.viewlist Start ****");
+		 System.out.println("fileDate="+filedate); 
+		List<FileUploadView> filelist = null;
+
+		try {
+
+			
+			/* String query ="SELECT * FROM UPLOADEDFILE_VIEW"; */
+			 
+			
+			  
+			  
+             String query="SELECT COUNT(*) AS COUNT,  UNIQUE_FILE_NAME AS FILE_NAME FROM RUPAY_RUPAY_RAWDATA_NAINITAL  WHERE FILEDATE='"+filedate+"' GROUP BY UNIQUE_FILE_NAME\r\n"
+             		+ "UNION ALL\r\n"
+             		+ "SELECT COUNT(*) AS COUNT,FILE_NAME  FROM switch_rawdata_nainital WHERE FILEDATE='"+filedate+"' GROUP BY FILE_NAME\r\n"
+             + "UNION ALL\r\n"
+      		+ "SELECT COUNT(*) AS COUNT,FILE_NAME  FROM nfs_nfs_iss_rawdata WHERE FILEDATE='"+filedate+"' GROUP BY FILE_NAME";
+			
+
+			logger.info("query" + query);
+
+			filelist = getJdbcTemplate().query(query, new RowMapper<FileUploadView>() {
+
+				@Override
+				public FileUploadView mapRow(ResultSet rs, int row) throws SQLException {
+					FileUploadView u = new FileUploadView();
+					u.setFile_name(rs.getString(2));
+					u.setCount(String.valueOf(rs.getInt(1)));
+					return u;
+				}
+
+			});
+
+			logger.info("***** CompareConfigDaoImpl.viewlist End ****");
+
+		} catch (Exception ex) {
+
+			logger.error(" error in CompareConfigDaoImpl.getFileList",
+					new Exception("CompareConfigDaoImpl.getFileList", ex));
+			throw ex;
+		}
+
+		return filelist;
+
+	}
+	
+	
+	@SuppressWarnings("null")
+	@Override
+	public List<FileUploadView> viewCbsUploadFileList(String filedate) {
+
+		logger.info("***** CompareConfigDaoImpl.viewlist Start ****");
+		System.out.println("fileDate="+filedate);
+		String formattedDate="";
+		try {
+		SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date;
+	
+			date = inputFormat.parse(filedate);
+			 SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH);
+		         formattedDate = outputFormat.format(date);
+				
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        // Step 2: Convert to the required format "07/AUG/2024"
+       
+		
+		
+		
+		
+		filedate=formattedDate;
+		System.out.println("NewfileDate="+filedate);
+		
+		        List<FileUploadView> filelist = new ArrayList<>(); // Initialize list properly
+		        
+				try {
+
+					
+					 
+					 
+					  String query="SELECT COUNT(*) as COUNT  FROM CBS_NAINITAL_RAWDATA   WHERE FILEDATE = '"+filedate+"'" ;
+					  
+
+					/*
+					 * String query="SELECT * FROM uploadedfileView_mv WHERE filedate ="+fileDate;
+					 */
+
+					logger.info("query" + query);
+
+					filelist = getJdbcTemplate().query(query, new RowMapper<FileUploadView>() {
+
+						@Override
+						public FileUploadView mapRow(ResultSet rs, int row) throws SQLException {
+							FileUploadView u = new FileUploadView();
+							
+							u.setCount(String.valueOf(rs.getInt("COUNT")));
+							System.out.println("Count="+rs.getInt("COUNT"));
+							return u;
+						}
+
+					});
+
+					logger.info("***** CompareConfigDaoImpl.viewlist End ****");
+
+				} catch (Exception ex) {
+
+					logger.error(" error in CompareConfigDaoImpl.getFileList",
+							new Exception("CompareConfigDaoImpl.getFileList", ex));
+					throw ex;
+				}
+   
+		        
+
+		        
+         logger.info("***** CompareConfigDaoImpl.viewlist End ****");
+
+		
+
+		return filelist;
+
+	}
+	
+	
+	
+	
 	@Override
 	public ArrayList<Pos_Bean> getFileNameList(String filedate) throws Exception {
 		logger.info("***** CompareConfigDaoImpl.getFileList Start ****");

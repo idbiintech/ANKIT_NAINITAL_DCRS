@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -282,6 +284,129 @@ public class ReadRupay {
 			retOutput.put("msg", "Issue at Line Number " + lineNumber);
 			return retOutput;
 		}
+	}
+	
+	public HashMap<String, Object> uploadRupayDomesticData1(CompareSetupBean setupBean, Connection con,
+	        MultipartFile file, FileSourceBean sourceBean) {
+	    
+	    String stLine;
+	    List<String> elements = getFieldMappings();
+	    int lineNumber = 0, batchNumber = 0;
+	    boolean batchExecuted = false;
+	    HashMap<String, Object> retOutput = new HashMap<>();
+
+	    String insertQuery = "INSERT INTO RUPAY_RUPAY_RAWDATA(DMS_SMS, APPROVAL, CARD_NUMBER, RRN, TRAN_DATE, TRAN_TIME, MERCHANT_NAME, AMOUNT, TRAN_CODE, FILEDATE, CREATED_BY, CATEGORY, UNIQUE_FILE_NAME) "
+	            + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?,'dd/MM/yyyy'), ?, ?, ?)";
+
+	    try (PreparedStatement ps = con.prepareStatement(insertQuery);
+	         BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+	        
+	        con.setAutoCommit(false);
+
+	        while ((stLine = br.readLine()) != null) {
+	            lineNumber++;
+	            
+	            // Ignore header and trailer records
+	            if (lineNumber == 1 || stLine.startsWith("TRL")) continue;
+	            
+	            if (stLine.contains("----------------------------")) break;
+	            
+	            int sr_no = 1;
+	            for (String element : elements) {
+	                String[] data = element.split("\\|");
+	                String fieldName = data[0];
+	                int fieldStart = Integer.parseInt(data[1]) - 1;
+	                int fieldEnd = Integer.parseInt(data[2]);
+	                
+	                String fieldValue = extractField(stLine, fieldStart, fieldEnd);
+
+	                if (fieldName.equals("AMOUNT")) {
+	                    fieldValue = formatAmount(fieldValue);
+	                    if (fieldValue.equals("INVALID")) {
+	                        retOutput.put("result", false);
+	                        retOutput.put("msg", "Issue at Line Number " + lineNumber + " - Invalid AMOUNT");
+	                        return retOutput;
+	                    }
+	                } else if (fieldName.equals("CARD_NUMBER")) {
+	                    fieldValue = maskCardNumber(fieldValue);
+	                }
+	                
+	                ps.setString(sr_no++, fieldValue);
+	            }
+	            
+	            // Additional setup fields
+	            ps.setString(sr_no++, setupBean.getFileDate());
+	            ps.setString(sr_no++, setupBean.getCreatedBy());
+	            ps.setString(sr_no++, setupBean.getStSubCategory());
+	            ps.setString(sr_no++, setupBean.getP_FILE_NAME());
+
+	            ps.addBatch();
+	            batchNumber++;
+
+	            if (batchNumber == 5000) {
+	                ps.executeBatch();
+	                con.commit();
+	                batchNumber = 0;
+	                batchExecuted = true;
+	            }
+	        }
+
+	        if (batchNumber > 0) {
+	            ps.executeBatch();
+	            con.commit();
+	        }
+	        
+	        retOutput.put("result", true);
+	        retOutput.put("msg", "Total Count of switch is " + lineNumber);
+	        return retOutput;
+	    } catch (Exception e) {
+	        try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+	        retOutput.put("result", false);
+	        retOutput.put("msg", "Issue at Line Number " + lineNumber + " - " + e.getMessage());
+	        return retOutput;
+	    }
+	}
+
+	private String extractField(String line, int start, int end) {
+	    return (start < line.length()) ? line.substring(start, Math.min(end, line.length())).trim() : "";
+	}
+
+	private String formatAmount(String amount) {
+	    if (amount == null || amount.trim().isEmpty()) {
+	        System.err.println("Warning: Empty AMOUNT field detected. Setting to 0.00");
+	        return "0.00";
+	    }
+
+	    amount = amount.trim().replaceAll("[^0-9.]", ""); // Remove non-numeric characters
+
+	    try {
+	        double amt = Double.parseDouble(amount) / 100;
+	        return String.format("%.2f", amt);
+	    } catch (NumberFormatException e) {
+	        System.err.println("Error: Invalid AMOUNT Field at Line. Raw Value: [" + amount + "]");
+	        return "0.00"; // Instead of terminating, return 0.00
+	    }
+	}
+
+	private String maskCardNumber(String cardNumber) {
+	    if (cardNumber.length() >= 10) {
+	        return cardNumber.substring(0, 6) + "xxxxxx" + cardNumber.substring(cardNumber.length() - 4);
+	    }
+	    return cardNumber;
+	}
+
+	private List<String> getFieldMappings() {
+	    List<String> mappings = new ArrayList<>();
+	    mappings.add("DMS_SMS|1|10");
+	    mappings.add("APPROVAL|11|20");
+	    mappings.add("CARD_NUMBER|21|40");
+	    mappings.add("RRN|41|55");
+	    mappings.add("TRAN_DATE|56|63");
+	    mappings.add("TRAN_TIME|64|69");
+	    mappings.add("MERCHANT_NAME|70|90");
+	    mappings.add("AMOUNT|91|102");
+	    mappings.add("TRAN_CODE|103|110");
+	    return mappings;
 	}
 
 	public HashMap<String, Object> uploadDomesticData(CompareSetupBean setupBean, Connection con, MultipartFile file,

@@ -29,6 +29,7 @@ import com.recon.dao.ICompareConfigDao;
 import com.recon.model.CompareBean;
 import com.recon.model.CompareSetupBean;
 import com.recon.model.FileColumnDtls;
+import com.recon.model.FileUploadView;
 import com.recon.model.LoginBean;
 import com.recon.model.ManualCompareBean;
 import com.recon.model.ManualFileColumnDtls;
@@ -189,6 +190,32 @@ public class CompareConfigController {
 		}
 
 	}
+	
+	@RequestMapping(value = "viewUploadFile", method = RequestMethod.POST)
+	  
+	  public @ResponseBody List<FileUploadView> viewUploadFile( HttpServletRequest request, HttpSession
+	  httpSession, Model model, ModelAndView modelAndView, RedirectAttributes
+	  redirectAttributes) throws Exception {
+	  logger.info("***** CompareConfigController.ClassifyFile Start ****"); 
+		 String fileDate=request.getParameter("fileDate"); 
+	      return icompareConfigService.viewFileUploadList(fileDate);
+	 
+	  
+	  
+	  }
+@RequestMapping(value = "viewCbsUploadFile", method = RequestMethod.POST)
+
+public @ResponseBody List<FileUploadView> viewCbsUploadFile( HttpServletRequest request, HttpSession
+httpSession, Model model, ModelAndView modelAndView, RedirectAttributes
+redirectAttributes) throws Exception {
+logger.info("***** CompareConfigController.ClassifyFile Start ****"); 
+	 String fileDate=request.getParameter("fileDate"); 
+	 System.out.println("fileDate="+fileDate);
+    return icompareConfigService.viewCbsFileUploadList(fileDate);
+
+
+
+}
 
 	@RequestMapping(value = "CbsDatafetch", method = RequestMethod.GET)
 	public ModelAndView CbsDatafetch(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
@@ -222,6 +249,110 @@ public class CompareConfigController {
 
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "DeleteUplodedFiles", method = RequestMethod.POST)
+
+	public ResponseEntity DeleteUplodedFiles(@ModelAttribute("CompareSetupBean") CompareSetupBean setupBean,
+			HttpServletRequest request, // @RequestParam("dataFile1") MultipartFile file,
+			 String filename, String excelType, String fileType,
+			String category, String stSubCategory, String fileDate, HttpSession httpSession, Model model,
+			ModelAndView modelAndView, RedirectAttributes redirectAttributes) throws Exception {
+
+		
+		logger.info("***** CompareConfigController.UploadFile Start ****");
+		HashMap<String, Object> output = new HashMap<String, Object>();
+		
+		boolean result=false;
+		String date = setupBean.getFileDate();
+		int fileid = setupBean.getInFileId();
+		System.out.println(fileid);
+
+		setupBean.setFileType(fileType);
+		setupBean.setExcelType(excelType);
+		setupBean.setFilename(filename);
+		setupBean.setCategory(category);
+		if (setupBean.getFilename().equalsIgnoreCase("REV_REPORT"))
+			setupBean.setStSubCategory("ACQUIRER");
+		else
+			setupBean.setStSubCategory(stSubCategory);
+		setupBean.setFileDate(fileDate);
+		setupBean.setCreatedBy(((LoginBean) httpSession.getAttribute("loginBean")).getUser_id());
+
+		
+		logger.info(date);
+		logger.info(fileid);
+
+		// Check File already uploaded or not
+
+		// icompareConfigService.chkFileupload(setupBean);
+		// icompareConfigService.chkFileupload(setupBean);
+		String chkFlag = "";
+
+		if (setupBean.getFileType().equalsIgnoreCase("Manual")) {
+
+			chkFlag = "ManUpload_FLAG";
+
+		} else {
+
+			chkFlag = "Upload_FLAG";
+
+		}
+		logger.info("chkFlag==" + chkFlag);
+
+		
+			
+			
+		/*
+		 * if (icompareConfigService.chkUploadFlag(chkFlag,
+		 * setupBean).equalsIgnoreCase("N") &&
+		 * (!setupBean.getFilename().equals("REV_REPORT"))) {
+		 */
+								
+
+									try {
+
+										result=icompareConfigService.DeleteUploadedFiles(setupBean);
+										//output = icompareConfigService.uploadFile(setupBean, file); // here
+									 return new ResponseEntity(
+											  "File Deleted Successfuly!!",
+											  HttpStatus.OK);
+										
+							
+									} catch (Exception e) {
+										demo.logSQLException(e, "CompareConfigController.UploadFile");
+										logger.error(" error in CompareConfigController.UploadFile",
+												new Exception("CompareConfigController.UploadFile", e));
+										redirectAttributes.addFlashAttribute(ERROR_MSG,
+												"error occured while uploading file");
+										return new ResponseEntity(ERROR_MSG, HttpStatus.OK);
+									}
+								
+							} 
+							
+							/*
+							 * else if ((setupBean.getFilename().equals("REV_REPORT"))) { output =
+							 * icompareConfigService.uploadREV_File(setupBean, file); if (output != null &&
+							 * (Boolean) output.get("result")) { String count =
+							 * output.get("msg").toString(); // int recordcount =
+							 * icompareConfigService.getREVrecordcount(setupBean);
+							 * logger.info("recordcount==" + count); return new ResponseEntity(
+							 * "File Uploaded Successfuly!! \n Total Record Count : " + count + "",
+							 * HttpStatus.OK);
+							 * 
+							 * } else { logger.info("msg is " + output.get("msg").toString()); return new
+							 * ResponseEntity(output.get("msg").toString(), HttpStatus.OK); } }
+							 */
+
+						
+					
+				
+			
+		
+	//}
+	
+	
+	
 	@RequestMapping(value = "datadelete", method = RequestMethod.GET)
 	public ModelAndView Datadelete(Model model, CompareSetupBean compareSetupBean, ModelAndView modelAndView,
 			HttpSession httpSession, HttpServletRequest request) throws Exception {
