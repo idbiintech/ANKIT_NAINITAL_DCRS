@@ -507,6 +507,11 @@ public class RupaySettlementServiceImpl implements RupaySettlementService {
 	public Boolean validateSettlementTTUM(RupayUploadBean beanObj) {
 		return rupayDao.validateSettlementTTUM(beanObj);
 	}
+	
+	public Boolean SettlementTTUMRollback(RupayUploadBean beanObj) {
+		return rupayDao.SettlementTTUMRollback(beanObj);
+	}
+
 
 	// validatePresentmentUpload
 

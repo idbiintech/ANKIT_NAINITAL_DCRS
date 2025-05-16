@@ -427,7 +427,8 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 	public HashMap<String, Object> validateAdjustmentTTUM(String fileDate, String adjType) {
 		HashMap<String, Object> output = new HashMap<String, Object>();
 		String fdate = genetalUtil.DateFunction(fileDate);
-		System.out.println("fdate is"+ fdate);
+		System.out.println("fdate is"+ fdate.replaceAll("-20", "-"));
+		fdate = fdate.replaceAll("-20", "-");
 		int adjTTUMCount = 0;
 		try {
 			System.out.println("inside the 1st validation");
@@ -441,11 +442,11 @@ public class RupayAdjustntFileUpServiceImpl extends JdbcDaoSupport implements Ru
 			if (uploadedCount > 0 && rawCount > 0) {
 				// 2. Adjustment TTUM is already processed
 				if (!adjType.equalsIgnoreCase("FEE")) {
-					String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = ? and adjtype != 'FEE'";
+					String checKAdjTTUM = "select count(1) from rupay_adjustment_ttum where filedate = ? and SUBCATEGORY != 'FEE'";
 					adjTTUMCount = getJdbcTemplate().queryForObject(checKAdjTTUM, new Object[] { fdate },
 							Integer.class);
 				} else {
-					String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = ? and adjtype = ?";
+					String checKAdjTTUM = "select count(1) from rupay_adjustment_Ttum where filedate = ? and SUBCATEGORY = 'ADJUSTMENT'";
 					adjTTUMCount = getJdbcTemplate().queryForObject(checKAdjTTUM, new Object[] { fdate, adjType },
 							Integer.class);
 				}

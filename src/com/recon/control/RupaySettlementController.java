@@ -721,6 +721,29 @@ public class RupaySettlementController {
 		}
 
 	}
+	
+	//int12725
+	@RequestMapping(value = "RupaySettlementTTUMRollback", method = RequestMethod.POST)
+	@ResponseBody
+	public String SettlementTTUMRollback(@ModelAttribute("mastercardUploadBean") RupayUploadBean beanObj,
+			HttpServletRequest request, HttpSession httpSession) throws Exception {
+		logger.info("***** RupaySettlementController.SettlementTTUMRollback post Start ****");
+		logger.info("SettlementTTUMRollback POST");
+		String Createdby = ((LoginBean) httpSession.getAttribute("loginBean")).getUser_id();
+		logger.info("Created by is " + Createdby);
+		beanObj.setCreatedBy(Createdby);
+
+		Boolean checkFlag = rupaySettlementService.SettlementTTUMRollback(beanObj);
+
+		if (checkFlag) {
+			return "Settlementttum Rollback is Completed Successfully!";
+		} 
+		else {
+			return "Issue while processing Settlementttum Rollback";
+		}
+
+
+	}
 
 	@RequestMapping(value = "DownloadRupaySettlementTTUM", method = RequestMethod.POST)
 	@ResponseBody

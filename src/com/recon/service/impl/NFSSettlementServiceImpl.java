@@ -940,18 +940,28 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 
 				String checkAdjProcess = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? and adjtype = ?";
 				int processCount = 0;
+				
+				logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess);
+
 				if (beanObj.getAdjType().equalsIgnoreCase("PENALTY") || beanObj.getAdjType().equalsIgnoreCase("FEE")) {
 					checkAdjProcess = "SELECT COUNT(*) FROM NFS_ADJUSTMENT_TTUM WHERE FILEDATE = ? AND SUBCATEGORY = ? "
 							+ "AND Upper(adjtype) like '%" + beanObj.getAdjType() + "%'";
+					
+					logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess);
+
 					processCount = getJdbcTemplate().queryForObject(checkAdjProcess, new Object[] {
 							beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory() },
 							Integer.class);
 				} else {
+					logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess);
+
 					processCount = getJdbcTemplate().queryForObject(checkAdjProcess,
 							new Object[] { beanObj.getDatepicker().toString().toUpperCase(), beanObj.getStSubCategory(),
 									beanObj.getAdjType() },
 							Integer.class);
 				}
+
+				logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess +" processCount "+ processCount);
 
 				if (processCount > 0) {
 					result.put("result", false);
@@ -968,6 +978,7 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 					 */
 					String checkDataPresent = "select count(*) FROM NFS_ADJUSTMENT_RAWDATA  where filedate = ? AND ADJTYPE in ('"
 							+ beanObj.getAdjType() + "') ";
+					logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess);
 
 					if (beanObj.getAdjType().equalsIgnoreCase("PENALTY")
 							|| beanObj.getAdjType().equalsIgnoreCase("FEE")) {
@@ -979,12 +990,17 @@ public class NFSSettlementServiceImpl extends JdbcDaoSupport implements NFSSettl
 
 						}
 					}
+					
+					
+					
 					// + "and cycle = '"+beanObj.getCycle()+"C'";
 					if (beanObj.getStSubCategory().equalsIgnoreCase("ISSUER")) {
 						checkDataPresent = checkDataPresent + " AND ACQ != 'NTB'";
 					} else {
 						checkDataPresent = checkDataPresent + " AND ACQ = 'NTB'";
 					}
+					logger.info("NFS_ADJUSTMENT_TTUM_processs" + checkAdjProcess);
+
 					int getcount = getJdbcTemplate().queryForObject(checkDataPresent,
 							new Object[] { beanObj.getDatepicker().toString().toUpperCase() }, Integer.class);
 					if (getcount > 0) {

@@ -136,7 +136,7 @@ public class SettlementRollbackDaoImpl extends JdbcDaoSupport implements Settlem
 		try
 		{
 			//1. first check whether voucher is processed if yes then throw error
-			query = "select count(1) from nfs_settlement_ttum where filedate = to_date(?,'dd/mm/yyyy')";
+			query = "select count(1) from NFS_SETTLEMENT_DATA_TTUM  where filedate = to_date(?,'dd/mm/yyyy')";
 			int vou_count = getJdbcTemplate().queryForObject(query, new Object[]{beanObj.getDatepicker()},Integer.class);
 			
 			if(vou_count>0)
@@ -165,7 +165,7 @@ public class SettlementRollbackDaoImpl extends JdbcDaoSupport implements Settlem
 	{
 		try
 		{
-				String query1 = "delete from nfs_settlement_ttum where filedate = to_date('"+
+				String query1 = "delete from NFS_SETTLEMENT_DATA_TTUM  where filedate = to_date('"+
 							beanObj.getDatepicker()+"','dd/mm/yyyy')";
 				getJdbcTemplate().execute(query1);
 			

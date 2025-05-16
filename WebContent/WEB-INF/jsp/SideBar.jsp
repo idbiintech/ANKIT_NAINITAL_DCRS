@@ -62,7 +62,7 @@
                 <i class="fa fa-file-o"></i> <span>View Status</span> <!-- <small class="label pull-right bg-green">new</small> -->
               </a>
             </li>
-            <!-- <li class="treeview">
+            <li class="treeview">
               <a href="#">
                 <i class="fa fa-dashboard"></i> <span>Administrator</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
@@ -70,7 +70,7 @@
                 <li><a href="#"><i class="fa fa-circle-o"></i> User Manager</a></li>
                 <li><a href="#"><i class="fa fa-circle-o"></i> Role Manager</a></li>
               </ul>
-            </li>  -->
+            </li>  
 
 			
             

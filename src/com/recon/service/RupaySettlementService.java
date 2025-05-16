@@ -40,6 +40,9 @@ public interface RupaySettlementService {
 
 	public Boolean validateSettlementTTUM(RupayUploadBean beanObj);
 	
+	public Boolean SettlementTTUMRollback(RupayUploadBean beanObj);
+
+	
 	public Boolean validatePresentmentUpload(RupayUploadBean beanObj , MultipartFile file);
 	
 	public Boolean validateNfsIssUpload(CompareSetupBean setupBean, MultipartFile file);

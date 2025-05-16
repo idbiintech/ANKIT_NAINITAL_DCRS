@@ -139,6 +139,55 @@ function processSettlement(){
 			});
 		}
 	}
+	
+	//int1275
+	function RollbackSettlement(){
+
+  
+	debugger;
+	var frm = $('#TTUMform');
+/*	var subcategory = document.getElementById("subcategory").value;*/
+	var fileDate = document.getElementById("datepicker").value;
+	/* var cycle = document.getElementById("cycle").value; */
+
+	if(ValidateData())  {
+		var oMyForm = new FormData();
+		//oMyForm.append('subcategory', subcategory);
+		oMyForm.append('fileDate',fileDate);
+		//oMyForm.append('cycle',cycle);
+		$.ajax({
+			type : "POST",
+			url : "RupaySettlementTTUMRollback.do",
+			data :oMyForm ,
+
+			processData : false,
+			contentType : false,
+			beforeSend : function() {
+				showLoader();
+			},
+			success : function(response) {
+				debugger;
+				hideLoader();
+
+				alert (response); 
+				//document.getElementById("subcategory").value="-";
+				document.getElementById("datepicker").value="";
+				//document.getElementById("cycle").value = "0";
+			},
+
+			error : function(err) {
+				hideLoader();
+				alert("Error Occurred");
+			},
+			complete : function(data) {
+
+				hideLoader();
+
+			},
+		});
+	}
+}
+
 
 function Rectify()
 	{

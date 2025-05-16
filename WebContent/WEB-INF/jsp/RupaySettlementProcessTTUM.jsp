@@ -114,6 +114,7 @@ function noBack() { window.history.forward(); }
 					<div class="box-footer" style="text-align: center">
 						<a onclick="processSettlement();" class="btn btn-primary">Process</a>
 						<a onclick="DownloadSettlement();" class="btn btn-info">Download</a>
+						<a onclick="RollbackSettlement();" class="btn btn-primary">Rupay Settlement TTUM ROLLBACK</a>
 						<!-- <a class="btn btn-success" onclick="Rectify();">Rectify Settlement </a> -->
 					</div>
 </form:form>

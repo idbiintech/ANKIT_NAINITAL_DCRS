@@ -1535,6 +1535,21 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 			return false;
 		}
 	}
+    //int12725
+	
+	 public Boolean SettlementTTUMRollback(RupayUploadBean beanObj) {
+	    try {
+	        String deleteSettlementTTUM = "DELETE FROM RUPAY_SETTLEMENT_DATA_TTUM WHERE FILEDATE = TO_DATE(?,'dd/mm/yyyy')";
+	        int rowsAffected = getJdbcTemplate().update(deleteSettlementTTUM, beanObj.getFileDate());
+
+	        // If rows were deleted, return true, otherwise false
+	        return rowsAffected > 0;
+
+	    } catch (Exception e) {
+	        logger.info("Exception in SettlementTTUMRollback " + e);
+	        return false;
+	    }
+	}
 
 	// validatePresentmentUpload
 
@@ -1590,7 +1605,7 @@ public class RupaySettelementDaoImpl extends JdbcDaoSupport implements RupaySett
 
 	public Boolean validateFileUpload(RupayUploadBean beanObj) {
 		try {
-			String checkSettlementTTUM = "Select count(1) from RUPAY_DSCR_RAWDATA WHERE FILEDATE = to_date(?,'dd/mm/yyyy') ";
+			String checkSettlementTTUM = "Select count(1) from RUPAY_DSCR_RAWDATA WHERE FILEDATE = to_date(?,'dd/mm/yyyy')";
 			int getCountTTUM = getJdbcTemplate().queryForObject(checkSettlementTTUM,
 					new Object[] { beanObj.getFileDate() }, Integer.class);
 

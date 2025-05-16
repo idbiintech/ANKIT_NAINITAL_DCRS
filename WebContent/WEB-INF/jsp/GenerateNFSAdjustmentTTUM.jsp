@@ -19,7 +19,7 @@ response.setHeader("X-Frame-Options","deny");
 $(document).ready(function() {
 	debugger;
 	//$('#dollar_field').hide();
-$("#dailypicker").datepicker({dateFormat:"dd-M-yy", maxDate:0});
+$("#dailypicker").datepicker({dateFormat:"dd-M-yyyy", maxDate:0});
 
 
 
